@@ -3,8 +3,11 @@ import { useCarrito } from '../context/CarritoContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/Carrito.css';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { useNavigate } from 'react-router-dom';
 
 function Carrito() {
+
+  const navigate = useNavigate()
   const {
     carrito,
     productosDisponibles,
@@ -15,6 +18,7 @@ function Carrito() {
     calcularTotal,
     mostrarMensaje
   } = useCarrito();
+  const [btnpago, setBtnpago] = useState(false)
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [datosCompra, setDatosCompra] = useState({
     nombre: '',
@@ -34,7 +38,7 @@ function Carrito() {
     }));
   };
 
-  var btn_pa_pagar = false
+
   const confirmarPedido = () => {
     
     if (!datosCompra.nombre.trim()) {
@@ -54,16 +58,38 @@ function Carrito() {
       return;
     }
 
-    btn_pa_pagar = true
+    setBtnpago(true)
     
     const pedido = {
       productos: carrito,
       total: calcularTotal(),
-      cliente: datosCompra,
-      fecha: new Date().toISOString()
+      cliente_despachar: datosCompra,
+      fecha_despacho: new Date().toISOString()
     };
+    localStorage.setItem("temporal_info", JSON.stringify(pedido))
 
   };
+
+  const redirigir = (details) => {
+  try {
+    localStorage.setItem("temporal_info_quien_pago", JSON.stringify(details));
+  } catch (e) {
+    console.error("Error guardando info de pago:", e);
+    localStorage.setItem("temporal_info_quien_pago", "");
+  }
+  navigate("/compra-exitosa");
+  vaciarCarrito();
+};
+
+const redirigirFallo = (error) => {
+  try {
+    localStorage.setItem("error_compra", JSON.stringify(error));
+  } catch (e) {
+    console.error("Error guardando info de fallo:", e);
+    localStorage.setItem("error_compra", "");
+  }
+  navigate("/compra-erronea");
+};
 
   const estilos = {
     body: {
@@ -417,39 +443,48 @@ function Carrito() {
 
               <div>
                 <button style={estilos.btnConfirmar} onClick={confirmarPedido}>
-                  Confirmar
+                  Continuar al pago
                 </button>
               
+                {btnpago && 
                 
                 <PayPalScriptProvider options={initialOptions}>
-                <PayPalButtons
-                style={{
-                  layout: 'vertical', 
-                  color: 'gold',   
-                  shape: 'rect',    
-                  label: 'pay', 
-                  tagline: false     
-                }}
-                forceReRender={[carrito, calcularTotal()]} // opcional si necesitas forzar re-render
-                createOrder={(data, actions) => {
-                  return actions.order.create({
-                    purchase_units: [
-                      {
-                        amount: {
-                          value: calcularTotal().toString(), // total como string
-                        },
-                      },
-                    ],
-                  });
-                }}
-                onApprove={(data, actions) => {
-                  return actions.order.capture().then((details) => {
-                    alert("Pago completado");
-                    confirmarPedido(); // Llamar a tu función de confirmación
-                  });
-                }}
-              />
-            </PayPalScriptProvider>
+                  <PayPalButtons
+                    style={{
+                      layout: 'vertical', 
+                      color: 'gold',   
+                      shape: 'rect',    
+                      label: 'pay', 
+                      tagline: false     
+                    }}
+                    forceReRender={[carrito, calcularTotal()]} // opcional si necesitas forzar re-render
+                    createOrder={(data, actions) => {
+                      return actions.order.create({
+                        purchase_units: [
+                          {
+                            amount: {
+                              value: calcularTotal().toString(), // total como string
+                            },
+                          },
+                        ],
+                      });
+                    }}
+                    onCancel={(data) =>{
+                      alert("Se ha cancelado el pago")
+                      navigate("/carrito")
+                    }}
+                    onError={(error) => {
+                      redirigirFallo(error)
+                    }}
+                    onApprove={(data, actions) => {
+                      return actions.order.capture().then((details) => {
+                        console.log(details)
+                        redirigir(details); // Llamar a tu función de confirmación
+                      });
+                    }}
+                  />
+                </PayPalScriptProvider>
+                }
                 
 
                 <button 

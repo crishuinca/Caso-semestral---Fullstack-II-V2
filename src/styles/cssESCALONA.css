@@ -1,0 +1,226 @@
+/*
+COLORES PREDETERMINADOS DE LA PAGINA:
+
+fff5e1  |  Color de fondo
+ffefcf  |  Color para tarjetas
+FFC0CB  |  Elementos rosas
+8B4513  |  Elementos cafes
+5D4037  |  Color de letra primaria
+*/
+
+/*BODY-------------------------------------------*/
+.cuerpo_pms{
+    background-color: #fff5e1;
+    color:            #5D4037;
+
+    padding: 0;
+    margin:  0;
+
+    font-family: sans-serif;
+
+    height: 100%;
+}
+/*CARDS------------------------------------------*/
+.base_tarjeta{
+    background-color: #ffefcf;
+    color:            #5D4037;
+
+    border: 1px solid #ff2600;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(60, 23, 0, 0.243);
+
+    padding: 1rem;
+    margin:  2rem;
+
+    font-family: sans-serif;
+}
+/*BOTONES----------------------------------------*/
+
+/*Botones solidos--------------------------------*/
+.btn-solido-chocolate{
+    background-color: #8B4513;
+    color: #ffffff;
+
+    border: 1px solid #8B4513;
+    border-radius: 5px;
+
+    padding: 5px 15px 5px 15px;
+
+    font-family: sans-serif;
+    font-weight: normal;
+
+    transition: all 0.2s ease-in-out;
+}.btn-solido-chocolate:hover{
+    background-color: #70370f;
+    border: 1px solid #70370f;
+}
+
+.btn-solido-frutilla{
+    background-color: #FFC0CB;
+    color: #8B4513;
+
+    border: 1px solid #FFC0CB;
+    border-radius: 5px;
+
+    padding: 5px 15px 5px 15px;
+
+    font-family: sans-serif;
+    font-weight: normal;
+
+    transition: all 0.2s ease-in-out;
+}.btn-solido-frutilla:hover{
+    background-color: #fa8b9d;
+    color: #ffffff;
+    border: 1px solid #f18b9c;
+}
+
+/*Botones delineado------------------------------*/
+.btn-delineado-chocolate{
+    background-color: #ffefcf;
+    color: #8B4513;
+
+    border: 1px solid #8B4513;
+    border-radius: 5px;
+
+    padding: 5px 15px 5px 15px;
+
+    font-family: sans-serif;
+    font-weight: normal;
+
+    transition: all 0.2s ease-in-out;
+}.btn-delineado-chocolate:hover{
+    background-color: #8B4513;
+    border: 1px solid #8B4513;
+    color: #ffffff;
+}
+
+.btn-delineado-frutilla{
+    background-color: #ffefcf;
+    color: #ff798f;
+
+    border: 1px solid #ff798f;
+    border-radius: 5px;
+
+    padding: 5px 15px 5px 15px;
+
+    font-family: sans-serif;
+    font-weight: normal;
+
+    transition: all 0.2s ease-in-out;
+}.btn-delineado-frutilla:hover{
+    background-color: #FFC0CB;
+    border: 1px solid #FFC0CB;
+    color: #8B4513;
+}
+
+/*Botones cambio---------------------------------*/
+.btn-cambio-chocolate{
+    background-color: #8B4513;
+    color: #ffffff;
+    
+    border: 1px solid #8B4513;
+    border-radius: 5px;
+
+    padding: 5px 15px 5px 15px;
+
+    font-family: sans-serif;
+    font-weight: normal;
+
+    transition: all 0.2s ease-in-out;
+}.btn-cambio-chocolate:hover{
+    background-color: #FFC0CB;
+    border: 1px solid #FFC0CB;
+    color: #8B4513;
+}
+
+.btn-cambio-frutilla{
+    background-color: #FFC0CB;
+    color: #5D4037;
+    
+    border: 1px solid #FFC0CB;
+    border-radius: 5px;
+
+    padding: 5px 15px 5px 15px;
+
+    font-family: sans-serif;
+    font-weight: normal;
+
+    transition: all 0.2s ease-in-out;
+}.btn-cambio-frutilla:hover{
+    background-color: #8B4513;
+    border: 1px solid #8B4513;
+    color: #ffffff;
+}
+
+/*INPUTS-----------------------------------------*/
+.input-chocolate{
+    background-color: #fff5e1;
+    color: #5D4037;
+    border: 1px solid #8B4513;
+    border-radius: 3px;
+
+    padding: 1px 5px 1px 5px;
+    outline: none;
+    font-family: sans-serif;
+}.input-chocolate:focus{
+    outline: auto;
+    outline-color: #8B4513;
+}.input-chocolate:disabled{
+    outline: none;
+    background-color: rgba(255, 227, 171, 0.5);
+    border-color: rgba(139, 69, 19, 0.5);
+}
+
+.input-frutilla{
+    background-color: #fff5e1;
+    color: #5D4037;
+    border: 1px solid #FFC0CB;
+    border-radius: 3px;
+
+    padding: 1px 5px 1px 5px;
+    outline: none;
+    font-family: sans-serif;
+}.input-frutilla:focus{
+    outline: auto;
+    outline-color: #FFC0CB;
+}.input-frutilla:disabled{
+    outline: none;
+    background-color: rgba(255, 227, 171, 0.5);
+    border-color: rgba(255, 194, 204, 0.5);
+}
+
+.input-normal {
+    background-color: #fff5e1;
+    color: #5D4037;
+    border: 1px solid #ff2600;
+    border-radius: 3px;
+
+    padding: 1px 5px 1px 5px;
+    outline: none;
+    font-family: sans-serif;
+}.input-normal:focus {
+    outline: auto;
+    outline-color: #ff2600;
+}.input-normal:disabled{
+    outline: none;
+    background-color: rgba(255, 227, 171, 0.5);
+    border-color: rgba(255, 38, 0, 0.5);
+}
+
+.seleccion{
+    height: 28px;
+    width: fit-content;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+/*todos tienen focus y disabled*/
+.display-flex-basico{
+    display: flex;
+    justify-content: start;
+    column-gap: 5px;
+}.altura-maxima{
+    margin-top: 19rem;
+    height: 100%;
+}
