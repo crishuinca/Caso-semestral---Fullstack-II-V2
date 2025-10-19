@@ -1,0 +1,105 @@
+/* Navbar.css */
+
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand {
+  color: #8B4513;
+  font-family: 'Pacifico', cursive;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.navbar-brand:hover {
+  color: #A0522D;
+  text-decoration: none;
+}
+
+.navbar-nav .nav-link {
+  color: #8B4513;
+  font-weight: 500;
+  margin: 0 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #D2691E;
+}
+
+.navbar-nav .nav-link.active {
+  color: #D2691E;
+  font-weight: bold;
+}
+
+.cart-button {
+  background-color: #FFC0CB;
+  color: #8B4513;
+  border: 2px solid #8B4513;
+  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.cart-button:hover {
+  background-color: #8B4513;
+  color: white;
+}
+
+.cart-badge {
+  background-color: #D2691E;
+  color: white;
+  border-radius: 50%;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}
+
+.auth-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.login-link {
+  color: #8B4513;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-link:hover {
+  color: #D2691E;
+  text-decoration: none;
+}
+
+.logout-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+}
+
+.user-greeting {
+  color: #8B4513;
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
