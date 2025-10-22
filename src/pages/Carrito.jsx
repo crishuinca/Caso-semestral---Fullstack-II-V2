@@ -2,6 +2,7 @@
 import { useCarrito } from '../context/CarritoContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/Carrito.css';
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 function Carrito() {
   const {
@@ -33,6 +34,7 @@ function Carrito() {
     }));
   };
 
+  var btn_pa_pagar = false
   const confirmarPedido = () => {
     
     if (!datosCompra.nombre.trim()) {
@@ -52,6 +54,8 @@ function Carrito() {
       return;
     }
 
+    btn_pa_pagar = true
+    
     const pedido = {
       productos: carrito,
       total: calcularTotal(),
@@ -59,20 +63,6 @@ function Carrito() {
       fecha: new Date().toISOString()
     };
 
-    console.log('Pedido confirmado:', pedido);
-    mostrarMensaje('¡Pedido confirmado exitosamente!', 'ok');
-
-    vaciarCarrito();
-    setMostrarConfirmacion(false);
-    setDatosCompra({
-      nombre: '',
-      rut: '',
-      direccion: '',
-      dia: '',
-      mes: '',
-      ano: '',
-      tipoEntrega: 'retiro'
-    });
   };
 
   const estilos = {
@@ -130,7 +120,9 @@ function Carrito() {
       fontFamily: 'sans-serif',
       color: '#5D4037',
       maxWidth: '780px',
-      width: '100%'
+      width: '100%',
+      maxHeight: "800px",
+      overflow: "auto"
     },
     overlay: {
       position: 'fixed',
@@ -142,6 +134,13 @@ function Carrito() {
       zIndex: 1040
     }
   };
+
+  const initialOptions = {
+        clientId: "AR36SqRE30K24Cv_7MIVRq0qBamsHC1vhgU_hiXCwRNoGehpT1hzCrSTgTjWEgNFFssFeZr4SlkqlFYN",
+        currency: "USD",
+        intent: "capture",
+        style: ""
+    };
 
   return (
     <div style={estilos.body}>
@@ -289,7 +288,7 @@ function Carrito() {
         {mostrarConfirmacion && (
           <>
             <div style={estilos.overlay} onClick={() => setMostrarConfirmacion(false)}></div>
-            <div style={estilos.modalConfirmar}>
+            <div className="div_confirmacion_pago" style={estilos.modalConfirmar}>
               <div className="row g-0" style={{ columnGap: '15px' }}>
                 <div className="col-md-6 col-sm-12">
                   <p>Nombre del comprador</p>
@@ -420,6 +419,39 @@ function Carrito() {
                 <button style={estilos.btnConfirmar} onClick={confirmarPedido}>
                   Confirmar
                 </button>
+              
+                
+                <PayPalScriptProvider options={initialOptions}>
+                <PayPalButtons
+                style={{
+                  layout: 'vertical', 
+                  color: 'gold',   
+                  shape: 'rect',    
+                  label: 'pay', 
+                  tagline: false     
+                }}
+                forceReRender={[carrito, calcularTotal()]} // opcional si necesitas forzar re-render
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: {
+                          value: calcularTotal().toString(), // total como string
+                        },
+                      },
+                    ],
+                  });
+                }}
+                onApprove={(data, actions) => {
+                  return actions.order.capture().then((details) => {
+                    alert("Pago completado");
+                    confirmarPedido(); // Llamar a tu función de confirmación
+                  });
+                }}
+              />
+            </PayPalScriptProvider>
+                
+
                 <button 
                   style={estilos.btnConfirmar} 
                   onClick={() => setMostrarConfirmacion(false)}
