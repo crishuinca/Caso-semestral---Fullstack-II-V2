@@ -5,7 +5,7 @@ import '../styles/AdminPanel.css';
 
 function AdminPanel() {
   const navigate = useNavigate();
-  const { productosDisponibles } = useCarrito();
+  const { productosDisponibles, productosStock } = useCarrito();
   const [vistaActiva, setVistaActiva] = useState('tablero');
   const [productos, setProductos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -104,7 +104,7 @@ function AdminPanel() {
         stock_critico: producto.stock_critico
       }));
     } else {
-      productosFinales = productosDisponibles.map(producto => ({
+      productosFinales = productosStock.map(producto => ({
         id: producto.prod_codigo,
         codigo: producto.prod_codigo,
         nombre: producto.nombre,
@@ -145,7 +145,7 @@ function AdminPanel() {
     return () => {
       window.removeEventListener('productosActualizados', handleProductosActualizados);
     };
-  }, [navigate, productosDisponibles]);
+  }, [navigate, productosDisponibles, productosStock]);
 
   const alternarMenu = () => {
     setMenuColapsado(!menuColapsado);

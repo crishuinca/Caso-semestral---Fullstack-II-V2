@@ -373,9 +373,23 @@ export const CarritoProvider = ({ children }) => {
   };
 
   const vaciarCarrito = () => {
+    // Restaurar el stock de todos los productos que estaban en el carrito
+    const nuevosProductos = productosStock.map(p => {
+      const itemEnCarrito = carrito.find(item => item.codigo === p.prod_codigo);
+      return itemEnCarrito
+        ? { ...p, stock: p.stock + itemEnCarrito.cantidad }
+        : p;
+    });
+    
+    setProductosStock(nuevosProductos);
+    localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+    
     setCarrito([]);
     localStorage.removeItem('carritoCompras');
     mostrarMensaje('Carrito vaciado', 'info');
+    
+    // Disparar evento para actualizar la UI
+    window.dispatchEvent(new Event('productosActualizados'));
   };
 
   const calcularTotal = () => {
@@ -392,6 +406,7 @@ export const CarritoProvider = ({ children }) => {
   const value = {
     carrito,
     productosDisponibles,
+    productosStock,
     agregarProducto,
     eliminarProducto,
     actualizarCantidad,

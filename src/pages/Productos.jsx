@@ -6,7 +6,7 @@ import FiltrosProductos from '../components/productos/FiltrosProductos';
 import ListadoProductos from '../components/productos/ListadoProductos';
 
 function Productos() {
-  const { productosDisponibles } = useCarrito();
+  const { productosDisponibles, productosStock } = useCarrito();
   const [productos, setProductos] = useState([]);
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
@@ -28,7 +28,7 @@ function Productos() {
         prod_stock_critico: producto.stock_critico
       }));
     } else {
-      productosFinales = productosDisponibles.map(producto => ({
+      productosFinales = productosStock.map(producto => ({
         prod_codigo: producto.prod_codigo,
         prod_nombre: producto.nombre,
         prod_desc: producto.descripcion || 'Sin descripción',
@@ -42,7 +42,7 @@ function Productos() {
     
     setProductos(productosFinales);
     setFilteredProductos(productosFinales);
-  }, [productosDisponibles]);
+  }, [productosDisponibles, productosStock]);
 
   useEffect(() => {
     const handleProductosActualizados = () => {
