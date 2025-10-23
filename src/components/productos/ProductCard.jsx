@@ -8,8 +8,10 @@ function ProductCard({ producto }) {
 
   useEffect(() => {
     const actualizarStock = () => {
+      // Ahora que están sincronizados, podemos usar productosStock directamente
       const productosStock = JSON.parse(localStorage.getItem('productosStock')) || [];
       const productoActualizado = productosStock.find(p => p.prod_codigo === producto.prod_codigo);
+      
       if (productoActualizado) {
         setStockActual(productoActualizado.stock);
       }

@@ -17,6 +17,9 @@ function Productos() {
     
     let productosFinales;
     if (productosAdmin) {
+      // Si existen productosAdmin, también sincronizar productosStock
+      localStorage.setItem('productosStock', JSON.stringify(productosAdmin));
+      
       productosFinales = productosAdmin.map(producto => ({
         prod_codigo: producto.prod_codigo,
         prod_nombre: producto.nombre,
@@ -47,8 +50,14 @@ function Productos() {
   useEffect(() => {
     const handleProductosActualizados = () => {
       const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+      const productosStock = JSON.parse(localStorage.getItem('productosStock') || '[]');
+      
+      let productosActualizados;
       if (productosAdmin) {
-        const productosActualizados = productosAdmin.map(producto => ({
+        // Sincronizar productosStock con productosAdmin
+        localStorage.setItem('productosStock', JSON.stringify(productosAdmin));
+        
+        productosActualizados = productosAdmin.map(producto => ({
           prod_codigo: producto.prod_codigo,
           prod_nombre: producto.nombre,
           prod_desc: producto.descripcion || 'Sin descripción',
@@ -58,9 +67,21 @@ function Productos() {
           prod_stock: producto.stock,
           prod_stock_critico: producto.stock_critico
         }));
-        setProductos(productosActualizados);
-        setFilteredProductos(productosActualizados);
+      } else {
+        productosActualizados = productosStock.map(producto => ({
+          prod_codigo: producto.prod_codigo,
+          prod_nombre: producto.nombre,
+          prod_desc: producto.descripcion || 'Sin descripción',
+          prod_categoria: producto.categoria,
+          prod_precio: producto.precio,
+          prod_imagen: producto.imagen,
+          prod_stock: producto.stock,
+          prod_stock_critico: producto.stock_critico
+        }));
       }
+      
+      setProductos(productosActualizados);
+      setFilteredProductos(productosActualizados);
     };
 
     window.addEventListener('productosActualizados', handleProductosActualizados);

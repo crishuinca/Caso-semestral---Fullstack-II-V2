@@ -185,6 +185,19 @@ export const CarritoProvider = ({ children }) => {
       setProductosStock(productosDisponibles);
       localStorage.setItem('productosStock', JSON.stringify(productosDisponibles));
     }
+
+    const handleProductosActualizados = () => {
+      const productosActualizados = JSON.parse(localStorage.getItem('productosStock') || '[]');
+      if (productosActualizados.length > 0) {
+        setProductosStock(productosActualizados);
+      }
+    };
+
+    window.addEventListener('productosActualizados', handleProductosActualizados);
+    
+    return () => {
+      window.removeEventListener('productosActualizados', handleProductosActualizados);
+    };
   }, []);
 
   useEffect(() => {
@@ -276,6 +289,16 @@ export const CarritoProvider = ({ children }) => {
     setProductosStock(nuevosProductos);
     localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
 
+    const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+    if (productosAdmin) {
+      const nuevosProductosAdmin = productosAdmin.map(p =>
+        p.prod_codigo === codigo
+          ? { ...p, stock: p.stock - cantidad }
+          : p
+      );
+      localStorage.setItem('productosAdmin', JSON.stringify(nuevosProductosAdmin));
+    }
+
     const itemEnCarrito = carrito.find(item => item.codigo === codigo);
     if (itemEnCarrito) {
       setCarrito(prev => prev.map(item =>
@@ -308,6 +331,16 @@ export const CarritoProvider = ({ children }) => {
     );
     setProductosStock(nuevosProductos);
     localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+
+    const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+    if (productosAdmin) {
+      const nuevosProductosAdmin = productosAdmin.map(p =>
+        p.prod_codigo === codigo
+          ? { ...p, stock: p.stock + itemEnCarrito.cantidad }
+          : p
+      );
+      localStorage.setItem('productosAdmin', JSON.stringify(nuevosProductosAdmin));
+    }
 
     const productoAEliminar = productosStock.find(p => p.prod_codigo === codigo);
     setCarrito(prev => prev.filter(item => item.codigo !== codigo));
@@ -345,6 +378,16 @@ export const CarritoProvider = ({ children }) => {
       );
       setProductosStock(nuevosProductos);
       localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+
+      const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+      if (productosAdmin) {
+        const nuevosProductosAdmin = productosAdmin.map(p =>
+          p.prod_codigo === codigo
+            ? { ...p, stock: p.stock - diferencia }
+            : p
+        );
+        localStorage.setItem('productosAdmin', JSON.stringify(nuevosProductosAdmin));
+      }
     } else if (diferencia < 0) {
       const nuevosProductos = productosStock.map(p =>
         p.prod_codigo === codigo
@@ -353,6 +396,16 @@ export const CarritoProvider = ({ children }) => {
       );
       setProductosStock(nuevosProductos);
       localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+
+      const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+      if (productosAdmin) {
+        const nuevosProductosAdmin = productosAdmin.map(p =>
+          p.prod_codigo === codigo
+            ? { ...p, stock: p.stock + Math.abs(diferencia) }
+            : p
+        );
+        localStorage.setItem('productosAdmin', JSON.stringify(nuevosProductosAdmin));
+      }
     }
 
     setCarrito(prev => prev.map(item =>
@@ -383,12 +436,22 @@ export const CarritoProvider = ({ children }) => {
     
     setProductosStock(nuevosProductos);
     localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+
+    const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+    if (productosAdmin) {
+      const nuevosProductosAdmin = productosAdmin.map(p => {
+        const itemEnCarrito = carrito.find(item => item.codigo === p.prod_codigo);
+        return itemEnCarrito
+          ? { ...p, stock: p.stock + itemEnCarrito.cantidad }
+          : p;
+      });
+      localStorage.setItem('productosAdmin', JSON.stringify(nuevosProductosAdmin));
+    }
     
     setCarrito([]);
     localStorage.removeItem('carritoCompras');
     mostrarMensaje('Carrito vaciado', 'info');
     
-    // Disparar evento para actualizar la UI
     window.dispatchEvent(new Event('productosActualizados'));
   };
 
