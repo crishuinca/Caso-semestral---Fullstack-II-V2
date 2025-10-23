@@ -12,6 +12,7 @@ export const useCarrito = () => {
 
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState([]);
+  const [productosStock, setProductosStock] = useState([]);
 
   const productosDisponibles = [
     {
@@ -21,8 +22,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Tortas Cuadradas",
       precio: 45000,
       imagen: "/img/TC001.png",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "TC002",
@@ -31,8 +32,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Tortas Cuadradas",
       precio: 50000,
       imagen: "/img/TC002.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "TT001",
@@ -41,8 +42,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Tortas Circulares",
       precio: 40000,
       imagen: "/img/TT001.png",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "TT002",
@@ -51,8 +52,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Tortas Circulares",
       precio: 42000,
       imagen: "/img/TT002.png",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PI001",
@@ -61,8 +62,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Postres Individuales",
       precio: 5000,
       imagen: "/img/PI001.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PI002",
@@ -71,8 +72,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Postres Individuales",
       precio: 5500,
       imagen: "/img/PI002.png",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PSA001",
@@ -81,8 +82,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Productos Sin Azúcar",
       precio: 48000,
       imagen: "/img/PSA001.png",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PSA002",
@@ -91,8 +92,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Productos Sin Azúcar",
       precio: 47000,
       imagen: "/img/PSA002.png",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PT001",
@@ -101,8 +102,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Pastelería Tradicional",
       precio: 3000,
       imagen: "/img/PT001.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PT002",
@@ -111,8 +112,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Pastelería Tradicional",
       precio: 6000,
       imagen: "/img/PT002.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PG001",
@@ -121,8 +122,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Productos Sin Gluten",
       precio: 4000,
       imagen: "/img/PG001.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PG002",
@@ -131,8 +132,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Productos Sin Gluten",
       precio: 3500,
       imagen: "/img/PG002.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PV001",
@@ -141,8 +142,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Productos Veganos",
       precio: 50000,
       imagen: "/img/PV001.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "PV002",
@@ -151,8 +152,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Productos Veganos",
       precio: 4500,
       imagen: "/img/PV002.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "TE001",
@@ -161,8 +162,8 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Tortas Especiales",
       precio: 55000,
       imagen: "/img/TE001.jpg",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     },
     {
       prod_codigo: "TE002",
@@ -171,10 +172,20 @@ export const CarritoProvider = ({ children }) => {
       categoria: "Tortas Especiales",
       precio: 60000,
       imagen: "/img/TE002.png",
-      stock: 15,
-      stock_critico: 3
+      stock: 10,
+      stock_critico: 5
     }
   ];
+
+  useEffect(() => {
+    const stockGuardado = localStorage.getItem('productosStock');
+    if (stockGuardado) {
+      setProductosStock(JSON.parse(stockGuardado));
+    } else {
+      setProductosStock(productosDisponibles);
+      localStorage.setItem('productosStock', JSON.stringify(productosDisponibles));
+    }
+  }, []);
 
   useEffect(() => {
     const carritoGuardado = localStorage.getItem('carritoCompras');
@@ -240,12 +251,35 @@ export const CarritoProvider = ({ children }) => {
   };
 
   const agregarProducto = (codigo, cantidad = 1, mensaje = '') => {
-    const productoExistente = carrito.find(item => item.codigo === codigo);
-    const producto = productosDisponibles.find(p => p.prod_codigo === codigo);
+    const producto = productosStock.find(p => p.prod_codigo === codigo);
     
-    if (productoExistente) {
-      setCarrito(prev => prev.map(item => 
-        item.codigo === codigo 
+    if (!producto) {
+      mostrarMensaje('Producto no encontrado', 'error');
+      return;
+    }
+
+    if (producto.stock < cantidad) {
+      mostrarMensaje(`Stock insuficiente. Solo quedan ${producto.stock} unidades disponibles`, 'error');
+      return;
+    }
+
+    if (producto.stock === 0) {
+      mostrarMensaje('Producto sin stock', 'error');
+      return;
+    }
+
+    const nuevosProductos = productosStock.map(p =>
+      p.prod_codigo === codigo
+        ? { ...p, stock: p.stock - cantidad }
+        : p
+    );
+    setProductosStock(nuevosProductos);
+    localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+
+    const itemEnCarrito = carrito.find(item => item.codigo === codigo);
+    if (itemEnCarrito) {
+      setCarrito(prev => prev.map(item =>
+        item.codigo === codigo
           ? { ...item, cantidad: item.cantidad + cantidad }
           : item
       ));
@@ -257,29 +291,77 @@ export const CarritoProvider = ({ children }) => {
         enCarrito: true
       }]);
     }
+
+    mostrarMensaje(`${producto.nombre} agregado al carrito`, 'ok');
     
-    mostrarMensaje(`${producto?.nombre || 'Producto'} agregado al carrito`, 'ok');
+    window.dispatchEvent(new Event('productosActualizados'));
   };
 
   const eliminarProducto = (codigo) => {
-    const productoAEliminar = productosDisponibles.find(p => p.prod_codigo === codigo);
+    const itemEnCarrito = carrito.find(item => item.codigo === codigo);
+    if (!itemEnCarrito) return;
+
+    const nuevosProductos = productosStock.map(p =>
+      p.prod_codigo === codigo
+        ? { ...p, stock: p.stock + itemEnCarrito.cantidad }
+        : p
+    );
+    setProductosStock(nuevosProductos);
+    localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+
+    const productoAEliminar = productosStock.find(p => p.prod_codigo === codigo);
     setCarrito(prev => prev.filter(item => item.codigo !== codigo));
     mostrarMensaje(`${productoAEliminar?.nombre || 'Producto'} eliminado del carrito`, 'info');
+    
+    window.dispatchEvent(new Event('productosActualizados'));
   };
 
   const actualizarCantidad = (codigo, nuevaCantidad) => {
     const cantidad = parseInt(nuevaCantidad) || 1;
-    
+
     if (cantidad <= 0) {
       eliminarProducto(codigo);
       return;
     }
-    
-    setCarrito(prev => prev.map(item => 
-      item.codigo === codigo 
+
+    const itemEnCarrito = carrito.find(item => item.codigo === codigo);
+    if (!itemEnCarrito) return;
+
+    const producto = productosStock.find(p => p.prod_codigo === codigo);
+    if (!producto) return;
+
+    const diferencia = cantidad - itemEnCarrito.cantidad;
+
+    if (diferencia > 0) {
+      if (producto.stock < diferencia) {
+        mostrarMensaje(`Stock insuficiente. Solo quedan ${producto.stock} unidades disponibles`, 'error');
+        return;
+      }
+
+      const nuevosProductos = productosStock.map(p =>
+        p.prod_codigo === codigo
+          ? { ...p, stock: p.stock - diferencia }
+          : p
+      );
+      setProductosStock(nuevosProductos);
+      localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+    } else if (diferencia < 0) {
+      const nuevosProductos = productosStock.map(p =>
+        p.prod_codigo === codigo
+          ? { ...p, stock: p.stock + Math.abs(diferencia) }
+          : p
+      );
+      setProductosStock(nuevosProductos);
+      localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+    }
+
+    setCarrito(prev => prev.map(item =>
+      item.codigo === codigo
         ? { ...item, cantidad: cantidad }
         : item
     ));
+    
+    window.dispatchEvent(new Event('productosActualizados'));
   };
 
   const actualizarMensaje = (codigo, nuevoMensaje) => {

@@ -1,101 +1,27 @@
-﻿import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+﻿import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/DetalleBlog.css';
+import AsideBlogs from '../components/blogs/AsideBlogs';
 
 function DetalleBlog2() {
   return (
-    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '400px' }}>
+    <div className="cuerpo-detalle-blog">
       <div className="container-fluid py-4">
-        <div className="row" style={{ marginTop: '80px' }}>
+        <div className="row fila-detalle-margen">
           
           {}
           <div className="col-lg-3">
-            <div className="card border-0" style={{ backgroundColor: '#FFC0CB', position: 'sticky', top: '150px' }}>
-              <div className="card-body p-4">
-                {}
-                <Link 
-                  to="/blogs" 
-                  className="btn d-flex align-items-center mb-4"
-                  style={{ 
-                    backgroundColor: '#8B4513',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '25px',
-                    padding: '10px 20px',
-                    textDecoration: 'none'
-                  }}
-                >
-                  <i className="fas fa-arrow-left me-2"></i>
-                  Volver
-                </Link>
-
-                {}
-                <nav aria-label="Navegación entre blogs relacionados">
-                  <h3 style={{ 
-                    color: '#8B4513', 
-                    fontFamily: 'Pacifico, cursive', 
-                    fontSize: '1.5rem',
-                    marginBottom: '1rem'
-                  }}>
-                    Otros Blogs
-                  </h3>
-                
-                <ol className="list-unstyled">
-                  <li className="mb-2">
-                    <Link 
-                      to="/blog/harina-magica" 
-                      style={{ 
-                        color: '#5D4037',
-                        textDecoration: 'none',
-                        fontSize: '1rem',
-                        fontWeight: 'bold'
-                      }}
-                      onMouseEnter={(e) => e.target.style.color = '#D2691E'}
-                      onMouseLeave={(e) => e.target.style.color = '#5D4037'}
-                    >
-                      El Secreto de la Harina Mágica
-                    </Link>
-                  </li>
-                  <li className="mb-2">
-                    <Link 
-                      to="/blog/secreto-dulzor" 
-                      style={{ 
-                        color: '#5D4037',
-                        textDecoration: 'none',
-                        fontSize: '1rem',
-                        fontWeight: 'bold'
-                      }}
-                      onMouseEnter={(e) => e.target.style.color = '#D2691E'}
-                      onMouseLeave={(e) => e.target.style.color = '#5D4037'}
-                    >
-                      El Secreto del Dulzor
-                    </Link>
-                  </li>
-                </ol>
-                </nav>
-              </div>
-            </div>
+            <AsideBlogs />
           </div>
 
           {}
           <div className="col-lg-9">
-            <article className="card border-0" style={{ backgroundColor: '#FFFFFF' }} role="article" aria-labelledby="blog-title">
+            <article className="card tarjeta-articulo" role="article" aria-labelledby="blog-title">
               <div className="card-body p-5">
-                <h1 id="blog-title" style={{ 
-                  color: '#8B4513', 
-                  fontFamily: 'Pacifico, cursive', 
-                  fontSize: '3rem',
-                  marginBottom: '2rem',
-                  textAlign: 'center'
-                }}>
+                <h1 id="blog-title" className="titulo-articulo">
                   El Secreto del Dulzor
                 </h1>
 
-                <div style={{ 
-                  fontSize: '1.2rem', 
-                  lineHeight: '2',
-                  color: '#5D4037',
-                  textAlign: 'justify'
-                }}>
+                <div className="contenido-articulo">
                   <p>
                     En nuestro taller, cada pastel comienza con un secreto heredado de 
                     generaciones: la miel de una colmena que se encuentra en lo alto de las montañas.
@@ -143,13 +69,7 @@ function DetalleBlog2() {
                     <img 
                       src="/img/blog2.jpg" 
                       alt="El Secreto del Dulzor - Imagen 1"
-                      className="img-fluid rounded"
-                      style={{ 
-                        width: '100%',
-                        height: '300px',
-                        objectFit: 'cover',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-                      }}
+                      className="img-fluid rounded imagen-articulo"
                       onError={(e) => {
                         e.target.src = 'https://via.placeholder.com/300x300/D2691E/FFF?text=Secreto+Dulzor+1';
                       }}
@@ -160,13 +80,7 @@ function DetalleBlog2() {
                     <img 
                       src="/img/blog2.1.jpg" 
                       alt="El Secreto del Dulzor - Imagen 2"
-                      className="img-fluid rounded"
-                      style={{ 
-                        width: '100%',
-                        height: '300px',
-                        objectFit: 'cover',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-                      }}
+                      className="img-fluid rounded imagen-articulo"
                       onError={(e) => {
                         e.target.src = 'https://via.placeholder.com/300x300/D2691E/FFF?text=Secreto+Dulzor+2';
                       }}

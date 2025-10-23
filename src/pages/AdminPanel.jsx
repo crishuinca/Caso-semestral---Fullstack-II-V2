@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCarrito } from '../context/CarritoContext';
+import '../styles/AdminPanel.css';
 
 function AdminPanel() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ function AdminPanel() {
     descripcion: '',
     precio: '',
     stock: '',
+    stock_critico: '',
     categoria: ''
   });
   const [modalEditarUsuario, setModalEditarUsuario] = useState(false);
@@ -72,10 +74,13 @@ function AdminPanel() {
       return;
     }
 
-    const productosGuardados = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+    const productosStock = JSON.parse(localStorage.getItem('productosStock')) || [];
+    const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
     
-    if (productosGuardados) {
-      const productosConStock = productosGuardados.map(producto => ({
+    let productosFinales;
+    
+    if (productosStock.length > 0) {
+      productosFinales = productosStock.map(producto => ({
         id: producto.prod_codigo,
         codigo: producto.prod_codigo,
         nombre: producto.nombre,
@@ -86,9 +91,20 @@ function AdminPanel() {
         imagen: producto.imagen,
         stock_critico: producto.stock_critico
       }));
-      setProductos(productosConStock);
+    } else if (productosAdmin) {
+      productosFinales = productosAdmin.map(producto => ({
+        id: producto.prod_codigo,
+        codigo: producto.prod_codigo,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        descripcion: producto.descripcion,
+        categoria: producto.categoria,
+        stock: producto.stock,
+        imagen: producto.imagen,
+        stock_critico: producto.stock_critico
+      }));
     } else {
-      const productosConStock = productosDisponibles.map(producto => ({
+      productosFinales = productosDisponibles.map(producto => ({
         id: producto.prod_codigo,
         codigo: producto.prod_codigo,
         nombre: producto.nombre,
@@ -99,24 +115,37 @@ function AdminPanel() {
         imagen: producto.imagen,
         stock_critico: producto.stock_critico
       }));
-      setProductos(productosConStock);
-      
-      const productosParaStorage = productosConStock.map(producto => ({
-        prod_codigo: producto.codigo,
-        nombre: producto.nombre,
-        precio: producto.precio,
-        descripcion: producto.descripcion,
-        imagen: producto.imagen,
-        stock: producto.stock,
-        categoria: producto.categoria,
-        stock_critico: producto.stock_critico
-      }));
-      localStorage.setItem('productosAdmin', JSON.stringify(productosParaStorage));
     }
+    
+    setProductos(productosFinales);
+
+    const handleProductosActualizados = () => {
+      const productosActualizados = JSON.parse(localStorage.getItem('productosStock')) || [];
+      if (productosActualizados.length > 0) {
+        const nuevoProductos = productosActualizados.map(producto => ({
+          id: producto.prod_codigo,
+          codigo: producto.prod_codigo,
+          nombre: producto.nombre,
+          precio: producto.precio,
+          descripcion: producto.descripcion,
+          categoria: producto.categoria,
+          stock: producto.stock,
+          imagen: producto.imagen,
+          stock_critico: producto.stock_critico
+        }));
+        setProductos(nuevoProductos);
+      }
+    };
+
+    window.addEventListener('productosActualizados', handleProductosActualizados);
 
     const usuariosGuardados = JSON.parse(localStorage.getItem('usuarios') || '[]');
     setUsuarios(usuariosGuardados);
-  }, [navigate]);
+
+    return () => {
+      window.removeEventListener('productosActualizados', handleProductosActualizados);
+    };
+  }, [navigate, productosDisponibles]);
 
   const alternarMenu = () => {
     setMenuColapsado(!menuColapsado);
@@ -224,6 +253,7 @@ function AdminPanel() {
       descripcion: producto.descripcion || '',
       precio: producto.precio,
       stock: producto.stock,
+      stock_critico: producto.stock_critico || 5,
       categoria: producto.categoria
     });
     setModalEditarProducto(true);
@@ -237,6 +267,7 @@ function AdminPanel() {
       descripcion: '',
       precio: '',
       stock: '',
+      stock_critico: '',
       categoria: ''
     });
   };
@@ -267,6 +298,11 @@ function AdminPanel() {
       return;
     }
 
+    if (isNaN(productoEditado.stock_critico) || productoEditado.stock_critico < 0) {
+      alert('El stock crítico debe ser un número válido mayor o igual a 0');
+      return;
+    }
+
     const productosActualizados = productos.map(producto => 
       producto.codigo === productoEditando.codigo 
         ? { 
@@ -275,6 +311,7 @@ function AdminPanel() {
             descripcion: productoEditado.descripcion,
             precio: parseInt(productoEditado.precio),
             stock: parseInt(productoEditado.stock),
+            stock_critico: parseInt(productoEditado.stock_critico),
             categoria: productoEditado.categoria
           }
         : producto
@@ -289,11 +326,14 @@ function AdminPanel() {
       precio: producto.precio,
       imagen: producto.imagen,
       stock: producto.stock,
-      categoria: producto.categoria,
-      stock_critico: producto.stock_critico
+      stock_critico: producto.stock_critico,
+      categoria: producto.categoria
     }));
     
     localStorage.setItem('productosAdmin', JSON.stringify(productosParaStorage));
+    localStorage.setItem('productosStock', JSON.stringify(productosParaStorage));
+    
+    window.dispatchEvent(new Event('productosActualizados'));
     
     alert('Producto actualizado exitosamente');
     cerrarModalEditar();
@@ -404,68 +444,53 @@ function AdminPanel() {
   };
 
   const renderTablero = () => (
-    <div className="area-contenido" style={estilos.areaContenido}>
-      <div style={estilos.encabezadoSeccion}>
+    <div className="area-contenido">
+      <div className="encabezado-seccion">
         <h2>Panel de Control</h2>
       </div>
-      <div style={estilos.estadisticas}>
+      <div className="estadisticas">
         <div 
-          style={{
-            ...estilos.tarjetaEstadistica,
-            ...estilos.tarjetaClickeable
-          }}
+          className="tarjeta-estadistica tarjeta-clickeable"
           onClick={() => setVistaActiva('productos')}
-          onMouseEnter={(e) => e.target.style.transform = 'translateY(-4px)'}
-          onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
         >
-          <div style={estilos.iconoEstadistica}>
+          <div className="icono-estadistica">
             <i className="fas fa-birthday-cake"></i>
           </div>
-          <div style={estilos.infoEstadistica}>
+          <div className="info-estadistica">
             <h3>{productos.length}</h3>
             <p>Productos</p>
           </div>
-          <div style={estilos.flechaNavegacion}>
+          <div className="flecha-navegacion">
             <i className="fas fa-arrow-right"></i>
           </div>
         </div>
         <div 
-          style={{
-            ...estilos.tarjetaEstadistica,
-            ...estilos.tarjetaClickeable
-          }}
+          className="tarjeta-estadistica tarjeta-clickeable"
           onClick={() => setVistaActiva('usuarios')}
-          onMouseEnter={(e) => e.target.style.transform = 'translateY(-4px)'}
-          onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
         >
-          <div style={estilos.iconoEstadistica}>
+          <div className="icono-estadistica">
             <i className="fas fa-users"></i>
           </div>
-          <div style={estilos.infoEstadistica}>
+          <div className="info-estadistica">
             <h3>{usuarios.length}</h3>
             <p>Usuarios</p>
           </div>
-          <div style={estilos.flechaNavegacion}>
+          <div className="flecha-navegacion">
             <i className="fas fa-arrow-right"></i>
           </div>
         </div>
         <div 
-          style={{
-            ...estilos.tarjetaEstadistica,
-            ...estilos.tarjetaClickeable
-          }}
+          className="tarjeta-estadistica tarjeta-clickeable"
           onClick={() => setVistaActiva('productos')}
-          onMouseEnter={(e) => e.target.style.transform = 'translateY(-4px)'}
-          onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
         >
-          <div style={estilos.iconoEstadistica}>
+          <div className="icono-estadistica">
             <i className="fas fa-box"></i>
           </div>
-          <div style={estilos.infoEstadistica}>
+          <div className="info-estadistica">
             <h3>{productos.reduce((total, p) => total + p.stock, 0)}</h3>
             <p>Stock Total</p>
           </div>
-          <div style={estilos.flechaNavegacion}>
+          <div className="flecha-navegacion">
             <i className="fas fa-arrow-right"></i>
           </div>
         </div>
@@ -474,64 +499,54 @@ function AdminPanel() {
   );
 
   const renderProductos = () => (
-    <div className="area-contenido" style={estilos.areaContenido}>
-      <div style={estilos.encabezadoSeccion}>
+    <div className="area-contenido-productos">
+      <div className="encabezado-seccion">
         <h2>Catálogo de Productos</h2>
       </div>
-      <div style={estilos.contenedorProductos}>
+      <div className="contenedor-productos">
         {productos.map(producto => (
           <div 
             key={producto.codigo} 
-            style={estilos.tarjetaProducto}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-3px)';
-              e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.12)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.08)';
-            }}
+            className="tarjeta-producto"
           >
-            <div style={estilos.avatarProductoTarjeta}>
-              <i className="fas fa-birthday-cake" style={estilos.iconoProducto}></i>
+            <div className="avatar-producto-tarjeta">
+              <i className="fas fa-birthday-cake icono-producto"></i>
             </div>
-            <div style={estilos.informacionProductoTarjeta}>
-              <div style={estilos.nombreProducto}>{producto.nombre}</div>
-              <div style={estilos.categoriaProducto}>{producto.categoria}</div>
-              <div style={estilos.descripcionProducto}>
+            <div className="informacion-producto-tarjeta">
+              <div className="nombre-producto">{producto.nombre}</div>
+              <div className="categoria-producto">{producto.categoria}</div>
+              <div className="descripcion-producto">
                 <strong>Descripción:</strong> {producto.descripcion || 'Sin descripción disponible'}
               </div>
-              <div style={estilos.detallesProducto}>
+              <div className="detalles-producto">
                 <div><strong>Precio:</strong> ${producto.precio.toLocaleString()}</div>
-                <div style={estilos.stockInfo}>
+                <div className="stock-info">
                   <strong>Stock:</strong> 
-                  <span style={{
-                    ...estilos.badgeStock,
-                    backgroundColor: producto.stock > 10 ? '#28a745' : producto.stock > 5 ? '#ffc107' : '#dc3545'
-                  }}>
+                  <span className={`badge-stock ${
+                    producto.stock === 0 ? 'stock-agotado' : 
+                    producto.stock < producto.stock_critico ? 'stock-critico' : 'stock-normal'
+                  }`}>
                     {producto.stock}
                   </span>
                 </div>
               </div>
-              <div style={estilos.imagenProductoContainer}>
+              <div className="imagen-producto-container">
                 <img 
                   src={producto.imagen} 
                   alt={producto.nombre}
-                  style={estilos.imagenProducto}
+                  className="imagen-producto"
                   onError={(e) => {
                     e.target.style.display = 'none';
                   }}
                 />
               </div>
-              <div style={estilos.accionesProducto}>
+              <div className="acciones-producto">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     abrirModalEditar(producto);
                   }}
-                  style={estilos.botonEditar}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
+                  className="boton-editar"
                 >
                   <i className="fas fa-edit me-1"></i>
                   Editar
@@ -545,37 +560,28 @@ function AdminPanel() {
   );
 
   const renderUsuarios = () => (
-    <div className="area-contenido" style={estilos.areaContenido}>
-      <div style={estilos.encabezadoSeccion}>
+    <div className="area-contenido">
+      <div className="encabezado-seccion">
         <h2>Lista de Usuarios</h2>
       </div>
-      <div style={estilos.contenedorUsuarios}>
+      <div className="contenedor-usuarios">
         {usuarios.map(usuario => (
           <div 
             key={usuario.id} 
-            style={estilos.tarjetaUsuario}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-3px)';
-              e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.12)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.08)';
-            }}
+            className="tarjeta-usuario"
           >
-            <div style={estilos.avatarUsuarioTarjeta}>
-              <i className="fas fa-user-circle" style={estilos.iconoUsuario}></i>
+            <div className="avatar-usuario-tarjeta">
+              <i className="fas fa-user-circle icono-usuario"></i>
             </div>
-            <div style={estilos.informacionUsuarioTarjeta}>
-              <div style={estilos.nombreUsuario}>{usuario.nombre} {usuario.apellidos}</div>
-              <div style={estilos.correoUsuario}>{usuario.correo}</div>
-              <div style={estilos.detallesUsuario}>
+            <div className="informacion-usuario-tarjeta">
+              <div className="nombre-usuario">{usuario.nombre} {usuario.apellidos}</div>
+              <div className="correo-usuario">{usuario.correo}</div>
+              <div className="detalles-usuario">
                 <div><strong>Región:</strong> {usuario.region}</div>
                 <div><strong>Comuna:</strong> {usuario.comuna}</div>
-                <div style={estilos.tipoUsuarioInfo}>
+                <div className="tipo-usuario-info">
                   <strong>Tipo:</strong> 
-                  <span style={{
-                    ...estilos.badgeUsuario,
+                  <span className="badge-usuario" style={{
                     backgroundColor: usuario.isAdmin ? '#8B4513' : '#6c757d'
                   }}>
                     {usuario.isAdmin ? 'Admin' : 'Usuario'}
@@ -586,15 +592,13 @@ function AdminPanel() {
                 )}
               </div>
               {!usuario.isAdmin && (
-                <div style={estilos.accionesUsuario}>
+                <div className="acciones-usuario">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       abrirModalEditarUsuario(usuario);
                     }}
-                    style={estilos.botonEditar}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
+                    className="boton-editar"
                   >
                     <i className="fas fa-edit me-1"></i>
                     Editar
@@ -609,22 +613,22 @@ function AdminPanel() {
   );
 
   const renderNuevoUsuario = () => (
-    <div className="area-contenido" style={estilos.areaContenido}>
-      <div style={estilos.encabezadoSeccion}>
+    <div className="area-contenido-usuario">
+      <div className="encabezado-seccion">
         <h2>Registro de Usuario</h2>
       </div>
-      <div style={estilos.registerCard}>
-        <form onSubmit={handleSubmitUsuario} style={estilos.form} noValidate>
+      <div className="register-card">
+        <form onSubmit={handleSubmitUsuario} className="form" noValidate>
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="rol" style={estilos.label}>Rol*</label>
+          <div className="input-group">
+            <label htmlFor="rol" className="label">Rol*</label>
             <select 
               id="rol" 
               name="rol" 
               required
               value={nuevoUsuario.rol}
               onChange={handleInputChange}
-              style={estilos.select}
+              className="select"
             >
               <option value="">Seleccionar rol</option>
               <option value="cliente">Cliente</option>
@@ -633,8 +637,8 @@ function AdminPanel() {
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="run" style={estilos.label}>RUN*</label>
+          <div className="input-group">
+            <label htmlFor="run" className="label">RUN*</label>
             <input 
               type="text" 
               id="run" 
@@ -645,13 +649,13 @@ function AdminPanel() {
               placeholder="Ej: 19011022K"
               value={nuevoUsuario.run}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="nombre" style={estilos.label}>Nombre*</label>
+          <div className="input-group">
+            <label htmlFor="nombre" className="label">Nombre*</label>
             <input 
               type="text" 
               id="nombre" 
@@ -660,13 +664,13 @@ function AdminPanel() {
               required
               value={nuevoUsuario.nombre}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="apellidos" style={estilos.label}>Apellidos*</label>
+          <div className="input-group">
+            <label htmlFor="apellidos" className="label">Apellidos*</label>
             <input 
               type="text" 
               id="apellidos" 
@@ -675,13 +679,13 @@ function AdminPanel() {
               required
               value={nuevoUsuario.apellidos}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="correo" style={estilos.label}>Correo*</label>
+          <div className="input-group">
+            <label htmlFor="correo" className="label">Correo*</label>
             <input 
               type="email" 
               id="correo" 
@@ -691,33 +695,33 @@ function AdminPanel() {
               placeholder="ejemplo@duoc.cl"
               value={nuevoUsuario.correo}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="fecha_nacimiento" style={estilos.label}>Fecha de nacimiento</label>
+          <div className="input-group">
+            <label htmlFor="fecha_nacimiento" className="label">Fecha de nacimiento</label>
             <input 
               type="date" 
               id="fecha_nacimiento" 
               name="fecha_nacimiento"
               value={nuevoUsuario.fecha_nacimiento}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="region" style={estilos.label}>Región*</label>
+          <div className="input-group">
+            <label htmlFor="region" className="label">Región*</label>
             <select 
               id="region" 
               name="region" 
               required
               value={nuevoUsuario.region}
               onChange={handleInputChange}
-              style={estilos.select}
+              className="select"
             >
               <option value="">Seleccione región</option>
               {Object.keys(regionesComunas).map(region => (
@@ -727,15 +731,15 @@ function AdminPanel() {
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="comuna" style={estilos.label}>Comuna*</label>
+          <div className="input-group">
+            <label htmlFor="comuna" className="label">Comuna*</label>
             <select 
               id="comuna" 
               name="comuna" 
               required
               value={nuevoUsuario.comuna}
               onChange={handleInputChange}
-              style={estilos.select}
+              className="select"
               disabled={!nuevoUsuario.region}
             >
               <option value="">Seleccione comuna</option>
@@ -746,8 +750,8 @@ function AdminPanel() {
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="direccion" style={estilos.label}>Dirección*</label>
+          <div className="input-group">
+            <label htmlFor="direccion" className="label">Dirección*</label>
             <input 
               type="text" 
               id="direccion" 
@@ -756,13 +760,13 @@ function AdminPanel() {
               required
               value={nuevoUsuario.direccion}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="password" style={estilos.label}>Contraseña*</label>
+          <div className="input-group">
+            <label htmlFor="password" className="label">Contraseña*</label>
             <input 
               type="password" 
               id="password" 
@@ -771,13 +775,13 @@ function AdminPanel() {
               required
               value={nuevoUsuario.password}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="confirmPassword" style={estilos.label}>Confirmar Contraseña*</label>
+          <div className="input-group">
+            <label htmlFor="confirmPassword" className="label">Confirmar Contraseña*</label>
             <input 
               type="password" 
               id="confirmPassword" 
@@ -786,13 +790,13 @@ function AdminPanel() {
               required
               value={nuevoUsuario.confirmPassword}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           {}
-          <div style={estilos.inputGroup}>
-            <label htmlFor="codigo_descuento" style={estilos.label}>Código de descuento</label>
+          <div className="input-group">
+            <label htmlFor="codigo_descuento" className="label">Código de descuento</label>
             <input 
               type="text" 
               id="codigo_descuento" 
@@ -801,20 +805,19 @@ function AdminPanel() {
               placeholder="Opcional"
               value={nuevoUsuario.codigo_descuento}
               onChange={handleInputChange}
-              style={estilos.input}
+              className="input"
             />
           </div>
 
           <button 
             type="submit"
-            style={estilos.submitButton}
+            className="submit-button"
           >
             Registrar Usuario
           </button>
 
           {resultado && (
-            <div style={{
-              ...estilos.resultado,
+            <div className="resultado" style={{
               color: resultado.includes('exitosamente') ? '#28a745' : '#dc3545'
             }}>
               {resultado}
@@ -838,647 +841,93 @@ function AdminPanel() {
     }
   };
 
-  const estilos = {
-    contenedorAdmin: {
-      display: 'flex',
-      minHeight: '100vh',
-      fontFamily: "'Lato', sans-serif"
-    },
-    barraLateral: {
-      width: menuColapsado ? '80px' : '280px',
-      background: 'linear-gradient(180deg, #8B4513 0%, #A0522D 100%)',
-      color: 'white',
-      position: 'fixed',
-      height: '100vh',
-      left: 0,
-      top: 0,
-      zIndex: 1000,
-      transition: 'all 0.3s ease',
-      boxShadow: '2px 0 10px rgba(0, 0, 0, 0.1)'
-    },
-    encabezadoBarraLateral: {
-      padding: '2rem 1.5rem',
-      textAlign: 'center',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-    },
-    tituloBarraLateral: {
-      fontSize: '1.2rem',
-      fontWeight: '700',
-      color: '#FFC0CB'
-    },
-    navegacionBarraLateral: {
-      padding: '1rem 0'
-    },
-    menuNavegacion: {
-      listStyle: 'none',
-      padding: 0,
-      margin: 0
-    },
-    elementoNavegacion: {
-      marginBottom: '0.5rem'
-    },
-    enlaceNavegacion: {
-      display: 'flex',
-      alignItems: 'center',
-      padding: '1rem 1.5rem',
-      color: 'white',
-      textDecoration: 'none',
-      transition: 'all 0.3s ease',
-      cursor: 'pointer'
-    },
-    enlaceNavegacionActivo: {
-      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-      borderRight: '4px solid #FFC0CB'
-    },
-    iconoNavegacion: {
-      marginRight: menuColapsado ? 0 : '1rem',
-      fontSize: '1.2rem',
-      width: '20px'
-    },
-    textoNavegacion: {
-      display: menuColapsado ? 'none' : 'block'
-    },
-    pieBarraLateral: {
-      position: 'absolute',
-      bottom: '1rem',
-      left: 0,
-      right: 0,
-      padding: '0 1.5rem'
-    },
-    botonSalir: {
-      display: 'flex',
-      alignItems: 'center',
-      width: '100%',
-      padding: '1rem',
-      color: 'white',
-      textDecoration: 'none',
-      backgroundColor: 'rgba(220, 53, 69, 0.2)',
-      borderRadius: '8px',
-      transition: 'all 0.3s ease',
-      cursor: 'pointer',
-      border: 'none'
-    },
-    contenidoPrincipal: {
-      flex: 1,
-      marginLeft: menuColapsado ? '80px' : '280px',
-      transition: 'margin-left 0.3s ease',
-      backgroundColor: '#f8f9fa'
-    },
-    encabezadoContenido: {
-      backgroundColor: 'white',
-      padding: '1rem 2rem',
-      borderBottom: '1px solid #e9ecef',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center'
-    },
-    izquierdaEncabezado: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    alternarMenu: {
-      backgroundColor: 'transparent',
-      border: 'none',
-      fontSize: '1.2rem',
-      color: '#8B4513',
-      cursor: 'pointer',
-      marginRight: '1rem'
-    },
-    tituloPagina: {
-      fontSize: '1.5rem',
-      fontWeight: '600',
-      color: '#333',
-      margin: 0
-    },
-    derechaEncabezado: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    informacionUsuario: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    textoBienvenida: {
-      marginRight: '1rem',
-      color: '#666',
-      fontSize: '0.9rem'
-    },
-    avatarUsuario: {
-      fontSize: '2rem',
-      color: '#8B4513'
-    },
-    areaContenido: {
-      padding: '1rem 1.5rem 1.5rem 1.5rem',
-      marginTop: '1rem'
-    },
-    encabezadoSeccion: {
-      marginTop: '1rem',
-      marginBottom: '2rem'
-    },
-    estadisticas: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-      gap: '2rem',
-      marginBottom: '2rem'
-    },
-    tarjetaEstadistica: {
-      backgroundColor: 'white',
-      padding: '2rem',
-      borderRadius: '12px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      display: 'flex',
-      alignItems: 'center',
-      position: 'relative'
-    },
-    tarjetaClickeable: {
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      border: '2px solid transparent'
-    },
-    flechaNavegacion: {
-      marginLeft: 'auto',
-      color: '#8B4513',
-      fontSize: '1.5rem',
-      opacity: 0.7,
-      transition: 'all 0.3s ease'
-    },
-    iconoEstadistica: {
-      fontSize: '3rem',
-      color: '#8B4513',
-      marginRight: '1.5rem'
-    },
-    infoEstadistica: {
-      flex: 1
-    },
-    contenedorTabla: {
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      overflow: 'hidden'
-    },
-    tabla: {
-      width: '100%',
-      borderCollapse: 'collapse'
-    },
-    filaEncabezado: {
-      backgroundColor: '#8B4513'
-    },
-    celdaEncabezado: {
-      padding: '1rem',
-      textAlign: 'left',
-      color: 'white',
-      fontWeight: '600'
-    },
-    fila: {
-      borderBottom: '1px solid #e9ecef'
-    },
-    celda: {
-      padding: '1rem',
-      color: '#333'
-    },
-    badge: {
-      padding: '0.25rem 0.5rem',
-      borderRadius: '4px',
-      color: 'white',
-      fontSize: '0.8rem',
-      fontWeight: '600'
-    },
-    registerCard: {
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      padding: '25rem 1.5rem 1.5rem 1.5rem',
-      maxWidth: '600px',
-      margin: '0 auto'
-    },
-    form: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '1.5rem'
-    },
-    inputGroup: {
-      display: 'flex',
-      flexDirection: 'column',
-      marginBottom: '0.5rem'
-    },
-    label: {
-      color: '#8B4513',
-      fontWeight: '600',
-      marginBottom: '0.5rem'
-    },
-    input: {
-      border: '1.5px solid #FFC0CB',
-      borderRadius: '8px',
-      padding: '0.8rem',
-      fontSize: '1rem',
-      fontFamily: "'Lato', sans-serif",
-      color: '#5D4037',
-      background: '#FFF5E1',
-      outline: 'none',
-      transition: 'border 0.2s'
-    },
-    select: {
-      border: '1.5px solid #FFC0CB',
-      borderRadius: '8px',
-      padding: '0.8rem',
-      fontSize: '1rem',
-      fontFamily: "'Lato', sans-serif",
-      color: '#5D4037',
-      background: '#FFF5E1',
-      outline: 'none',
-      transition: 'border 0.2s'
-    },
-    submitButton: {
-      gridColumn: '1 / -1',
-      background: '#8B4513',
-      color: 'white',
-      border: 'none',
-      padding: '1rem 2rem',
-      borderRadius: '12px',
-      cursor: 'pointer',
-      fontSize: '1.1rem',
-      fontWeight: '700',
-      marginTop: '1rem',
-      boxShadow: '0 5px 8px rgba(139,69,19,0.2)',
-      transition: 'all 0.3s ease',
-      fontFamily: "'Lato', sans-serif"
-    },
-    resultado: {
-      gridColumn: '1 / -1',
-      marginTop: '1rem',
-      fontSize: '1rem',
-      fontWeight: 'bold',
-      textAlign: 'center',
-      padding: '1rem',
-      borderRadius: '8px',
-      backgroundColor: '#f8f9fa'
-    },
-    accionesRapidas: {
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      padding: '2rem',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      marginBottom: '2rem'
-    },
-    tituloSeccion: {
-      color: '#8B4513',
-      marginBottom: '1.5rem',
-      fontSize: '1.3rem',
-      fontWeight: '600'
-    },
-    botonesAccion: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-      gap: '1rem'
-    },
-    botonAccion: {
-      backgroundColor: '#8B4513',
-      color: 'white',
-      border: 'none',
-      padding: '1.2rem 1.5rem',
-      borderRadius: '10px',
-      cursor: 'pointer',
-      fontSize: '1rem',
-      fontWeight: '600',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 3px 6px rgba(139, 69, 19, 0.2)'
-    },
-    iconoBoton: {
-      marginRight: '0.8rem',
-      fontSize: '1.2rem'
-    },
-    actividadReciente: {
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      padding: '2rem',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-    },
-    tarjetasResumen: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '1rem'
-    },
-    tarjetaResumen: {
-      backgroundColor: '#f8f9fa',
-      borderRadius: '8px',
-      padding: '1.5rem',
-      border: '1px solid #e9ecef'
-    },
-    contenidoResumen: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    estadoPositivo: {
-      color: '#28a745',
-      fontSize: '2rem',
-      marginRight: '1rem'
-    },
-    estadoInfo: {
-      color: '#17a2b8',
-      fontSize: '2rem',
-      marginRight: '1rem'
-    },
-    estadoAdvertencia: {
-      color: '#ffc107',
-      fontSize: '2rem',
-      marginRight: '1rem'
-    },
-    contenedorProductos: {
-      display: 'grid',
-      padding: '65rem 1.5rem 1.5rem 1.5rem',
-      gridTemplateColumns: 'repeat(3, minmax(150px, 1fr))',
-      gap: '1rem',
-      overflowX: 'auto'
-    },
-    tarjetaProducto: {
-      background: 'white',
-      borderRadius: '10px',
-      padding: '0.8rem',
-      boxShadow: '0 5px 15px rgba(0, 0, 0, 0.08)',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: '0.8rem',
-      cursor: 'pointer'
-    },
-    avatarProductoTarjeta: {
-      flexShrink: 0
-    },
-    iconoProducto: {
-      fontSize: '3rem',
-      color: '#8B4513',
-      background: 'linear-gradient(135deg, #FFC0CB, #FFB6C1)',
-      borderRadius: '50%',
-      padding: '0.5rem'
-    },
-    informacionProductoTarjeta: {
-      flex: 1
-    },
-    nombreProducto: {
-      color: '#8B4513',
-      fontSize: '1.2rem',
-      fontWeight: '700',
-      marginBottom: '0.3rem'
-    },
-    categoriaProducto: {
-      color: '#6c757d',
-      fontSize: '0.9rem',
-      marginBottom: '0.5rem'
-    },
-    descripcionProducto: {
-      color: '#6c757d',
-      fontSize: '0.85rem',
-      marginBottom: '0.5rem',
-      lineHeight: '1.3'
-    },
-    detallesProducto: {
-      marginBottom: '1rem'
-    },
-    stockInfo: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem'
-    },
-    badgeStock: {
-      padding: '0.25rem 0.5rem',
-      borderRadius: '4px',
-      color: 'white',
-      fontSize: '0.8rem',
-      fontWeight: '600'
-    },
-    imagenProductoContainer: {
-      marginTop: '1rem'
-    },
-    imagenProducto: {
-      maxWidth: '100px',
-      maxHeight: '80px',
-      borderRadius: '8px',
-      objectFit: 'cover',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-    },
-    contenedorUsuarios: {
-
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-      gap: '1.5rem'
-    },
-    tarjetaUsuario: {
-      background: 'white',
-      borderRadius: '15px',
-      padding: '1.5rem',
-      boxShadow: '0 5px 15px rgba(0, 0, 0, 0.08)',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: '1rem',
-      cursor: 'pointer'
-    },
-    avatarUsuarioTarjeta: {
-      flexShrink: 0
-    },
-    iconoUsuario: {
-      fontSize: '3rem',
-      color: '#8B4513',
-      background: 'linear-gradient(135deg, #FFC0CB, #FFB6C1)',
-      borderRadius: '50%',
-      padding: '0.5rem'
-    },
-    informacionUsuarioTarjeta: {
-      flex: 1
-    },
-    nombreUsuario: {
-      color: '#8B4513',
-      fontSize: '1.2rem',
-      fontWeight: '700',
-      marginBottom: '0.3rem'
-    },
-    correoUsuario: {
-      color: '#6c757d',
-      fontSize: '0.9rem',
-      marginBottom: '0.5rem'
-    },
-    detallesUsuario: {
-      marginBottom: '1rem'
-    },
-    tipoUsuarioInfo: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem'
-    },
-    badgeUsuario: {
-      padding: '0.25rem 0.5rem',
-      borderRadius: '4px',
-      color: 'white',
-      fontSize: '0.8rem',
-      fontWeight: '600'
-    },
-    accionesProducto: {
-      marginTop: '1rem',
-      display: 'flex',
-      justifyContent: 'flex-end'
-    },
-    accionesUsuario: {
-      marginTop: '1rem',
-      display: 'flex',
-      justifyContent: 'flex-end'
-    },
-    botonEditar: {
-      backgroundColor: '#8B4513',
-      color: 'white',
-      border: 'none',
-      padding: '0.5rem 1rem',
-      borderRadius: '6px',
-      cursor: 'pointer',
-      fontSize: '0.9rem',
-      fontWeight: '600',
-      transition: 'all 0.3s ease',
-      display: 'flex',
-      alignItems: 'center'
-    },
-    modalOverlay: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999
-    },
-    modalContent: {
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      padding: '0',
-      maxWidth: '500px',
-      width: '90%',
-      maxHeight: '80vh',
-      overflow: 'auto',
-      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
-    },
-    modalHeader: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '1.5rem',
-      borderBottom: '1px solid #e9ecef',
-      backgroundColor: '#8B4513',
-      color: 'white',
-      borderRadius: '12px 12px 0 0'
-    },
-    botonCerrar: {
-      backgroundColor: 'transparent',
-      border: 'none',
-      color: 'white',
-      fontSize: '1.5rem',
-      cursor: 'pointer',
-      padding: '0.25rem'
-    },
-    modalForm: {
-      padding: '2rem'
-    },
-    modalActions: {
-      display: 'flex',
-      gap: '1rem',
-      justifyContent: 'flex-end',
-      marginTop: '2rem'
-    },
-    botonCancelar: {
-      backgroundColor: '#6c757d',
-      color: 'white',
-      border: 'none',
-      padding: '0.75rem 1.5rem',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      fontSize: '1rem',
-      fontWeight: '600'
-    },
-    botonGuardar: {
-      backgroundColor: '#28a745',
-      color: 'white',
-      border: 'none',
-      padding: '0.75rem 1.5rem',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      fontSize: '1rem',
-      fontWeight: '600'
-    }
-  };
-
   const renderModalEditarProducto = () => (
     modalEditarProducto && (
-      <div style={estilos.modalOverlay}>
-        <div style={estilos.modalContent}>
-          <div style={estilos.modalHeader}>
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-header">
             <h3>Editar Producto</h3>
             <button 
               onClick={cerrarModalEditar}
-              style={estilos.botonCerrar}
+              className="boton-cerrar"
             >
               <i className="fas fa-times"></i>
             </button>
           </div>
-          <form onSubmit={handleSubmitEditarProducto} style={estilos.modalForm}>
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Nombre del Producto*</label>
+          <form onSubmit={handleSubmitEditarProducto} className="modal-form">
+            <div className="input-group">
+              <label className="label">Nombre del Producto*</label>
               <input
                 type="text"
                 name="nombre"
                 value={productoEditado.nombre}
                 onChange={handleInputChangeProducto}
-                style={estilos.input}
+                className="input"
                 required
               />
             </div>
             
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Descripción</label>
+            
+            <div className="input-group">
+              <label className="label">Descripción</label>
               <textarea
                 name="descripcion"
                 value={productoEditado.descripcion}
                 onChange={handleInputChangeProducto}
-                style={{...estilos.input, minHeight: '80px', resize: 'vertical'}}
+                className="input"
                 rows="3"
               />
             </div>
             
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Precio*</label>
+            <div className="input-group">
+              <label className="label">Precio*</label>
               <input
                 type="number"
                 name="precio"
                 value={productoEditado.precio}
                 onChange={handleInputChangeProducto}
-                style={estilos.input}
+                className="input"
                 min="0"
                 required
               />
             </div>
             
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Stock*</label>
+            <div className="input-group">
+              <label className="label">Stock*</label>
               <input
                 type="number"
                 name="stock"
                 value={productoEditado.stock}
                 onChange={handleInputChangeProducto}
-                style={estilos.input}
+                className="input"
                 min="0"
                 required
               />
             </div>
             
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Categoría</label>
+            <div className="input-group">
+              <label className="label">Stock Crítico*</label>
+              <input
+                type="number"
+                name="stock_critico"
+                value={productoEditado.stock_critico}
+                onChange={handleInputChangeProducto}
+                className="input"
+                min="0"
+                required
+              />
+              <small>
+                Alerta cuando el stock baje de este número
+              </small>
+            </div>
+            
+            <div className="input-group">
+              <label className="label">Categoría</label>
               <select
                 name="categoria"
                 value={productoEditado.categoria}
                 onChange={handleInputChangeProducto}
-                style={estilos.select}
+                className="select"
               >
                 <option value="Tortas Cuadradas">Tortas Cuadradas</option>
                 <option value="Tortas Circulares">Tortas Circulares</option>
@@ -1491,17 +940,17 @@ function AdminPanel() {
               </select>
             </div>
             
-            <div style={estilos.modalActions}>
+            <div className="modal-actions">
               <button 
                 type="button" 
                 onClick={cerrarModalEditar}
-                style={estilos.botonCancelar}
+                className="boton-cancelar"
               >
                 Cancelar
               </button>
               <button 
                 type="submit"
-                style={estilos.botonGuardar}
+                className="boton-guardar"
               >
                 Guardar Cambios
               </button>
@@ -1514,73 +963,73 @@ function AdminPanel() {
 
   const renderModalEditarUsuario = () => (
     modalEditarUsuario && (
-      <div style={estilos.modalOverlay}>
-        <div style={estilos.modalContent}>
-          <div style={estilos.modalHeader}>
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-header">
             <h3>Editar Usuario</h3>
             <button 
               onClick={cerrarModalEditarUsuario}
-              style={estilos.botonCerrar}
+              className="boton-cerrar"
             >
               <i className="fas fa-times"></i>
             </button>
           </div>
           
-          <form onSubmit={handleSubmitEditarUsuario} style={estilos.modalForm}>
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Nombre*</label>
+          <form onSubmit={handleSubmitEditarUsuario} className="modal-form">
+            <div className="input-group">
+              <label className="label">Nombre*</label>
               <input
                 type="text"
                 name="nombre"
                 value={usuarioEditado.nombre}
                 onChange={handleInputChangeUsuario}
-                style={estilos.input}
+                className="input"
                 required
               />
             </div>
 
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Apellidos*</label>
+            <div className="input-group">
+              <label className="label">Apellidos*</label>
               <input
                 type="text"
                 name="apellidos"
                 value={usuarioEditado.apellidos}
                 onChange={handleInputChangeUsuario}
-                style={estilos.input}
+                className="input"
                 required
               />
             </div>
 
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Correo Electrónico*</label>
+            <div className="input-group">
+              <label className="label">Correo Electrónico*</label>
               <input
                 type="email"
                 name="correo"
                 value={usuarioEditado.correo}
                 onChange={handleInputChangeUsuario}
-                style={estilos.input}
+                className="input"
                 required
               />
             </div>
 
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Fecha de Nacimiento</label>
+            <div className="input-group">
+              <label className="label">Fecha de Nacimiento</label>
               <input
                 type="date"
                 name="fecha_nacimiento"
                 value={usuarioEditado.fecha_nacimiento}
                 onChange={handleInputChangeUsuario}
-                style={estilos.input}
+                className="input"
               />
             </div>
 
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Región*</label>
+            <div className="input-group">
+              <label className="label">Región*</label>
               <select
                 name="region"
                 value={usuarioEditado.region}
                 onChange={handleInputChangeUsuario}
-                style={estilos.select}
+                className="select"
                 required
               >
                 <option value="">Seleccionar región</option>
@@ -1590,13 +1039,13 @@ function AdminPanel() {
               </select>
             </div>
 
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Comuna*</label>
+            <div className="input-group">
+              <label className="label">Comuna*</label>
               <select
                 name="comuna"
                 value={usuarioEditado.comuna}
                 onChange={handleInputChangeUsuario}
-                style={estilos.select}
+                className="select"
                 required
                 disabled={!usuarioEditado.region}
               >
@@ -1607,29 +1056,29 @@ function AdminPanel() {
               </select>
             </div>
 
-            <div style={estilos.inputGroup}>
-              <label style={estilos.label}>Dirección*</label>
+            <div className="input-group">
+              <label className="label">Dirección*</label>
               <input
                 type="text"
                 name="direccion"
                 value={usuarioEditado.direccion}
                 onChange={handleInputChangeUsuario}
-                style={estilos.input}
+                className="input"
                 required
               />
             </div>
 
-            <div style={estilos.modalActions}>
+            <div className="modal-actions">
               <button 
                 type="button" 
                 onClick={cerrarModalEditarUsuario}
-                style={estilos.botonCancelar}
+                className="boton-cancelar"
               >
                 Cancelar
               </button>
               <button 
                 type="submit"
-                style={estilos.botonGuardar}
+                className="boton-guardar"
               >
                 Guardar Cambios
               </button>
@@ -1641,126 +1090,88 @@ function AdminPanel() {
   );
 
   return (
-    <div style={estilos.contenedorAdmin}>
+    <div className="contenedor-admin">
       {}
-      <aside style={estilos.barraLateral}>
-        <div style={estilos.encabezadoBarraLateral}>
-          <h2 style={estilos.tituloBarraLateral}>
+      <aside className={`barra-lateral ${menuColapsado ? 'colapsada' : ''}`}>
+        <div className="encabezado-barra-lateral">
+          <h2 className="titulo-barra-lateral">
             {menuColapsado ? 'PA' : 'Panel de Admin'}
           </h2>
         </div>
         
-        <nav style={estilos.navegacionBarraLateral}>
-          <ul style={estilos.menuNavegacion}>
-            <li style={estilos.elementoNavegacion}>
+        <nav className="navegacion-barra-lateral">
+          <ul className="menu-navegacion">
+            <li className="elemento-navegacion">
               <a
                 onClick={() => setVistaActiva('tablero')}
-                style={{
-                  ...estilos.enlaceNavegacion,
-                  ...(vistaActiva === 'tablero' ? estilos.enlaceNavegacionActivo : {})
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-                onMouseLeave={(e) => {
-                  if (vistaActiva !== 'tablero') {
-                    e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
+                className={`enlace-navegacion ${vistaActiva === 'tablero' ? 'activo' : ''}`}
               >
-                <i className="fas fa-home" style={estilos.iconoNavegacion}></i>
-                <span style={estilos.textoNavegacion}>Tablero</span>
+                <i className="fas fa-home icono-navegacion"></i>
+                <span className="texto-navegacion">Tablero</span>
               </a>
             </li>
-            <li style={estilos.elementoNavegacion}>
+            <li className="elemento-navegacion">
               <a
                 onClick={() => setVistaActiva('productos')}
-                style={{
-                  ...estilos.enlaceNavegacion,
-                  ...(vistaActiva === 'productos' ? estilos.enlaceNavegacionActivo : {})
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-                onMouseLeave={(e) => {
-                  if (vistaActiva !== 'productos') {
-                    e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
+                className={`enlace-navegacion ${vistaActiva === 'productos' ? 'activo' : ''}`}
               >
-                <i className="fas fa-birthday-cake" style={estilos.iconoNavegacion}></i>
-                <span style={estilos.textoNavegacion}>Productos</span>
+                <i className="fas fa-birthday-cake icono-navegacion"></i>
+                <span className="texto-navegacion">Productos</span>
               </a>
             </li>
-            <li style={estilos.elementoNavegacion}>
+            <li className="elemento-navegacion">
               <a
                 onClick={() => setVistaActiva('usuarios')}
-                style={{
-                  ...estilos.enlaceNavegacion,
-                  ...(vistaActiva === 'usuarios' ? estilos.enlaceNavegacionActivo : {})
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-                onMouseLeave={(e) => {
-                  if (vistaActiva !== 'usuarios') {
-                    e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
+                className={`enlace-navegacion ${vistaActiva === 'usuarios' ? 'activo' : ''}`}
               >
-                <i className="fas fa-users" style={estilos.iconoNavegacion}></i>
-                <span style={estilos.textoNavegacion}>Usuarios</span>
+                <i className="fas fa-users icono-navegacion"></i>
+                <span className="texto-navegacion">Usuarios</span>
               </a>
             </li>
-            <li style={estilos.elementoNavegacion}>
+            <li className="elemento-navegacion">
               <a
                 onClick={() => setVistaActiva('nuevoUsuario')}
-                style={{
-                  ...estilos.enlaceNavegacion,
-                  ...(vistaActiva === 'nuevoUsuario' ? estilos.enlaceNavegacionActivo : {})
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-                onMouseLeave={(e) => {
-                  if (vistaActiva !== 'nuevoUsuario') {
-                    e.target.style.backgroundColor = 'transparent';
-                  }
-                }}
+                className={`enlace-navegacion ${vistaActiva === 'nuevoUsuario' ? 'activo' : ''}`}
               >
-                <i className="fas fa-user-plus" style={estilos.iconoNavegacion}></i>
-                <span style={estilos.textoNavegacion}>Nuevo Usuario</span>
+                <i className="fas fa-user-plus icono-navegacion"></i>
+                <span className="texto-navegacion">Nuevo Usuario</span>
               </a>
             </li>
           </ul>
         </nav>
         
-        <div style={estilos.pieBarraLateral}>
+        <div className="pie-barra-lateral">
           <button
             onClick={salirDelPanel}
-            style={estilos.botonSalir}
-            onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(220, 53, 69, 0.4)'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(220, 53, 69, 0.2)'}
+            className="boton-salir"
           >
-            <i className="fas fa-sign-out-alt" style={estilos.iconoNavegacion}></i>
-            <span style={estilos.textoNavegacion}>Salir</span>
+            <i className="fas fa-sign-out-alt icono-navegacion"></i>
+            <span className="texto-navegacion">Salir</span>
           </button>
         </div>
       </aside>
 
       {}
-      <main style={estilos.contenidoPrincipal}>
+      <main className="contenido-principal">
         {}
-        <header style={estilos.encabezadoContenido}>
-          <div style={estilos.izquierdaEncabezado}>
+        <header className="encabezado-contenido">
+          <div className="izquierda-encabezado">
             <button 
               onClick={alternarMenu}
-              style={estilos.alternarMenu}
+              className="alternar-menu"
             >
               <i className="fas fa-bars"></i>
             </button>
-            <h1 style={estilos.tituloPagina}>
+            <h1 className="titulo-pagina">
               {vistaActiva === 'productos' ? 'Productos' : 
                vistaActiva === 'usuarios' ? 'Usuarios' : 
                vistaActiva === 'nuevoUsuario' ? 'Nuevo Usuario' : 'Tablero'}
             </h1>
           </div>
-          <div style={estilos.derechaEncabezado}>
-            <div style={estilos.informacionUsuario}>
-              <span style={estilos.textoBienvenida}>Bienvenido, Admin</span>
-              <div style={estilos.avatarUsuario}>
+          <div className="derecha-encabezado">
+            <div className="informacion-usuario">
+              <span className="texto-bienvenida">Bienvenido, Admin</span>
+              <div className="avatar-usuario">
                 <i className="fas fa-user-circle"></i>
               </div>
             </div>

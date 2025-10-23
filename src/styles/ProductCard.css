@@ -1,5 +1,3 @@
-/* ProductCard.css */
-
 .product-card {
   background: white;
   border-radius: 20px;
@@ -121,4 +119,42 @@
 .add-to-cart-button:disabled:hover {
   transform: none;
   box-shadow: none;
+}
+
+.imagen-producto-card {
+  height: 200px;
+  object-fit: cover;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.imagen-producto-card.sin-stock {
+  opacity: 0.5;
+}
+
+.titulo-producto-card {
+  color: #8B4513;
+}
+
+.precio-producto-card {
+  color: #D2691E;
+}
+
+.boton-agregar-carrito {
+  background-color: #D2691E;
+  transition: background-color 0.3s ease;
+}
+
+.boton-agregar-carrito:hover:not(:disabled) {
+  background-color: #B8550E;
+}
+
+.boton-agregar-carrito.sin-stock {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.boton-agregar-carrito:disabled {
+  background-color: #999;
+  cursor: not-allowed;
 }
