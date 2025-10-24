@@ -10,7 +10,6 @@ function DetalleBoleta(){
     const [lsBoletas, setLsBoletas] = useState([])
     const [recboleta, setRecboleta] = useState(null)
     const [productos, setProductos] = useState(null)
-    const [estilo, setEstilo] = useState("")
 
     const navigate = useNavigate()
 
@@ -28,8 +27,6 @@ function DetalleBoleta(){
         const prods = encontrarBoleta.productos_comprados
         const listp = []
 
-        var est = " row g-0"
-        
         prods.forEach(p=>{
             pg.forEach(pg=>{
                 if(pg.prod_codigo == p.codigo_producto){
@@ -38,8 +35,7 @@ function DetalleBoleta(){
                         cantidad: parseInt(p.cantidad_producto),
                         precio: parseInt(pg.precio)
                     }
-                    if(est == "fondo row g-0"){est = " row g-0"}else{est = "fondo row g-0"}
-                    setEstilo(est)
+                    
                     listp.push(producto_info)
                 }
             })
@@ -48,17 +44,19 @@ function DetalleBoleta(){
     },[])
 
     return(
-        <div>
+        <>
+        <h3 className="ms-5 mt-5">Detalle boleta</h3>
+        <div className="justify-self-center">
         {recboleta ? (
             <CardBoletas 
             brp={recboleta}
             prods={productos}
-            style={estilo}
             regresar={() => navigate("/admin/boletas")}/>
         ) : (
             <p>No se encontró la boleta seleccionada</p>
         )}
         </div>
+        </>
     )
 }
 export default DetalleBoleta

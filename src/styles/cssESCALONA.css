@@ -256,4 +256,10 @@ FFC0CB  |  Elementos rosas
     background-color: rgba(255, 255, 255, 0.1);
     border-right: 4px solid rgb(255, 210, 233);
     color: #ffffff;
+}.margin-btn{
+    margin-left: 2rem;
+}.justify-self-center{
+    justify-self: center;
+    width: 100%;
+    max-width: 850px;
 }

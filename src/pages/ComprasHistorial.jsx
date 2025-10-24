@@ -9,6 +9,10 @@ function ComprasHistorial(usuario){
 
     const navigate = useNavigate()
 
+    const volverInicio = ()=>{
+        navigate("/admin")
+    }
+
     const ver = (r)=>{
         console.log("RUN = "+r)
         let lista = []
@@ -35,18 +39,30 @@ function ComprasHistorial(usuario){
     },[])
 
     return(
-        <div className="base_tarjeta">
+        <>
+        <h3 className="ms-5 mt-5">Usuarios y sus compras realizadas</h3>
+        <div>
             {
                 usuarios.map((u,i)=>(
-                    <div key={i}>
-                        <p>{u.nombre}</p>
-                        <button value={u.run} onClick={()=>ver(u.run)}>Ver compras</button>
+                    <div className="base_tarjeta" key={i}>
+
+                        <strong>Usuario: </strong>
+                        <div className="fondo">
+                            <p>{u.nombre}</p>
+                        </div>
+
+                        <strong>Compras realizadas: </strong>
+                        <div className="fondo">
+                            <p>x{i+1}</p>
+                        </div>
+
+                        <button className="btn-delineado-chocolate mb-2" value={u.run} onClick={()=>ver(u.run)}>Ver compras</button>
                     </div>
                 ))
             }
-            <strong>Usuraio:</strong>
-            <p></p>
         </div>
+        <button className="btn-cambio-frutilla margin-btn" onClick={volverInicio}>Volver al panel</button>
+        </>
     )
 }
 export default ComprasHistorial

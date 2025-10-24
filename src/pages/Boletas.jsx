@@ -29,6 +29,7 @@ function Boletas(){
 
     return(
         <>
+            <h3 className="ms-5 mt-5">Historial de boletas</h3>
             <div>
                 {
                 lista_boletas.map(boleta=>(
@@ -41,7 +42,7 @@ function Boletas(){
                 }
             </div>
             <div>
-                <button onClick={volverInicio}>Volver</button>
+                <button className="btn-cambio-frutilla margin-btn" onClick={volverInicio}>Volver al panel</button>
             </div>
         </>
     )

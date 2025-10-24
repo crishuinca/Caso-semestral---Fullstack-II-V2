@@ -1,7 +1,7 @@
 import "../styles/cssESCALONA.css"
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-function CardBoletas({brp, prods, style, regresar}){
+function CardBoletas({brp, prods, regresar}){
     let [ano,mes,dia] = brp.comprador.fecha_compra.split("-")
     var ndia = dia.substring(0,2)
     var total = 0
@@ -38,7 +38,7 @@ function CardBoletas({brp, prods, style, regresar}){
                 <div>
                     {
                         prods.map((p,i)=>(
-                            <div key={i} className={style}>
+                            <div key={i} className="row g-0">
                                 <p className="mb-1 col-6">{p.nombre}</p>
                                 <p className="mb-1 col-2 blt-mandar-end">x{p.cantidad}</p>
                                 <p className="mb-1 col-4 blt-mandar-end">${p.cantidad * p.precio}</p>
@@ -54,7 +54,11 @@ function CardBoletas({brp, prods, style, regresar}){
                 </div>
             </div>
         </div>
-        <button className="margen-btn btn-cambio-chocolate" onClick={regresar}>Regresar al panel</button>
+        { regresar?(
+            <button className="margen-btn btn-cambio-chocolate" onClick={regresar}>Regresar</button>
+        ):(
+            <p></p>
+        )}
         </>
     )
 }
