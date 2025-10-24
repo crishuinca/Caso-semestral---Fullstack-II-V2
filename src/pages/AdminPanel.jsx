@@ -126,6 +126,9 @@ function AdminPanel() {
     
     navigate('/');
   };
+  const irBoletas = ()=>{
+    navigate("/admin/boletas")
+  }
 
   const determinarCategoria = (nombre) => {
     if (nombre.toLowerCase().includes('torta')) return 'Tortas';
@@ -1641,6 +1644,7 @@ function AdminPanel() {
   );
 
   return (
+  
     <div style={estilos.contenedorAdmin}>
       {}
       <aside style={estilos.barraLateral}>
@@ -1723,6 +1727,9 @@ function AdminPanel() {
                 <i className="fas fa-user-plus" style={estilos.iconoNavegacion}></i>
                 <span style={estilos.textoNavegacion}>Nuevo Usuario</span>
               </a>
+            </li>
+            <li>
+              <a onClick={irBoletas()}></a>
             </li>
           </ul>
         </nav>

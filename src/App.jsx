@@ -14,6 +14,7 @@ import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel';
 import CompraExitosa from './pages/CompraExitosa'
 import CompraErronea from './pages/CompraErronea'
+import Boletas from './pages/Boletas'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
@@ -41,6 +42,7 @@ function AppContent() {
           <Route path="*" element={<Home />} />
           <Route path="/compra-exitosa" element={<CompraExitosa />} />
           <Route path="/compra-erronea" element={<CompraErronea />} />
+          <Route path='/admin/boletas' element={<Boletas/>}/>
         </Routes>
       </main>
     </div>
