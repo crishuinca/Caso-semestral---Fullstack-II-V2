@@ -29,7 +29,7 @@ function Carrito() {
     ano: '',
     tipoEntrega: 'retiro'
   });
-
+//-----------------------------------------------------------------------------------
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setDatosCompra(prev => ({
@@ -38,7 +38,7 @@ function Carrito() {
     }));
   };
 
-
+//-----------------------------------------------------------------------------------
   const confirmarPedido = () => {
     
     if (!datosCompra.nombre.trim()) {
@@ -69,7 +69,7 @@ function Carrito() {
     localStorage.setItem("temporal_info", JSON.stringify(pedido))
 
   };
-
+//-----------------------------------------------------------------------------------
   const redirigir = (details) => {
   try {
     localStorage.setItem("temporal_info_quien_pago", JSON.stringify(details));
@@ -80,17 +80,40 @@ function Carrito() {
   navigate("/compra-exitosa");
   vaciarCarrito();
 };
+//-----------------------------------------------------------------------------------
+  const redirigirFallo = (error) => {
+    try {
+      const tipo_error = {
+        insuficiente: /INSTRUMENT_DECLINED|INSUFFICIENT_FUNDS/i,
+        expiro: /EXPIRED_CARD/i,
+        rechazado: /CARD_DECLINED|REJECTED/i,
+        procesando: /PROCESSING_ERROR/i,
+      }
+      var errorTxt = String(error)
 
-const redirigirFallo = (error) => {
-  try {
-    localStorage.setItem("error_compra", JSON.stringify(error));
-  } catch (e) {
-    console.error("Error guardando info de fallo:", e);
-    localStorage.setItem("error_compra", "");
-  }
-  navigate("/compra-erronea");
-};
+      if(tipo_error.insuficiente.test(errorTxt)){
+        localStorage.setItem("error_compra", "Pago rechazado, fondos insuficientes o metodo no disponible")
+        return}
+      if(tipo_error.expiro.test(errorTxt)){
+        localStorage.setItem("error_compra", "Tarjeta expirada, usa otra tarjeta o metodo de pago")
+        return}
+      if(tipo_error.rechazado.test(errorTxt)){
+        localStorage.setItem("error_compra", "Tarjeta rechazada por el banco, pruebe otro metodo")
+        return}
+      if(tipo_error.procesando.test(errorTxt)){
+        localStorage.setItem("error_compra", "Error de procesamiento, intente de nuevo mas tarde")
+        return}
+      
+      localStorage.setItem("error_compra", "Error al procesar el pago")
+      console.error(error)
 
+    } catch (e) {
+      console.error("Error guardando info de fallo:", e);
+      localStorage.setItem("error_compra", "ERROR DESCONOCIDO");
+    }
+    navigate("/compra-erronea");
+  };
+//-----------------------------------------------------------------------------------
   const estilos = {
     body: {
       backgroundColor: '#FFF5E1',
@@ -160,14 +183,14 @@ const redirigirFallo = (error) => {
       zIndex: 1040
     }
   };
-
+//-----------------------------------------------------------------------------------
   const initialOptions = {
         clientId: "AR36SqRE30K24Cv_7MIVRq0qBamsHC1vhgU_hiXCwRNoGehpT1hzCrSTgTjWEgNFFssFeZr4SlkqlFYN",
         currency: "USD",
         intent: "capture",
         style: ""
     };
-
+//-----------------------------------------------------------------------------------
   return (
     <div style={estilos.body}>
       <main>
@@ -478,9 +501,10 @@ const redirigirFallo = (error) => {
                     }}
                     onApprove={(data, actions) => {
                       return actions.order.capture().then((details) => {
-                        console.log(details)
-                        redirigir(details); // Llamar a tu función de confirmación
-                      });
+                        redirigir(details)
+                      }).catch((error) => {
+                        redirigirFallo(error)
+                      })
                     }}
                   />
                 </PayPalScriptProvider>
