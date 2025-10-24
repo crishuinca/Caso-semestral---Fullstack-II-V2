@@ -1729,7 +1729,7 @@ function AdminPanel() {
               </a>
             </li>
             <li>
-              <a onClick={irBoletas()}></a>
+              <a onClick={irBoletas}>Boletas</a>
             </li>
           </ul>
         </nav>

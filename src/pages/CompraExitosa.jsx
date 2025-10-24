@@ -18,6 +18,8 @@ function CompraExitosa() {
         let info_usuario_comprador = {}
         let info_usuario_recibidor = {}
 
+        let lista_boletas_guardadas = []
+
         try {  
             if(localStorage.getItem("usuarioActual")){
                 let u = JSON.parse(localStorage.getItem("usuarioActual"))
@@ -56,12 +58,20 @@ function CompraExitosa() {
                 nombre_recibidor: infodespacho.cliente_despachar.nombre,
                 rut_recibidor: infodespacho.cliente_despachar.rut
             }
+            var id = "HBLT_1"
+            lista_boletas_guardadas = JSON.parse(localStorage.getItem("historial_boletas"))
+            lista_boletas_guardadas.forEach((b,i)=>{
+                id = "HBLT_"+(i+1)
+            })
             let guardar_boleta = {
+                n_boleta: id,
                 recibidor: info_usuario_recibidor,
                 comprador: info_usuario_comprador,
                 productos_comprados: lista_productos_comprados
             }
             localStorage.setItem("compra_realizada", JSON.stringify(guardar_boleta))
+            lista_boletas_guardadas.push(guardar_boleta)
+            localStorage.setItem("historial_boletas", JSON.stringify(lista_boletas_guardadas))
 
         } catch (error) {
             console.error("Error al cargar la informacion: ", error)
