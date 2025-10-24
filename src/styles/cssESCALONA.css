@@ -225,4 +225,21 @@ FFC0CB  |  Elementos rosas
     height: 100%;
 }.margen{
     margin-top: 15rem;
+}.blt-tarjeta{
+    max-width: 800px;
+    margin: 2rem;
+}
+@media screen and (max-width: 600px){
+    .blt-tarjeta{ margin: 1rem; }
+}
+.blt-bordes{
+    border-bottom: 1px solid #ff2600;
+    border-top: 1px solid #ff2600;
+}.blt-jst{
+    text-align: center;
+}.blt-mandar-end{
+    text-align: end;
+}.fondo{
+    background-color: #fff5e1;
+    border-radius: 3px;
 }
