@@ -5,7 +5,7 @@ import '../styles/AdminPanel.css';
 
 function AdminPanel() {
   const navigate = useNavigate();
-  const { productosDisponibles, productosStock } = useCarrito();
+  const { productosDisponibles, productosStock, mostrarMensaje } = useCarrito();
   const [vistaActiva, setVistaActiva] = useState('tablero');
   const [productos, setProductos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -559,6 +559,112 @@ function AdminPanel() {
     </div>
   );
 
+  const renderReportes = () => (
+    <div className="area-contenido">
+      <div className="encabezado-seccion">
+        <h2>Reportes del Sistema</h2>
+        <p>Análisis y estadísticas de la pastelería</p>
+      </div>
+      
+      <div className="contenedor-reportes">
+        <div className="reporte-seccion">
+          <div className="encabezado-reporte">
+            <h3>
+              <i className="fas fa-birthday-cake"></i>
+              Reporte de Productos
+            </h3>
+            <p>Análisis del inventario y ventas de productos</p>
+          </div>
+          <div className="contenido-reporte">
+            <div className="metricas-reporte">
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">{productosDisponibles.length}</span>
+                  <span className="metrica-label">Total Productos</span>
+                </div>
+              </div>
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">
+                    {productosDisponibles.filter(p => p.stock <= 5).length}
+                  </span>
+                  <span className="metrica-label">Stock Crítico</span>
+                </div>
+              </div>
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">
+                    {productosDisponibles.filter(p => p.stock === 0).length}
+                  </span>
+                  <span className="metrica-label">Sin Stock</span>
+                </div>
+              </div>
+            </div>
+            <div className="acciones-reporte">
+              <button 
+                className="boton-descargar-csv"
+                onClick={() => descargarReporteCSV('productos')}
+              >
+                <i className="fas fa-download"></i>
+                Descargar reporte en CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="reporte-seccion">
+          <div className="encabezado-reporte">
+            <h3>
+              <i className="fas fa-users"></i>
+              Reporte de Usuarios
+            </h3>
+            <p>Estadísticas de usuarios registrados</p>
+          </div>
+          <div className="contenido-reporte">
+            <div className="metricas-reporte">
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">{usuarios.length}</span>
+                  <span className="metrica-label">Total Usuarios</span>
+                </div>
+              </div>
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">
+                    {usuarios.filter(u => u.tipo === 'Administrador' || u.isAdmin).length}
+                  </span>
+                  <span className="metrica-label">Administradores</span>
+                </div>
+              </div>
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">
+                    {usuarios.filter(u => {
+                      const fechaRegistro = new Date(u.fechaRegistro);
+                      const haceUnaSemana = new Date();
+                      haceUnaSemana.setDate(haceUnaSemana.getDate() - 7);
+                      return fechaRegistro >= haceUnaSemana;
+                    }).length}
+                  </span>
+                  <span className="metrica-label">Nuevos (7 días)</span>
+                </div>
+              </div>
+            </div>
+            <div className="acciones-reporte">
+              <button 
+                className="boton-descargar-csv"
+                onClick={() => descargarReporteCSV('usuarios')}
+              >
+                <i className="fas fa-download"></i>
+                Descargar reporte en CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderUsuarios = () => (
     <div className="area-contenido">
       <div className="encabezado-seccion">
@@ -828,10 +934,151 @@ function AdminPanel() {
     </div>
   );
 
+  const descargarReporteCSV = (tipoReporte) => {
+    let datos = [];
+    let nombreArchivo = '';
+    
+    if (tipoReporte === 'productos') {
+      // Generar datos de productos
+      const productosActuales = productosStock.length > 0 ? productosStock : productosDisponibles;
+      datos = productosActuales.map(producto => ({
+        'Código': producto.prod_codigo,
+        'Nombre': producto.nombre,
+        'Categoría': producto.categoria,
+        'Precio': producto.precio,
+        'Stock': producto.stock,
+        'Stock Crítico': producto.stock_critico,
+        'Estado': producto.stock === 0 ? 'Sin Stock' : 
+                 producto.stock <= producto.stock_critico ? 'Stock Crítico' : 'Normal'
+      }));
+      nombreArchivo = 'reporte_productos.csv';
+    } else if (tipoReporte === 'usuarios') {
+      // Generar datos de usuarios - obtener directamente del localStorage
+      let usuariosActuales = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      
+      // Si no hay usuarios, crear datos de ejemplo para la demostración
+      if (usuariosActuales.length === 0) {
+        usuariosActuales = [
+          {
+            id: 1,
+            run: '12345678-9',
+            nombre: 'Administrador',
+            apellidos: 'del Sistema',
+            correo: 'admin@pasteleriaAA',
+            isAdmin: true,
+            fechaRegistro: new Date().toISOString(),
+            region: 'Metropolitana',
+            comuna: 'Santiago'
+          },
+          {
+            id: 2,
+            run: '98765432-1',
+            nombre: 'Usuario',
+            apellidos: 'de Ejemplo',
+            correo: 'usuario@example.com',
+            isAdmin: false,
+            fechaRegistro: new Date().toISOString(),
+            region: 'Metropolitana',
+            comuna: 'Las Condes'
+          }
+        ];
+      }
+      
+      datos = usuariosActuales.map(usuario => ({
+        'ID': usuario.id || 'N/A',
+        'RUT': usuario.run || usuario.rut || 'N/A',
+        'Nombre': usuario.nombre || 'N/A',
+        'Apellidos': usuario.apellidos || 'N/A',
+        'Correo': usuario.correo || 'N/A',
+        'Tipo': usuario.isAdmin ? 'Administrador' : 'Usuario',
+        'Fecha Registro': usuario.fechaRegistro ? 
+          new Date(usuario.fechaRegistro).toLocaleDateString('es-CL') : 'N/A',
+        'Región': usuario.region || 'N/A',
+        'Comuna': usuario.comuna || 'N/A'
+      }));
+      nombreArchivo = 'reporte_usuarios.csv';
+    }
+
+    // Convertir a CSV
+    
+    if (datos.length === 0) {
+      if (tipoReporte === 'usuarios') {
+        alert('No hay usuarios registrados para exportar');
+      } else {
+        alert('No hay productos para exportar');
+      }
+      return;
+    }
+
+    const headers = Object.keys(datos[0]);
+    
+    // Función para escapar valores CSV
+    const escaparValorCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      const str = String(value);
+      // Siempre encerrar en comillas para evitar problemas con SYLK
+      return `"${str.replace(/"/g, '""')}"`;
+    };
+
+    const csvContent = [
+      headers.map(h => `"${h}"`).join(','), // Headers también entre comillas
+      ...datos.map(row => 
+        headers.map(header => escaparValorCSV(row[header])).join(',')
+      )
+    ].join('\n');
+
+    // Agregar BOM para UTF-8 y evitar problema SYLK
+    const BOM = '\uFEFF';
+    const csvWithBOM = BOM + csvContent;
+
+    // Crear y descargar el archivo con tipo MIME correcto
+    const blob = new Blob([csvWithBOM], { type: 'application/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', nombreArchivo);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      
+      // Intentar diferentes métodos de descarga
+      try {
+        // Método 1: Click directo
+        link.click();
+        
+        // Método 2: Evento click programático
+        const evento = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: false
+        });
+        link.dispatchEvent(evento);
+        
+      } catch (error) {
+        // Método alternativo: abrir en nueva ventana
+        window.open(url, '_blank');
+      }
+      
+      // Limpiar después de un pequeño delay
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 1000);
+      
+      // Mostrar mensaje de éxito
+      mostrarMensaje(`Reporte ${tipoReporte} descargado exitosamente`, 'ok');
+    } else {
+      alert('Tu navegador no soporta la descarga de archivos');
+    }
+  };
+
   const renderContenido = () => {
     switch (vistaActiva) {
       case 'productos':
         return renderProductos();
+      case 'reportes':
+        return renderReportes();
       case 'usuarios':
         return renderUsuarios();
       case 'nuevoUsuario':
@@ -1121,6 +1368,15 @@ function AdminPanel() {
             </li>
             <li className="elemento-navegacion">
               <a
+                onClick={() => setVistaActiva('reportes')}
+                className={`enlace-navegacion ${vistaActiva === 'reportes' ? 'activo' : ''}`}
+              >
+                <i className="fas fa-chart-bar icono-navegacion"></i>
+                <span className="texto-navegacion">Reportes</span>
+              </a>
+            </li>
+            <li className="elemento-navegacion">
+              <a
                 onClick={() => setVistaActiva('usuarios')}
                 className={`enlace-navegacion ${vistaActiva === 'usuarios' ? 'activo' : ''}`}
               >
@@ -1164,6 +1420,7 @@ function AdminPanel() {
             </button>
             <h1 className="titulo-pagina">
               {vistaActiva === 'productos' ? 'Productos' : 
+               vistaActiva === 'reportes' ? 'Reportes' :
                vistaActiva === 'usuarios' ? 'Usuarios' : 
                vistaActiva === 'nuevoUsuario' ? 'Nuevo Usuario' : 'Tablero'}
             </h1>
