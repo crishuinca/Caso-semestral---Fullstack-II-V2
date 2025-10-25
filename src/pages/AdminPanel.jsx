@@ -684,14 +684,14 @@ function AdminPanel() {
             <div className="metricas-reporte">
               <div className="metrica-card">
                 <div className="metrica-info">
-                  <span className="metrica-numero">{productosDisponibles.length}</span>
+                  <span className="metrica-numero">{productos.length}</span>
                   <span className="metrica-label">Total Productos</span>
                 </div>
               </div>
               <div className="metrica-card">
                 <div className="metrica-info">
                   <span className="metrica-numero">
-                    {productosDisponibles.filter(p => p.stock <= 5).length}
+                    {productos.filter(p => p.stock <= 5).length}
                   </span>
                   <span className="metrica-label">Stock Crítico</span>
                 </div>
@@ -699,7 +699,7 @@ function AdminPanel() {
               <div className="metrica-card">
                 <div className="metrica-info">
                   <span className="metrica-numero">
-                    {productosDisponibles.filter(p => p.stock === 0).length}
+                    {productos.filter(p => p.stock === 0).length}
                   </span>
                   <span className="metrica-label">Sin Stock</span>
                 </div>
@@ -1045,8 +1045,7 @@ function AdminPanel() {
     
     if (tipoReporte === 'productos') {
       // Generar datos de productos
-      const productosActuales = productosStock.length > 0 ? productosStock : productosDisponibles;
-      datos = productosActuales.map(producto => ({
+      datos = productos.map(producto => ({
         'Código': producto.prod_codigo,
         'Nombre': producto.nombre,
         'Categoría': producto.categoria,
