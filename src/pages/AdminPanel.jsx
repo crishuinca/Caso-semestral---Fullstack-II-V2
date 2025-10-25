@@ -502,6 +502,13 @@ function AdminPanel() {
     <div className="area-contenido-productos">
       <div className="encabezado-seccion">
         <h2>Catálogo de Productos</h2>
+        <button 
+          className="boton-productos-criticos"
+          onClick={() => setVistaActiva('productosCriticos')}
+        >
+          <i className="fas fa-exclamation-triangle"></i>
+          Listado de productos críticos
+        </button>
       </div>
       <div className="contenedor-productos">
         {productos.map(producto => (
@@ -558,6 +565,104 @@ function AdminPanel() {
       </div>
     </div>
   );
+
+  const renderProductosCriticos = () => {
+    // Filtrar productos con stock crítico (menor o igual a 5)
+    const productosCriticos = productos.filter(producto => producto.stock <= 5);
+    
+    return (
+      <div className="area-contenido-productos-criticos">
+        <div className="encabezado-seccion">
+          <div className="titulo-con-volver">
+            <button 
+              className="boton-volver"
+              onClick={() => setVistaActiva('productos')}
+            >
+              <i className="fas fa-arrow-left"></i>
+              Volver
+            </button>
+            <h2>Productos con Stock Crítico</h2>
+          </div>
+          <div className="info-criticos">
+            <span className="contador-criticos">
+              {productosCriticos.length} productos críticos encontrados
+            </span>
+          </div>
+        </div>
+        
+        {productosCriticos.length === 0 ? (
+          <div className="mensaje-sin-productos">
+            <i ></i>
+            <h3>Muy Bien!</h3>
+            <p>No hay productos con stock crítico en este momento.</p>
+            <button 
+              className="boton-volver-principal"
+              onClick={() => setVistaActiva('productos')}
+            >
+              Volver al catálogo
+            </button>
+          </div>
+        ) : (
+          <div className="contenedor-productos">
+            {productosCriticos.map(producto => (
+              <div 
+                key={producto.codigo} 
+                className="tarjeta-producto tarjeta-critica"
+              >
+                <div className="alerta-critica">
+                  <i ></i>
+                  Stock Crítico
+                </div>
+                <div className="avatar-producto-tarjeta">
+                  <i className="fas fa-birthday-cake icono-producto"></i>
+                </div>
+                <div className="informacion-producto-tarjeta">
+                  <div className="nombre-producto">{producto.nombre}</div>
+                  <div className="categoria-producto">{producto.categoria}</div>
+                  <div className="descripcion-producto">
+                    <strong>Descripción:</strong> {producto.descripcion || 'Sin descripción disponible'}
+                  </div>
+                  <div className="detalles-producto">
+                    <div><strong>Precio:</strong> ${producto.precio.toLocaleString()}</div>
+                    <div className="stock-info">
+                      <strong>Stock:</strong> 
+                      <span className={`badge-stock ${
+                        producto.stock === 0 ? 'stock-agotado' : 'stock-critico'
+                      }`}>
+                        {producto.stock}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="imagen-producto-container">
+                    <img 
+                      src={producto.imagen} 
+                      alt={producto.nombre}
+                      className="imagen-producto"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                  <div className="acciones-producto">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        abrirModalEditar(producto);
+                      }}
+                      className="boton-editar"
+                    >
+                      <i className="fas fa-edit me-1"></i>
+                      Editar 
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderReportes = () => (
     <div className="area-contenido">
@@ -1077,6 +1182,8 @@ function AdminPanel() {
     switch (vistaActiva) {
       case 'productos':
         return renderProductos();
+      case 'productosCriticos':
+        return renderProductosCriticos();
       case 'reportes':
         return renderReportes();
       case 'usuarios':
