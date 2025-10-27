@@ -8,6 +8,15 @@ function Navbar() {
   const navigate = useNavigate();
   const cantidadTotal = obtenerCantidadTotal();
   const [usuarioActual, setUsuarioActual] = useState(null);
+  const [esPantallaGrande, setEsPantallaGrande] = useState(window.innerWidth >= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setEsPantallaGrande(window.innerWidth >= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     
@@ -40,7 +49,12 @@ function Navbar() {
     <header>
       <nav 
         className="navbar navbar-expand-lg custom-navbar fixed-top" 
-        style={{ backgroundColor: '#FFC0CB' }}
+        style={{ 
+          backgroundColor: '#FFC0CB',
+          minHeight: '60px',
+          paddingTop: '0.5rem',
+          paddingBottom: '0.5rem'
+        }}
         role="navigation"
         aria-label="Navegación principal"
       >
@@ -50,15 +64,36 @@ function Navbar() {
             to="/"
             aria-label="Ir a página principal de Mil Sabores"
           >
-            <img 
-              src="/img/Logotipo_pasteleria.png" 
-              alt="Logo de Pastelería Mil Sabores" 
-              height="70"
-              className="me-2"
-              onError={(e) => {
-                e.target.style.display = 'none';
-              }}
-            />
+            {esPantallaGrande ? (
+              <>
+                <img 
+                  src="/img/logo_chico_color.png" 
+                  alt="Logo Pequeño de Mil Sabores" 
+                  height="40"
+                  className="me-2"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+                <img 
+                  src="/img/logo_grande_color.png" 
+                  alt="Logo Grande de Mil Sabores" 
+                  height="55"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </>
+            ) : (
+              <img 
+                src="/img/logo_chico_color.png" 
+                alt="Logo de Mil Sabores" 
+                height="45"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            )}
           </Link>
           
           <button 
