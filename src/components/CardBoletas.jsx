@@ -1,7 +1,7 @@
 import "../styles/cssESCALONA.css"
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-function CardBoletas({brp, prods, style}){
+function CardBoletas({brp, prods, style, regresar}){
     let [ano,mes,dia] = brp.comprador.fecha_compra.split("-")
     var ndia = dia.substring(0,2)
     var total = 0
@@ -9,6 +9,7 @@ function CardBoletas({brp, prods, style}){
         total += p.cantidad * p.precio
     })
     return(
+        <>
         <div className="base_tarjeta blt-tarjeta">
             <div className="blt-bordes">
                 <div className="blt-bordes mt-1 mb-1 p-2 blt-jst">
@@ -20,11 +21,11 @@ function CardBoletas({brp, prods, style}){
                     <strong>Pasteleria mil sabores</strong>
                 </div>
                 <div className="row g-0">
-                    <p className="mb-1 col-6">Direccion:</p>
-                    <p className="mb-1 col-6 blt-mandar-end">Una calle de Santiago no se</p>
+                    <strong className="mb-1 col-6">Direccion despacho:</strong>
+                    <p className="mb-1 col-6 blt-mandar-end">{brp.recibidor.direccion_recibidor}</p>
                 </div>
                 <div className="row g-0">
-                    <p className="mb-1 col-6">Fecha:</p>
+                    <strong className="mb-1 col-6">Fecha de compra:</strong>
                     <p className="mb-1 col-6 blt-mandar-end">{ano}-{mes}-{ndia}</p>
                 </div>
             </div>
@@ -53,6 +54,8 @@ function CardBoletas({brp, prods, style}){
                 </div>
             </div>
         </div>
+        <button className="margen-btn btn-cambio-chocolate" onClick={regresar}>Regresar al panel</button>
+        </>
     )
 }
 export default CardBoletas

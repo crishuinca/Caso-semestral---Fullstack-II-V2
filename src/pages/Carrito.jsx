@@ -64,7 +64,8 @@ function Carrito() {
       productos: carrito,
       total: calcularTotal(),
       cliente_despachar: datosCompra,
-      fecha_despacho: new Date().toISOString()
+      fecha_despacho: new Date().toISOString(),
+      direccion_despacho: datosCompra.direccion,
     };
     localStorage.setItem("temporal_info", JSON.stringify(pedido))
 

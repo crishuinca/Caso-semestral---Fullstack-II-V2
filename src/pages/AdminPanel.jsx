@@ -129,6 +129,9 @@ function AdminPanel() {
   const irBoletas = ()=>{
     navigate("/admin/boletas")
   }
+  const irHistorial = ()=>{
+    navigate("/admin/historial-compras")
+  }
 
   const determinarCategoria = (nombre) => {
     if (nombre.toLowerCase().includes('torta')) return 'Tortas';
@@ -1728,8 +1731,11 @@ function AdminPanel() {
                 <span style={estilos.textoNavegacion}>Nuevo Usuario</span>
               </a>
             </li>
-            <li>
-              <a onClick={irBoletas}>Boletas</a>
+            <li className='mt-3'>
+              <a className='link-perso' onClick={irBoletas}>- Boletas</a>
+            </li>
+            <li className='mt-4'>
+              <a className='link-perso' onClick={irHistorial}>- Historial de compras</a>
             </li>
           </ul>
         </nav>

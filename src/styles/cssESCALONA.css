@@ -243,3 +243,17 @@ FFC0CB  |  Elementos rosas
     background-color: #fff5e1;
     border-radius: 3px;
 }
+.margen-btn{margin: 0 2rem;}
+@media screen and (max-width: 600px){ .margen-btn{margin: 0 1rem;} }
+.link-perso{
+    padding: 1rem 1.5rem;
+    text-decoration: none;
+    color: #ffffff;
+    size: 24px;
+    width: 100%;
+    transition: all 0.2s ease-in-out;
+}.link-perso:hover{
+    background-color: rgba(255, 255, 255, 0.1);
+    border-right: 4px solid rgb(255, 210, 233);
+    color: #ffffff;
+}

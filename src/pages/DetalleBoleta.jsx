@@ -3,6 +3,7 @@ import CardBoletas from "../components/CardBoletas"
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import "../styles/cssESCALONA.css"
+import { useNavigate } from "react-router-dom"
 
 function DetalleBoleta(){
 
@@ -10,6 +11,8 @@ function DetalleBoleta(){
     const [recboleta, setRecboleta] = useState(null)
     const [productos, setProductos] = useState(null)
     const [estilo, setEstilo] = useState("")
+
+    const navigate = useNavigate()
 
     useEffect(()=>{
 
@@ -50,7 +53,8 @@ function DetalleBoleta(){
             <CardBoletas 
             brp={recboleta}
             prods={productos}
-            style={estilo}/>
+            style={estilo}
+            regresar={() => navigate("/admin/boletas")}/>
         ) : (
             <p>No se encontró la boleta seleccionada</p>
         )}

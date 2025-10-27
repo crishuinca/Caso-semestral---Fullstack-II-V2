@@ -28,6 +28,7 @@ function CompraExitosa() {
                 com_rut = "USUARIO NO REGISTRADO"
             } 
             const infodespacho = JSON.parse(localStorage.getItem("temporal_info"))
+            if(infodespacho.cliente_despachar.direccion == ""){infodespacho.cliente_despachar.direccion = "RETIRO EN TIENDA"}
             if(infodespacho){
                 setI_desp(infodespacho)
                 setProductos(infodespacho.productos       || [])
@@ -56,7 +57,8 @@ function CompraExitosa() {
             }
             info_usuario_recibidor = {
                 nombre_recibidor: infodespacho.cliente_despachar.nombre,
-                rut_recibidor: infodespacho.cliente_despachar.rut
+                rut_recibidor: infodespacho.cliente_despachar.rut,
+                direccion_recibidor: infodespacho.cliente_despachar.direccion,
             }
             var id = "HBLT_0"
             lista_boletas_guardadas = JSON.parse(localStorage.getItem("historial_boletas"))
@@ -122,6 +124,8 @@ function CompraExitosa() {
                             <p>{cliente.nombre}</p>
                             <strong className='mb-1'>Rut de la persona:</strong>
                             <p>{cliente.rut}</p>
+                            <strong className='mb-1'>Direccion despacho:</strong>
+                            <p>{cliente.direccion}</p>
                         </div>
                     }
                     </div>

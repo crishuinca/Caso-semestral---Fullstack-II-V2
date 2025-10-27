@@ -16,6 +16,8 @@ import CompraExitosa from './pages/CompraExitosa'
 import CompraErronea from './pages/CompraErronea'
 import Boletas from './pages/Boletas'
 import DetalleBoleta from './pages/DetalleBoleta'
+import ComprasHistorial from './pages/ComprasHistorial'
+import ComprasDetalle from './pages/ComprasDetalle'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
@@ -45,6 +47,8 @@ function AppContent() {
           <Route path="/compra-erronea" element={<CompraErronea />} />
           <Route path='/admin/boletas' element={<Boletas/>}/>
           <Route path="/admin/boletas/detalle-boleta" element={<DetalleBoleta/>}/>
+          <Route path="/admin/historial-compras" element={<ComprasHistorial/>}/>
+          <Route path="/admin/historial-compras/detalle-compra" element={<ComprasDetalle/>}/>
         </Routes>
       </main>
     </div>
