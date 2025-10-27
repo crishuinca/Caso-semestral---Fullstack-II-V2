@@ -1,6 +1,7 @@
 import React from 'react';
 
 function ModalEditarProducto({ 
+  modalEditarProducto,
   productoEditado,
   handleInputChangeProducto,
   handleSubmitEditarProducto,
