@@ -5,7 +5,7 @@ import '../styles/AdminPanel.css';
 
 function AdminPanel() {
   const navigate = useNavigate();
-  const { productosDisponibles, productosStock } = useCarrito();
+  const { productosDisponibles, productosStock, mostrarMensaje } = useCarrito();
   const [vistaActiva, setVistaActiva] = useState('tablero');
   const [productos, setProductos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -155,6 +155,8 @@ function AdminPanel() {
     
     navigate('/');
   };
+
+
 
   const determinarCategoria = (nombre) => {
     if (nombre.toLowerCase().includes('torta')) return 'Tortas';
@@ -502,6 +504,13 @@ function AdminPanel() {
     <div className="area-contenido-productos">
       <div className="encabezado-seccion">
         <h2>Catálogo de Productos</h2>
+        <button 
+          className="boton-productos-criticos"
+          onClick={() => setVistaActiva('productosCriticos')}
+        >
+          <i className="fas fa-exclamation-triangle"></i>
+          Listado de productos críticos
+        </button>
       </div>
       <div className="contenedor-productos">
         {productos.map(producto => (
@@ -555,6 +564,219 @@ function AdminPanel() {
             </div>
           </div>
         ))}
+      </div>
+      <div className="contenedor-boton-reporte">
+        <button 
+          className="boton-descargar-csv"
+          onClick={() => navigate('/admin/reportes-productos')}
+        >
+          <i className="fas fa-download"></i>
+          Reporte de Productos
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderProductosCriticos = () => {
+    // Filtrar productos con stock crítico (menor o igual a 5)
+    const productosCriticos = productos.filter(producto => producto.stock <= 5);
+    
+    return (
+      <div className="area-contenido-productos-criticos">
+        <div className="encabezado-seccion">
+          <div className="titulo-con-volver">
+            <button 
+              className="boton-volver"
+              onClick={() => setVistaActiva('productos')}
+            >
+              <i className="fas fa-arrow-left"></i>
+              Volver
+            </button>
+            <h2>Productos con Stock Crítico</h2>
+          </div>
+          <div className="info-criticos">
+            <span className="contador-criticos">
+              {productosCriticos.length} productos críticos encontrados
+            </span>
+          </div>
+        </div>
+        
+        {productosCriticos.length === 0 ? (
+          <div className="mensaje-sin-productos">
+            <i ></i>
+            <h3>Muy Bien!</h3>
+            <p>No hay productos con stock crítico en este momento.</p>
+            <button 
+              className="boton-volver-principal"
+              onClick={() => setVistaActiva('productos')}
+            >
+              Volver al catálogo
+            </button>
+          </div>
+        ) : (
+          <div className="contenedor-productos">
+            {productosCriticos.map(producto => (
+              <div 
+                key={producto.codigo} 
+                className="tarjeta-producto tarjeta-critica"
+              >
+                <div className="alerta-critica">
+                  <i ></i>
+                  Stock Crítico
+                </div>
+                <div className="avatar-producto-tarjeta">
+                  <i className="fas fa-birthday-cake icono-producto"></i>
+                </div>
+                <div className="informacion-producto-tarjeta">
+                  <div className="nombre-producto">{producto.nombre}</div>
+                  <div className="categoria-producto">{producto.categoria}</div>
+                  <div className="descripcion-producto">
+                    <strong>Descripción:</strong> {producto.descripcion || 'Sin descripción disponible'}
+                  </div>
+                  <div className="detalles-producto">
+                    <div><strong>Precio:</strong> ${producto.precio.toLocaleString()}</div>
+                    <div className="stock-info">
+                      <strong>Stock:</strong> 
+                      <span className={`badge-stock ${
+                        producto.stock === 0 ? 'stock-agotado' : 'stock-critico'
+                      }`}>
+                        {producto.stock}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="imagen-producto-container">
+                    <img 
+                      src={producto.imagen} 
+                      alt={producto.nombre}
+                      className="imagen-producto"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                  <div className="acciones-producto">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        abrirModalEditar(producto);
+                      }}
+                      className="boton-editar"
+                    >
+                      <i className="fas fa-edit me-1"></i>
+                      Editar 
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderReportes = () => (
+    <div className="area-contenido">
+      <div className="encabezado-seccion">
+        <h2>Reportes del Sistema</h2>
+        <p>Análisis y estadísticas de la pastelería</p>
+      </div>
+      
+      <div className="contenedor-reportes">
+        <div className="reporte-seccion">
+          <div className="encabezado-reporte">
+            <h3>
+              <i className="fas fa-birthday-cake"></i>
+              Reporte de Productos
+            </h3>
+            <p>Análisis del inventario y ventas de productos</p>
+          </div>
+          <div className="contenido-reporte">
+            <div className="metricas-reporte">
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">{productos.length}</span>
+                  <span className="metrica-label">Total Productos</span>
+                </div>
+              </div>
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">
+                    {productos.filter(p => p.stock <= 5).length}
+                  </span>
+                  <span className="metrica-label">Stock Crítico</span>
+                </div>
+              </div>
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">
+                    {productos.filter(p => p.stock === 0).length}
+                  </span>
+                  <span className="metrica-label">Sin Stock</span>
+                </div>
+              </div>
+            </div>
+            <div className="acciones-reporte">
+              <button 
+                className="boton-descargar-csv"
+                onClick={() => descargarReporteCSV('productos')}
+              >
+                <i className="fas fa-download"></i>
+                Descargar reporte en CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="reporte-seccion">
+          <div className="encabezado-reporte">
+            <h3>
+              <i className="fas fa-users"></i>
+              Reporte de Usuarios
+            </h3>
+            <p>Estadísticas de usuarios registrados</p>
+          </div>
+          <div className="contenido-reporte">
+            <div className="metricas-reporte">
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">{usuarios.length}</span>
+                  <span className="metrica-label">Total Usuarios</span>
+                </div>
+              </div>
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">
+                    {usuarios.filter(u => u.tipo === 'Administrador' || u.isAdmin).length}
+                  </span>
+                  <span className="metrica-label">Administradores</span>
+                </div>
+              </div>
+              <div className="metrica-card">
+                <div className="metrica-info">
+                  <span className="metrica-numero">
+                    {usuarios.filter(u => {
+                      const fechaRegistro = new Date(u.fechaRegistro);
+                      const haceUnaSemana = new Date();
+                      haceUnaSemana.setDate(haceUnaSemana.getDate() - 7);
+                      return fechaRegistro >= haceUnaSemana;
+                    }).length}
+                  </span>
+                  <span className="metrica-label">Nuevos (7 días)</span>
+                </div>
+              </div>
+            </div>
+            <div className="acciones-reporte">
+              <button 
+                className="boton-descargar-csv"
+                onClick={() => descargarReporteCSV('usuarios')}
+              >
+                <i className="fas fa-download"></i>
+                Descargar reporte en CSV
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -828,10 +1050,152 @@ function AdminPanel() {
     </div>
   );
 
+  const descargarReporteCSV = (tipoReporte) => {
+    let datos = [];
+    let nombreArchivo = '';
+    
+    if (tipoReporte === 'productos') {
+      // Generar datos de productos
+      datos = productos.map(producto => ({
+        'Código': producto.prod_codigo,
+        'Nombre': producto.nombre,
+        'Categoría': producto.categoria,
+        'Precio': producto.precio,
+        'Stock': producto.stock,
+        'Stock Crítico': producto.stock_critico,
+        'Estado': producto.stock === 0 ? 'Sin Stock' : 
+                 producto.stock <= producto.stock_critico ? 'Stock Crítico' : 'Normal'
+      }));
+      nombreArchivo = 'reporte_productos.csv';
+    } else if (tipoReporte === 'usuarios') {
+      // Generar datos de usuarios - obtener directamente del localStorage
+      let usuariosActuales = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      
+      // Si no hay usuarios, crear datos de ejemplo para la demostración
+      if (usuariosActuales.length === 0) {
+        usuariosActuales = [
+          {
+            id: 1,
+            run: '12345678-9',
+            nombre: 'Administrador',
+            apellidos: 'del Sistema',
+            correo: 'admin@pasteleriaAA',
+            isAdmin: true,
+            fechaRegistro: new Date().toISOString(),
+            region: 'Metropolitana',
+            comuna: 'Santiago'
+          },
+          {
+            id: 2,
+            run: '98765432-1',
+            nombre: 'Usuario',
+            apellidos: 'de Ejemplo',
+            correo: 'usuario@example.com',
+            isAdmin: false,
+            fechaRegistro: new Date().toISOString(),
+            region: 'Metropolitana',
+            comuna: 'Las Condes'
+          }
+        ];
+      }
+      
+      datos = usuariosActuales.map(usuario => ({
+        'ID': usuario.id || 'N/A',
+        'RUT': usuario.run || usuario.rut || 'N/A',
+        'Nombre': usuario.nombre || 'N/A',
+        'Apellidos': usuario.apellidos || 'N/A',
+        'Correo': usuario.correo || 'N/A',
+        'Tipo': usuario.isAdmin ? 'Administrador' : 'Usuario',
+        'Fecha Registro': usuario.fechaRegistro ? 
+          new Date(usuario.fechaRegistro).toLocaleDateString('es-CL') : 'N/A',
+        'Región': usuario.region || 'N/A',
+        'Comuna': usuario.comuna || 'N/A'
+      }));
+      nombreArchivo = 'reporte_usuarios.csv';
+    }
+
+    // Convertir a CSV
+    
+    if (datos.length === 0) {
+      if (tipoReporte === 'usuarios') {
+        alert('No hay usuarios registrados para exportar');
+      } else {
+        alert('No hay productos para exportar');
+      }
+      return;
+    }
+
+    const headers = Object.keys(datos[0]);
+    
+    // Función para escapar valores CSV
+    const escaparValorCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      const str = String(value);
+      // Siempre encerrar en comillas para evitar problemas con SYLK
+      return `"${str.replace(/"/g, '""')}"`;
+    };
+
+    const csvContent = [
+      headers.map(h => `"${h}"`).join(','), // Headers también entre comillas
+      ...datos.map(row => 
+        headers.map(header => escaparValorCSV(row[header])).join(',')
+      )
+    ].join('\n');
+
+    // Agregar BOM para UTF-8 y evitar problema SYLK
+    const BOM = '\uFEFF';
+    const csvWithBOM = BOM + csvContent;
+
+    // Crear y descargar el archivo con tipo MIME correcto
+    const blob = new Blob([csvWithBOM], { type: 'application/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', nombreArchivo);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      
+      // Intentar diferentes métodos de descarga
+      try {
+        // Método 1: Click directo
+        link.click();
+        
+        // Método 2: Evento click programático
+        const evento = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: false
+        });
+        link.dispatchEvent(evento);
+        
+      } catch (error) {
+        // Método alternativo: abrir en nueva ventana
+        window.open(url, '_blank');
+      }
+      
+      // Limpiar después de un pequeño delay
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 1000);
+      
+      // Mostrar mensaje de éxito
+      mostrarMensaje(`Reporte ${tipoReporte} descargado exitosamente`, 'ok');
+    } else {
+      alert('Tu navegador no soporta la descarga de archivos');
+    }
+  };
+
   const renderContenido = () => {
     switch (vistaActiva) {
       case 'productos':
         return renderProductos();
+      case 'productosCriticos':
+        return renderProductosCriticos();
+      case 'reportes':
+        return renderReportes();
       case 'usuarios':
         return renderUsuarios();
       case 'nuevoUsuario':
@@ -1121,6 +1485,15 @@ function AdminPanel() {
             </li>
             <li className="elemento-navegacion">
               <a
+                onClick={() => setVistaActiva('reportes')}
+                className={`enlace-navegacion ${vistaActiva === 'reportes' ? 'activo' : ''}`}
+              >
+                <i className="fas fa-chart-bar icono-navegacion"></i>
+                <span className="texto-navegacion">Reportes</span>
+              </a>
+            </li>
+            <li className="elemento-navegacion">
+              <a
                 onClick={() => setVistaActiva('usuarios')}
                 className={`enlace-navegacion ${vistaActiva === 'usuarios' ? 'activo' : ''}`}
               >
@@ -1164,6 +1537,7 @@ function AdminPanel() {
             </button>
             <h1 className="titulo-pagina">
               {vistaActiva === 'productos' ? 'Productos' : 
+               vistaActiva === 'reportes' ? 'Reportes' :
                vistaActiva === 'usuarios' ? 'Usuarios' : 
                vistaActiva === 'nuevoUsuario' ? 'Nuevo Usuario' : 'Tablero'}
             </h1>
