@@ -10,6 +10,8 @@ import Usuarios from '../components/admin/components/Usuarios';
 import NuevoUsuario from '../components/admin/components/NuevoUsuario';
 import ModalEditarProducto from '../components/admin/components/ModalEditarProducto';
 import ModalEditarUsuario from '../components/admin/components/ModalEditarUsuario';
+import ProductosCriticos from '../components/admin/components/ProductosCriticos';
+import Reportes from '../components/admin/components/Reportes';
 import Perfil from './Perfil';
 
 function AdminPanel() {
@@ -419,10 +421,120 @@ function AdminPanel() {
     cerrarModalEditarUsuario();
   };
 
+  const descargarReporteCSV = (tipoReporte) => {
+    let datos = [];
+    let nombreArchivo = '';
+    
+    if (tipoReporte === 'productos') {
+      datos = productos.map(producto => ({
+        'Código': producto.codigo,
+        'Nombre': producto.nombre,
+        'Categoría': producto.categoria,
+        'Precio': producto.precio,
+        'Stock': producto.stock,
+        'Stock Crítico': producto.stock_critico,
+        'Estado': producto.stock === 0 ? 'Sin Stock' : 
+                 producto.stock <= 5 ? 'Stock Crítico' : 'Normal'
+      }));
+      nombreArchivo = 'reporte_productos.csv';
+    } else if (tipoReporte === 'usuarios') {
+      datos = usuarios.map(usuario => ({
+        'ID': usuario.id,
+        'RUN': usuario.run,
+        'Nombre': usuario.nombre,
+        'Apellidos': usuario.apellidos,
+        'Correo': usuario.correo,
+        'Fecha Nacimiento': usuario.fecha_nacimiento || 'No especificada',
+        'Región': usuario.region,
+        'Comuna': usuario.comuna,
+        'Dirección': usuario.direccion,
+        'Tipo': usuario.isAdmin ? 'Administrador' : 'Usuario',
+        'Fecha Registro': new Date(usuario.fechaRegistro).toLocaleDateString('es-CL')
+      }));
+      nombreArchivo = 'reporte_usuarios.csv';
+    }
+
+    if (datos.length === 0) {
+      alert(`No hay ${tipoReporte} para exportar`);
+      return;
+    }
+
+    const headers = Object.keys(datos[0]);
+    
+    const escaparValorCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      const str = String(value);
+      return `"${str.replace(/"/g, '""')}"`;
+    };
+
+    const csvContent = [
+      headers.map(h => `"${h}"`).join(','),
+      ...datos.map(row => 
+        headers.map(header => escaparValorCSV(row[header])).join(',')
+      )
+    ].join('\n');
+
+    const BOM = '\uFEFF';
+    const csvWithBOM = BOM + csvContent;
+    const blob = new Blob([csvWithBOM], { type: 'application/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', nombreArchivo);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      
+      try {
+        link.click();
+        
+        const evento = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: false
+        });
+        link.dispatchEvent(evento);
+        
+      } catch (error) {
+        window.open(url, '_blank');
+      }
+      
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 1000);
+      
+      alert(`Reporte ${tipoReporte} descargado exitosamente`);
+    } else {
+      alert('Tu navegador no soporta la descarga de archivos');
+    }
+  };
+
   const renderContenido = () => {
     switch (vistaActiva) {
       case 'productos':
-        return <Productos productos={productos} abrirModalEditar={abrirModalEditar} estilos={estilos} />;
+        return <Productos 
+          productos={productos} 
+          abrirModalEditar={abrirModalEditar} 
+          estilos={estilos}
+          descargarReporteCSV={() => descargarReporteCSV('productos')}
+        />;
+      case 'productosCriticos':
+        return <ProductosCriticos 
+          productos={productos}
+          setVistaActiva={setVistaActiva}
+          abrirModalEditar={abrirModalEditar}
+          estilos={estilos}
+        />;
+      case 'reportes':
+        return <Reportes 
+          productos={productos}
+          usuarios={usuarios}
+          setVistaActiva={setVistaActiva}
+          descargarReporteCSV={descargarReporteCSV}
+          estilos={estilos}
+        />;
       case 'usuarios':
         return <Usuarios usuarios={usuarios} abrirModalEditarUsuario={abrirModalEditarUsuario} estilos={estilos} />;
       case 'nuevoUsuario':
@@ -496,6 +608,8 @@ function AdminPanel() {
                 color: '#8B4513'
               }}>
                 {vistaActiva === 'productos' ? 'Productos' : 
+                 vistaActiva === 'productosCriticos' ? 'Productos Críticos' :
+                 vistaActiva === 'reportes' ? 'Reportes' :
                  vistaActiva === 'usuarios' ? 'Usuarios' : 
                  vistaActiva === 'nuevoUsuario' ? 'Nuevo Usuario' :
                  vistaActiva === 'perfil' ? 'Mi Perfil' : 'Tablero'}

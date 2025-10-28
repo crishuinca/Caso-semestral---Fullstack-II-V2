@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Productos({ productos, abrirModalEditar, estilos }) {
+function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV }) {
   const contenedorProductosResponsive = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
@@ -121,6 +121,46 @@ function Productos({ productos, abrirModalEditar, estilos }) {
             </div>
           </div>
         ))}
+      </div>
+      
+      {/* Botón de descarga de reporte */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '2rem 1rem',
+        marginTop: '1rem'
+      }}>
+        <button 
+          style={{
+            background: 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '0.75rem 1.5rem',
+            fontSize: '0.9rem',
+            fontWeight: '500',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            boxShadow: '0 2px 8px rgba(139, 69, 19, 0.2)',
+            transition: 'all 0.3s ease'
+          }}
+          onClick={() => descargarReporteCSV && descargarReporteCSV()}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'linear-gradient(135deg, #A0522D 0%, #8B4513 100%)';
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 4px 12px rgba(139, 69, 19, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)';
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 2px 8px rgba(139, 69, 19, 0.2)';
+          }}
+        >
+          <i className="fas fa-download"></i>
+          Descargar reporte en CSV
+        </button>
       </div>
     </div>
   );

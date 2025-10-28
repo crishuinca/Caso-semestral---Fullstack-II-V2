@@ -1,0 +1,12 @@
+[
+    {
+        "nombre": 0,
+        "rut": 0,
+        "direccion": 0,
+        "fecha": 0,
+        "despacho": 0,
+        "lista_productos": 0,
+        "lista_prod_mensajes": 0,
+        "total": 0
+    }
+]

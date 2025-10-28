@@ -13,6 +13,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Perfil from './pages/Perfil';
 import AdminPanel from './pages/AdminPanel';
+import ReportesProductos from './pages/ReportesProductos';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
@@ -38,6 +39,7 @@ function AppContent() {
           <Route path="/register" element={<Register />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin/reportes-productos" element={<ReportesProductos />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

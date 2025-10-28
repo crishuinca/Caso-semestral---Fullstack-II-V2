@@ -78,6 +78,24 @@ function Sidebar({ menuColapsado, vistaActiva, setVistaActiva, estilos }) {
           </li>
           <li style={estilos.elementoNavegacion}>
             <a
+              onClick={() => setVistaActiva('reportes')}
+              style={{
+                ...estilos.enlaceNavegacion,
+                ...(vistaActiva === 'reportes' ? estilos.enlaceNavegacionActivo : {})
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+              onMouseLeave={(e) => {
+                if (vistaActiva !== 'reportes') {
+                  e.target.style.backgroundColor = 'transparent';
+                }
+              }}
+            >
+              <i className="fas fa-chart-bar" style={{...estilos.iconoNavegacion, marginRight: menuColapsado ? 0 : '1rem'}}></i>
+              {!menuColapsado && <span>Reportes</span>}
+            </a>
+          </li>
+          <li style={estilos.elementoNavegacion}>
+            <a
               onClick={() => setVistaActiva('usuarios')}
               style={{
                 ...estilos.enlaceNavegacion,
