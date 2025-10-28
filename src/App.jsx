@@ -46,13 +46,13 @@ function AppContent() {
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/admin/reportes-productos" element={<ReportesProductos />} />
-          <Route path="*" element={<Home />} />
           <Route path="/compra-exitosa" element={<CompraExitosa />} />
           <Route path="/compra-erronea" element={<CompraErronea />} />
           <Route path='/admin/boletas' element={<Boletas/>}/>
           <Route path="/admin/boletas/detalle-boleta" element={<DetalleBoleta/>}/>
           <Route path="/admin/historial-compras" element={<ComprasHistorial/>}/>
           <Route path="/admin/historial-compras/detalle-compra" element={<ComprasDetalle/>}/>
+          <Route path="*" element={<Home />} />
         </Routes>
       </main>
     </div>

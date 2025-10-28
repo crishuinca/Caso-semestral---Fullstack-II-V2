@@ -3,7 +3,59 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Home() {
   const usuario = JSON.parse(localStorage.getItem("usuarioActual") || "null");
-  if(!localStorage.getItem("historial_boletas")){localStorage.setItem("historial_boletas", JSON.stringify([]))}
+  
+  // Inicializar historial de boletas con datos de ejemplo si está vacío
+  if(!localStorage.getItem("historial_boletas")){
+    const boletasEjemplo = [
+      {
+        n_boleta: "HBLT_0",
+        recibidor: {
+          nombre_recibidor: "Juan Pérez",
+          rut_recibidor: "12345678-9",
+          direccion_recibidor: "Av. Principal 123, Santiago"
+        },
+        comprador: {
+          nombre_comprador: "María González",
+          rut_comprador: "98765432-1",
+          fecha_compra: "2024-10-28T10:30:00"
+        },
+        productos_comprados: [
+          {
+            codigo_producto: "TC001",
+            cantidad_producto: "2"
+          },
+          {
+            codigo_producto: "TT001", 
+            cantidad_producto: "1"
+          }
+        ]
+      },
+      {
+        n_boleta: "HBLT_1",
+        recibidor: {
+          nombre_recibidor: "Ana Silva",
+          rut_recibidor: "11223344-5",
+          direccion_recibidor: "Los Pinos 456, Providencia"
+        },
+        comprador: {
+          nombre_comprador: "Carlos Rojas",
+          rut_comprador: "55667788-9",
+          fecha_compra: "2024-10-27T15:45:00"
+        },
+        productos_comprados: [
+          {
+            codigo_producto: "TC002",
+            cantidad_producto: "1"
+          },
+          {
+            codigo_producto: "CU001",
+            cantidad_producto: "6"
+          }
+        ]
+      }
+    ];
+    localStorage.setItem("historial_boletas", JSON.stringify(boletasEjemplo));
+  }
 
   return (
     <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '80px' }}>

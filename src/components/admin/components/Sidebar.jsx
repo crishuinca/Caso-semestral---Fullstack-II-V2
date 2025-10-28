@@ -132,6 +132,32 @@ function Sidebar({ menuColapsado, vistaActiva, setVistaActiva, estilos }) {
           </li>
           <li style={estilos.elementoNavegacion}>
             <a
+              onClick={() => window.location.href = '/admin/boletas'}
+              style={{
+                ...estilos.enlaceNavegacion
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              <i className="fas fa-receipt" style={{...estilos.iconoNavegacion, marginRight: menuColapsado ? 0 : '1rem'}}></i>
+              {!menuColapsado && <span>Boletas</span>}
+            </a>
+          </li>
+          <li style={estilos.elementoNavegacion}>
+            <a
+              onClick={() => window.location.href = '/admin/historial-compras'}
+              style={{
+                ...estilos.enlaceNavegacion
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              <i className="fas fa-history" style={{...estilos.iconoNavegacion, marginRight: menuColapsado ? 0 : '1rem'}}></i>
+              {!menuColapsado && <span>Historial Compras</span>}
+            </a>
+          </li>
+          <li style={estilos.elementoNavegacion}>
+            <a
               onClick={() => setVistaActiva('perfil')}
               style={{
                 ...estilos.enlaceNavegacion,
