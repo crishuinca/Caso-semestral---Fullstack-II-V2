@@ -156,6 +156,8 @@ function AdminPanel() {
     navigate('/');
   };
 
+
+
   const determinarCategoria = (nombre) => {
     if (nombre.toLowerCase().includes('torta')) return 'Tortas';
     if (nombre.toLowerCase().includes('tarta')) return 'Tartas';
@@ -562,6 +564,15 @@ function AdminPanel() {
             </div>
           </div>
         ))}
+      </div>
+      <div className="contenedor-boton-reporte">
+        <button 
+          className="boton-descargar-csv"
+          onClick={() => navigate('/admin/reportes-productos')}
+        >
+          <i className="fas fa-download"></i>
+          Reporte de Productos
+        </button>
       </div>
     </div>
   );
