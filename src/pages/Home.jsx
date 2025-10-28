@@ -5,7 +5,7 @@ function Home() {
   const usuario = JSON.parse(localStorage.getItem("usuarioActual") || "null");
 
   return (
-    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '290px' }}>
+    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '80px' }}>
       {}
       <div className="text-center py-4" style={{ marginTop: '50px' }}>
         <h1 style={{ 

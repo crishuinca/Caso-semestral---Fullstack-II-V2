@@ -112,6 +112,24 @@ function Sidebar({ menuColapsado, vistaActiva, setVistaActiva, estilos }) {
               {!menuColapsado && <span>Nuevo Usuario</span>}
             </a>
           </li>
+          <li style={estilos.elementoNavegacion}>
+            <a
+              onClick={() => setVistaActiva('perfil')}
+              style={{
+                ...estilos.enlaceNavegacion,
+                ...(vistaActiva === 'perfil' ? estilos.enlaceNavegacionActivo : {})
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+              onMouseLeave={(e) => {
+                if (vistaActiva !== 'perfil') {
+                  e.target.style.backgroundColor = 'transparent';
+                }
+              }}
+            >
+              <i className="fas fa-user-circle" style={{...estilos.iconoNavegacion, marginRight: menuColapsado ? 0 : '1rem'}}></i>
+              {!menuColapsado && <span>Mi Perfil</span>}
+            </a>
+          </li>
         </ul>
       </nav>
       

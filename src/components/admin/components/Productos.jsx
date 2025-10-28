@@ -51,7 +51,24 @@ function Productos({ productos, abrirModalEditar, estilos }) {
                 <strong>Descripción:</strong> {producto.descripcion || 'Sin descripción disponible'}
               </div>
               <div style={estilos.detallesProducto}>
-                <div><strong>Precio:</strong> ${producto.precio.toLocaleString()}</div>
+                <div>
+                  <strong>Precio:</strong> 
+                  {producto.precioEspecial ? (
+                    <>
+                      <span style={{ textDecoration: 'line-through', color: '#999', marginRight: '8px' }}>
+                        ${producto.precio.toLocaleString()}
+                      </span>
+                      <span style={{ color: '#dc3545', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                        ${producto.precioEspecial.toLocaleString()}
+                      </span>
+                      <span style={{ marginLeft: '8px', color: '#dc3545', fontWeight: 'bold' }}>
+                        🎁 OFERTA
+                      </span>
+                    </>
+                  ) : (
+                    <span> ${producto.precio.toLocaleString()}</span>
+                  )}
+                </div>
                 <div style={estilos.stockInfo}>
                   <strong>Stock:</strong> 
                   <span style={{

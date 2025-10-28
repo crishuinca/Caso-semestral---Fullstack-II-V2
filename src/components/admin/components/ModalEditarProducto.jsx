@@ -60,6 +60,38 @@ function ModalEditarProducto({
           </div>
           
           <div style={estilos.inputGroup}>
+            <label style={{...estilos.label, display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
+              <input
+                type="checkbox"
+                name="tieneDescuento"
+                checked={productoEditado.tieneDescuento}
+                onChange={handleInputChangeProducto}
+                style={{ marginRight: '8px', width: '20px', height: '20px', cursor: 'pointer' }}
+              />
+              Con descuento
+            </label>
+          </div>
+          
+          {productoEditado.tieneDescuento && (
+            <div style={estilos.inputGroup}>
+              <label style={estilos.label}>Precio con descuento*</label>
+              <input
+                type="number"
+                name="precioConDescuento"
+                value={productoEditado.precioConDescuento}
+                onChange={handleInputChangeProducto}
+                style={estilos.input}
+                min="0"
+                required
+                placeholder="Precio oferta"
+              />
+              <small style={{ color: '#666', marginTop: '4px', display: 'block' }}>
+                Debe ser menor al precio normal
+              </small>
+            </div>
+          )}
+          
+          <div style={estilos.inputGroup}>
             <label style={estilos.label}>Stock*</label>
             <input
               type="number"

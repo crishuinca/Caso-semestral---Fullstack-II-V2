@@ -10,6 +10,7 @@ import Usuarios from '../components/admin/components/Usuarios';
 import NuevoUsuario from '../components/admin/components/NuevoUsuario';
 import ModalEditarProducto from '../components/admin/components/ModalEditarProducto';
 import ModalEditarUsuario from '../components/admin/components/ModalEditarUsuario';
+import Perfil from './Perfil';
 
 function AdminPanel() {
   const [esMovil, setEsMovil] = useState(window.innerWidth < 768);
@@ -50,7 +51,9 @@ function AdminPanel() {
     descripcion: '',
     precio: '',
     stock: '',
-    categoria: ''
+    categoria: '',
+    tieneDescuento: false,
+    precioConDescuento: ''
   });
   const [modalEditarUsuario, setModalEditarUsuario] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState(null);
@@ -83,7 +86,8 @@ function AdminPanel() {
         categoria: producto.categoria,
         stock: producto.stock,
         imagen: producto.imagen,
-        stock_critico: producto.stock_critico
+        stock_critico: producto.stock_critico,
+        precioEspecial: producto.precioEspecial || null
       }));
       setProductos(productosConStock);
     } else {
@@ -96,7 +100,8 @@ function AdminPanel() {
         categoria: producto.categoria,
         stock: producto.stock,
         imagen: producto.imagen,
-        stock_critico: producto.stock_critico
+        stock_critico: producto.stock_critico,
+        precioEspecial: null
       }));
       setProductos(productosConStock);
       
@@ -108,7 +113,8 @@ function AdminPanel() {
         imagen: producto.imagen,
         stock: producto.stock,
         categoria: producto.categoria,
-        stock_critico: producto.stock_critico
+        stock_critico: producto.stock_critico,
+        precioEspecial: producto.precioEspecial
       }));
       localStorage.setItem('productosAdmin', JSON.stringify(productosParaStorage));
     }
@@ -206,7 +212,9 @@ function AdminPanel() {
       descripcion: producto.descripcion || '',
       precio: producto.precio,
       stock: producto.stock,
-      categoria: producto.categoria
+      categoria: producto.categoria,
+      tieneDescuento: producto.precioEspecial ? true : false,
+      precioConDescuento: producto.precioEspecial || ''
     });
     setModalEditarProducto(true);
   };
@@ -219,15 +227,17 @@ function AdminPanel() {
       descripcion: '',
       precio: '',
       stock: '',
-      categoria: ''
+      categoria: '',
+      tieneDescuento: false,
+      precioConDescuento: ''
     });
   };
 
   const handleInputChangeProducto = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setProductoEditado(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -249,6 +259,25 @@ function AdminPanel() {
       return;
     }
 
+    // Validar precio con descuento si tiene descuento activado
+    let precioEspecial = null;
+    if (productoEditado.tieneDescuento) {
+      if (!productoEditado.precioConDescuento) {
+        alert('Por favor ingrese el precio con descuento');
+        return;
+      }
+      const precioDesc = parseInt(productoEditado.precioConDescuento);
+      if (isNaN(precioDesc) || precioDesc <= 0) {
+        alert('El precio con descuento debe ser un número válido mayor a 0');
+        return;
+      }
+      if (precioDesc >= parseInt(productoEditado.precio)) {
+        alert('El precio con descuento debe ser menor al precio normal');
+        return;
+      }
+      precioEspecial = precioDesc;
+    }
+
     const productosActualizados = productos.map(producto => 
       producto.codigo === productoEditando.codigo 
         ? { 
@@ -257,7 +286,8 @@ function AdminPanel() {
             descripcion: productoEditado.descripcion,
             precio: parseInt(productoEditado.precio),
             stock: parseInt(productoEditado.stock),
-            categoria: productoEditado.categoria
+            categoria: productoEditado.categoria,
+            precioEspecial: precioEspecial
           }
         : producto
     );
@@ -272,10 +302,14 @@ function AdminPanel() {
       imagen: producto.imagen,
       stock: producto.stock,
       categoria: producto.categoria,
-      stock_critico: producto.stock_critico
+      stock_critico: producto.stock_critico,
+      precioEspecial: producto.precioEspecial
     }));
     
     localStorage.setItem('productosAdmin', JSON.stringify(productosParaStorage));
+    
+    // Disparar evento para actualizar productos en otras páginas
+    window.dispatchEvent(new Event('productosActualizados'));
     
     alert('Producto actualizado exitosamente');
     cerrarModalEditar();
@@ -403,6 +437,12 @@ function AdminPanel() {
             estilos={estilos}
           />
         );
+      case 'perfil':
+        return (
+          <div style={{ padding: '2rem', marginTop: '-60px' }}>
+            <Perfil />
+          </div>
+        );
       default:
         return <Tablero productos={productos} usuarios={usuarios} setVistaActiva={setVistaActiva} estilos={estilos} />;
     }
@@ -442,34 +482,37 @@ function AdminPanel() {
       />
 
       <main style={estilosDinamicos.contenidoPrincipal}>
-        <header style={estilos.encabezadoContenido}>
-          <div style={estilos.izquierdaEncabezado}>
-            <button 
-              onClick={alternarMenu}
-              style={estilos.alternarMenu}
-            >
-              <i className="fas fa-bars"></i>
-            </button>
-            <h1 style={{
-              ...estilos.tituloPagina,
-              color: '#8B4513'
-            }}>
-              {vistaActiva === 'productos' ? 'Productos' : 
-               vistaActiva === 'usuarios' ? 'Usuarios' : 
-               vistaActiva === 'nuevoUsuario' ? 'Nuevo Usuario' : 'Tablero'}
-            </h1>
-          </div>
-          {!esMovil && (
-          <div style={estilos.derechaEncabezado}>
-            <div style={estilos.informacionUsuario}>
-              <span style={estilos.textoBienvenida}>Bienvenido, Admin</span>
-              <div style={estilos.avatarUsuario}>
-                <i className="fas fa-user-circle"></i>
+        {vistaActiva !== 'perfil' && (
+          <header style={estilos.encabezadoContenido}>
+            <div style={estilos.izquierdaEncabezado}>
+              <button 
+                onClick={alternarMenu}
+                style={estilos.alternarMenu}
+              >
+                <i className="fas fa-bars"></i>
+              </button>
+              <h1 style={{
+                ...estilos.tituloPagina,
+                color: '#8B4513'
+              }}>
+                {vistaActiva === 'productos' ? 'Productos' : 
+                 vistaActiva === 'usuarios' ? 'Usuarios' : 
+                 vistaActiva === 'nuevoUsuario' ? 'Nuevo Usuario' :
+                 vistaActiva === 'perfil' ? 'Mi Perfil' : 'Tablero'}
+              </h1>
+            </div>
+            {!esMovil && (
+            <div style={estilos.derechaEncabezado}>
+              <div style={estilos.informacionUsuario}>
+                <span style={estilos.textoBienvenida}>Bienvenido, Admin</span>
+                <div style={estilos.avatarUsuario}>
+                  <i className="fas fa-user-circle"></i>
+                </div>
               </div>
             </div>
-          </div>
-          )}
-        </header>
+            )}
+          </header>
+        )}
 
         {renderContenido()}
       </main>
