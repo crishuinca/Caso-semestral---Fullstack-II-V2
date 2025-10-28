@@ -61,7 +61,7 @@ function Navbar() {
   return (
     <header>
       <nav 
-        className="navbar navbar-expand-lg custom-navbar fixed-top" 
+        className="navbar navbar-expand-lg custom-navbar fixed-top pt-1 pb-1" 
         style={{ backgroundColor: '#FFC0CB' }}
         role="navigation"
         aria-label="Navegación principal"

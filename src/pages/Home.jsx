@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function Home() {
   const usuario = JSON.parse(localStorage.getItem("usuarioActual") || "null");
+  if(!localStorage.getItem("historial_boletas")){localStorage.setItem("historial_boletas", JSON.stringify([]))}
 
   return (
     <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '80px' }}>

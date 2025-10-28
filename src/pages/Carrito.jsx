@@ -5,8 +5,12 @@ import CarritoResumen from '../components/carrito/CarritoResumen';
 import ConfirmacionModal from '../components/carrito/ConfirmacionModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/Carrito.css';
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { useNavigate } from 'react-router-dom';
 
 function Carrito() {
+
+  const navigate = useNavigate()
   const {
     carrito,
     productosDisponibles,
@@ -17,6 +21,7 @@ function Carrito() {
     calcularTotal,
     mostrarMensaje
   } = useCarrito();
+  const [btnpago, setBtnpago] = useState(false)
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [datosCompra, setDatosCompra] = useState({
     nombre: '',
@@ -53,6 +58,7 @@ function Carrito() {
     }));
   };
 
+//-----------------------------------------------------------------------------------
   const confirmarPedido = () => {
     
     if (!datosCompra.nombre.trim()) {
@@ -72,12 +78,16 @@ function Carrito() {
       return;
     }
 
+    setBtnpago(true)
+    
     const pedido = {
       productos: carrito,
       total: calcularTotal(),
-      cliente: datosCompra,
-      fecha: new Date().toISOString()
+      cliente_despachar: datosCompra,
+      fecha_despacho: new Date().toISOString(),
+      direccion_despacho: datosCompra.direccion,
     };
+    localStorage.setItem("temporal_info", JSON.stringify(pedido))
 
     console.log('Pedido confirmado:', pedido);
     mostrarMensaje('¡Pedido confirmado exitosamente!', 'ok');
@@ -119,7 +129,51 @@ function Carrito() {
       tipoEntrega: 'despacho'
     });
   };
+//-----------------------------------------------------------------------------------
+  const redirigir = (details) => {
+  try {
+    localStorage.setItem("temporal_info_quien_pago", JSON.stringify(details));
+  } catch (e) {
+    console.error("Error guardando info de pago:", e);
+    localStorage.setItem("temporal_info_quien_pago", "");
+  }
+  navigate("/compra-exitosa");
+  vaciarCarrito();
+};
+//-----------------------------------------------------------------------------------
+  const redirigirFallo = (error) => {
+    try {
+      const tipo_error = {
+        insuficiente: /INSTRUMENT_DECLINED|INSUFFICIENT_FUNDS/i,
+        expiro: /EXPIRED_CARD/i,
+        rechazado: /CARD_DECLINED|REJECTED/i,
+        procesando: /PROCESSING_ERROR/i,
+      }
+      var errorTxt = String(error)
 
+      if(tipo_error.insuficiente.test(errorTxt)){
+        localStorage.setItem("error_compra", "Pago rechazado, fondos insuficientes o metodo no disponible")
+        return}
+      if(tipo_error.expiro.test(errorTxt)){
+        localStorage.setItem("error_compra", "Tarjeta expirada, usa otra tarjeta o metodo de pago")
+        return}
+      if(tipo_error.rechazado.test(errorTxt)){
+        localStorage.setItem("error_compra", "Tarjeta rechazada por el banco, pruebe otro metodo")
+        return}
+      if(tipo_error.procesando.test(errorTxt)){
+        localStorage.setItem("error_compra", "Error de procesamiento, intente de nuevo mas tarde")
+        return}
+      
+      localStorage.setItem("error_compra", "Error al procesar el pago")
+      console.error(error)
+
+    } catch (e) {
+      console.error("Error guardando info de fallo:", e);
+      localStorage.setItem("error_compra", "ERROR DESCONOCIDO");
+    }
+    navigate("/compra-erronea");
+  };
+//-----------------------------------------------------------------------------------
   const estilos = {
     body: {
       backgroundColor: '#FFF5E1',
@@ -189,7 +243,14 @@ function Carrito() {
       zIndex: 1040
     }
   };
-
+//-----------------------------------------------------------------------------------
+  const initialOptions = {
+        clientId: "AR36SqRE30K24Cv_7MIVRq0qBamsHC1vhgU_hiXCwRNoGehpT1hzCrSTgTjWEgNFFssFeZr4SlkqlFYN",
+        currency: "USD",
+        intent: "capture",
+        style: ""
+    };
+//-----------------------------------------------------------------------------------
   return (
     <div style={estilos.body}>
       <main>
