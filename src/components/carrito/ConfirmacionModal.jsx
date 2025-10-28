@@ -17,6 +17,74 @@ function ConfirmacionModal({
 }) {
   if (!mostrarConfirmacion) return null;
 
+  // Función para obtener la fecha actual
+  const obtenerFechaActual = () => {
+    const hoy = new Date();
+    return {
+      dia: hoy.getDate(),
+      mes: hoy.getMonth() + 1, // Los meses van de 0-11
+      ano: hoy.getFullYear()
+    };
+  };
+
+  // Función para verificar si una fecha es válida (no pasada)
+  const esFechaValida = (dia, mes, ano) => {
+    const fechaActual = obtenerFechaActual();
+    const fechaSeleccionada = new Date(ano, mes - 1, dia);
+    const fechaHoy = new Date(fechaActual.ano, fechaActual.mes - 1, fechaActual.dia);
+    
+    return fechaSeleccionada >= fechaHoy;
+  };
+
+  // Función para obtener días válidos según el mes y año seleccionados
+  const obtenerDiasValidos = () => {
+    const fechaActual = obtenerFechaActual();
+    const mesSeleccionado = parseInt(datosCompra.mes);
+    const anoSeleccionado = parseInt(datosCompra.ano);
+    
+    if (!mesSeleccionado || !anoSeleccionado) {
+      return Array.from({ length: 31 }, (_, i) => i + 1);
+    }
+
+    // Si es el mes y año actual, solo mostrar días desde hoy en adelante
+    if (mesSeleccionado === fechaActual.mes && anoSeleccionado === fechaActual.ano) {
+      return Array.from({ length: 31 - fechaActual.dia + 1 }, (_, i) => fechaActual.dia + i);
+    }
+
+    // Para otros meses/años, mostrar todos los días
+    const diasEnMes = new Date(anoSeleccionado, mesSeleccionado, 0).getDate();
+    return Array.from({ length: diasEnMes }, (_, i) => i + 1);
+  };
+
+  // Función para obtener meses válidos según el año seleccionado
+  const obtenerMesesValidos = () => {
+    const fechaActual = obtenerFechaActual();
+    const anoSeleccionado = parseInt(datosCompra.ano);
+    
+    if (!anoSeleccionado) {
+      return Array.from({ length: 12 }, (_, i) => i + 1);
+    }
+
+    // Si es el año actual, solo mostrar meses desde el actual en adelante
+    if (anoSeleccionado === fechaActual.ano) {
+      return Array.from({ length: 12 - fechaActual.mes + 1 }, (_, i) => fechaActual.mes + i);
+    }
+
+    // Para otros años, mostrar todos los meses
+    return Array.from({ length: 12 }, (_, i) => i + 1);
+  };
+
+  // Función para obtener años válidos (desde el actual)
+  const obtenerAnosValidos = () => {
+    const fechaActual = obtenerFechaActual();
+    return Array.from({ length: 10 }, (_, i) => fechaActual.ano + i);
+  };
+
+  const nombresMeses = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+
   return (
     <>
       <div style={estilos.overlay} onClick={onCancelar}></div>
@@ -93,6 +161,9 @@ function ConfirmacionModal({
         )}
 
         <p>Fecha de entrega</p>
+        <small style={{ color: '#8B4513', fontStyle: 'italic', marginBottom: '10px', display: 'block' }}>
+          ⚠️ No se pueden seleccionar fechas pasadas
+        </small>
         <div className="row g-0" style={{ columnGap: '15px', marginBottom: '15px' }}>
           <div className="col-4">
             <label style={{ marginBottom: '5px', display: 'block' }}>Día:</label>
@@ -105,7 +176,7 @@ function ConfirmacionModal({
               required
             >
               <option value="">Día</option>
-              {Array.from({ length: 31 }, (_, i) => i + 1).map(dia => (
+              {obtenerDiasValidos().map(dia => (
                 <option key={dia} value={dia}>{dia}</option>
               ))}
             </select>
@@ -121,18 +192,9 @@ function ConfirmacionModal({
               required
             >
               <option value="">Mes</option>
-              <option value="1">Enero</option>
-              <option value="2">Febrero</option>
-              <option value="3">Marzo</option>
-              <option value="4">Abril</option>
-              <option value="5">Mayo</option>
-              <option value="6">Junio</option>
-              <option value="7">Julio</option>
-              <option value="8">Agosto</option>
-              <option value="9">Septiembre</option>
-              <option value="10">Octubre</option>
-              <option value="11">Noviembre</option>
-              <option value="12">Diciembre</option>
+              {obtenerMesesValidos().map(mes => (
+                <option key={mes} value={mes}>{nombresMeses[mes - 1]}</option>
+              ))}
             </select>
           </div>
           <div className="col-4">
@@ -146,7 +208,7 @@ function ConfirmacionModal({
               required
             >
               <option value="">Año</option>
-              {Array.from({ length: 10 }, (_, i) => 2025 + i).map(ano => (
+              {obtenerAnosValidos().map(ano => (
                 <option key={ano} value={ano}>{ano}</option>
               ))}
             </select>

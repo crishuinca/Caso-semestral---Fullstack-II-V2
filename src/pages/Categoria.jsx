@@ -1,24 +1,42 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { useCarrito } from '../context/CarritoContext';
-import { useFiltro } from '../context/FiltroContext';
-import '../styles/Productos.css';
+import '../styles/Categoria.css';
 
-function Productos() {
+function Categoria() {
+  const { categoria } = useParams();
+  const navigate = useNavigate();
   const { productosDisponibles, agregarProducto } = useCarrito();
-  const { categoriaSeleccionada, setCategoriaSeleccionada, terminoBusqueda, setTerminoBusqueda } = useFiltro();
   const [productos, setProductos] = useState([]);
   const [filteredProductos, setFilteredProductos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [ofertas, setOfertas] = useState([]);
 
+  // Categorías válidas
+  const categoriasValidas = [
+    'Todos',
+    'Tortas Cuadradas',
+    'Tortas Circulares', 
+    'Postres Individuales',
+    'Productos Sin Azúcar',
+    'Pastelería Tradicional',
+    'Productos Sin Gluten',
+    'Productos Veganos',
+    'Tortas Especiales'
+  ];
+
   useEffect(() => {
-    
+    // Verificar si la categoría es válida
+    if (!categoriasValidas.includes(categoria)) {
+      navigate('/productos');
+      return;
+    }
+
+    // Cargar productos
     const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
     
     let productosFinales;
     if (productosAdmin) {
-      
       productosFinales = productosAdmin.map(producto => ({
         prod_codigo: producto.prod_codigo,
         prod_nombre: producto.nombre,
@@ -31,7 +49,6 @@ function Productos() {
         prod_precio_oferta: producto.precioEspecial || null
       }));
     } else {
-      
       productosFinales = productosDisponibles.map(producto => ({
         prod_codigo: producto.prod_codigo,
         prod_nombre: producto.nombre,
@@ -45,12 +62,10 @@ function Productos() {
     }
     
     setProductos(productosFinales);
-    setFilteredProductos(productosFinales);
-  }, [productosDisponibles]);
+  }, [productosDisponibles, categoria, navigate]);
 
   useEffect(() => {
     const handleProductosActualizados = () => {
-      
       const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
       if (productosAdmin) {
         const productosActualizados = productosAdmin.map(producto => ({
@@ -65,7 +80,6 @@ function Productos() {
           prod_precio_oferta: producto.precioEspecial || null
         }));
         setProductos(productosActualizados);
-        setFilteredProductos(productosActualizados);
       }
     };
 
@@ -76,9 +90,20 @@ function Productos() {
     };
   }, []);
 
-  // Generar ofertas dinámicamente de productos con descuento
+  // Filtrar productos por categoría
   useEffect(() => {
-    const productosConOferta = productos.filter(producto => producto.prod_precio_oferta);
+    let productosFiltrados;
+    if (categoria === 'Todos') {
+      productosFiltrados = productos; // Mostrar todos los productos
+    } else {
+      productosFiltrados = productos.filter(producto => producto.prod_categoria === categoria);
+    }
+    setFilteredProductos(productosFiltrados);
+  }, [productos, categoria]);
+
+  // Generar ofertas dinámicamente
+  useEffect(() => {
+    const productosConOferta = filteredProductos.filter(producto => producto.prod_precio_oferta);
     
     const ofertasGeneradas = productosConOferta.map(producto => {
       const descuento = Math.round(((producto.prod_precio - producto.prod_precio_oferta) / producto.prod_precio) * 100);
@@ -89,26 +114,7 @@ function Productos() {
     });
     
     setOfertas(ofertasGeneradas);
-  }, [productos]);
-
-  useEffect(() => {
-    let filtered = productos;
-
-    if (categoriaSeleccionada !== 'Todos') {
-      filtered = filtered.filter(producto => producto.prod_categoria === categoriaSeleccionada);
-    }
-
-    if (terminoBusqueda) {
-      filtered = filtered.filter(producto =>
-        producto.prod_nombre.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
-        producto.prod_desc.toLowerCase().includes(terminoBusqueda.toLowerCase())
-      );
-    }
-
-    setFilteredProductos(filtered);
-  }, [productos, categoriaSeleccionada, terminoBusqueda]);
-
-  const categorias = ['Todos', ...new Set(productos.map(p => p.prod_categoria))];
+  }, [filteredProductos]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-CL', {
@@ -121,65 +127,49 @@ function Productos() {
     agregarProducto(producto.prod_codigo, 1, '', producto.prod_precio_oferta);
   };
 
+  const getCategoriaIcon = (categoria) => {
+    const iconos = {
+      'Todos': '🛍️',
+      'Tortas Cuadradas': '🍰',
+      'Tortas Circulares': '🎂',
+      'Postres Individuales': '🍮',
+      'Productos Sin Azúcar': '🍯',
+      'Pastelería Tradicional': '🥧',
+      'Productos Sin Gluten': '🌾',
+      'Productos Veganos': '🌱',
+      'Tortas Especiales': '🎉'
+    };
+    return iconos[categoria] || '🍰';
+  };
+
   return (
     <div style={{ backgroundColor: '#FFF5E1', paddingTop: '100px', paddingBottom: '40px' }}>
       <div className="container py-4">
-        {}
-        <div className="text-center mb-4">
-          <h1 style={{ 
-            color: '#8B4513', 
-            fontFamily: 'Pacifico, cursive', 
-            fontSize: '3rem' 
-          }}>
-            Nuestros Productos
-          </h1>
-          <p className="text-muted fs-5">
-            Descubre todos nuestros deliciosos productos
-          </p>
-        </div>
-
-        {}
-        <div className="card mb-4 shadow">
-          <div className="card-body">
-            {}
-            <div className="mb-3">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Buscar productos..."
-                value={terminoBusqueda}
-                onChange={(e) => setTerminoBusqueda(e.target.value)}
-              />
-            </div>
-
-            {}
-            <div className="d-flex flex-wrap gap-2 justify-content-center">
-              {categorias.map(categoria => (
-                <button
-                  key={categoria}
-                  className={`btn rounded-pill ${
-                    categoriaSeleccionada === categoria 
-                      ? 'text-white' 
-                      : 'btn-outline-secondary'
-                  }`}
-                  style={{
-                    backgroundColor: categoriaSeleccionada === categoria ? '#D2691E' : 'transparent',
-                    borderColor: '#D2691E'
-                  }}
-                  onClick={() => setCategoriaSeleccionada(categoria)}
-                >
-                  {categoria}
-                </button>
-              ))}
-            </div>
+        {/* Header de la categoría */}
+        <div className="text-center mb-5">
+          <div className="categoria-header">
+            <h1 className="categoria-title">
+              {getCategoriaIcon(categoria)} Categoría
+            </h1>
+            <h2 className="categoria-subtitle">
+              {categoria === 'Todos' ? 'Todos los Productos' : categoria}
+            </h2>
+            <p className="categoria-description">
+              {categoria === 'Todos' 
+                ? 'Descubre todos nuestros deliciosos productos disponibles'
+                : `Descubre todos nuestros deliciosos productos de ${categoria.toLowerCase()}`
+              }
+            </p>
           </div>
         </div>
 
         {/* Sección de Ofertas */}
         {ofertas.length > 0 && (
-          <div className="ofertas-container">
+          <div className="ofertas-container mb-5">
             <div className="ofertas-header text-center">
-              <h2 className="ofertas-title">🎁 Ofertas Especiales</h2>
+              <h3 className="ofertas-title">
+                🎁 Ofertas Especiales{categoria !== 'Todos' ? ` en ${categoria}` : ''}
+              </h3>
               <p className="ofertas-subtitle">Aprovecha estos increíbles descuentos</p>
             </div>
 
@@ -227,35 +217,43 @@ function Productos() {
           </div>
         )}
 
-        {/* Título para el resto de productos */}
-        <div className="text-center mb-4">
-          <h2 style={{ 
-            color: '#8B4513', 
-            fontFamily: 'Pacifico, cursive', 
-            fontSize: '2rem' 
-          }}>
-            Todos Nuestros Productos
-          </h2>
-        </div>
-
-        {}
-        <div className="row g-4">
-          {filteredProductos.map(producto => (
-            <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
-              <ProductCard producto={producto} />
-            </div>
-          ))}
-        </div>
-
-        {filteredProductos.length === 0 && (
-          <div className="text-center py-5">
-            <h3 className="text-muted">No se encontraron productos</h3>
-            <p>No hay productos que coincidan con tu búsqueda.</p>
+        {/* Productos de la categoría */}
+        <div className="productos-categoria">
+          <div className="text-center mb-4">
+            <h3 className="productos-titulo">
+              {ofertas.length > 0 ? 'Todos los Productos' : 'Productos Disponibles'}
+            </h3>
+            <p className="productos-contador">
+              {filteredProductos.length} producto{filteredProductos.length !== 1 ? 's' : ''} encontrado{filteredProductos.length !== 1 ? 's' : ''}
+            </p>
           </div>
-        )}
+
+          <div className="row g-4">
+            {filteredProductos.map(producto => (
+              <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
+                <ProductCard producto={producto} />
+              </div>
+            ))}
+          </div>
+
+          {filteredProductos.length === 0 && (
+            <div className="text-center py-5">
+              <div className="no-productos">
+                <h3 className="text-muted">No hay productos disponibles</h3>
+                <p>No se encontraron productos en esta categoría.</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => navigate('/productos')}
+                >
+                  Ver Todos los Productos
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default Productos;
+export default Categoria;

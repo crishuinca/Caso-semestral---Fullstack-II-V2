@@ -78,6 +78,16 @@ function Carrito() {
       return;
     }
 
+    // Validar que la fecha no sea pasada
+    const fechaSeleccionada = new Date(parseInt(datosCompra.ano), parseInt(datosCompra.mes) - 1, parseInt(datosCompra.dia));
+    const fechaHoy = new Date();
+    fechaHoy.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
+    
+    if (fechaSeleccionada < fechaHoy) {
+      mostrarMensaje('La fecha de entrega no puede ser anterior a hoy', 'error');
+      return;
+    }
+
     setBtnpago(true)
     
     const pedido = {

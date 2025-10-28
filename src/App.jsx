@@ -1,8 +1,10 @@
 ﻿import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CarritoProvider } from './context/CarritoContext';
+import { FiltroProvider } from './context/FiltroContext';
 import Navbar from './pages/Navbar';
 import Home from './pages/Home';
 import Productos from './pages/Productos';
+import Categoria from './pages/Categoria';
 import Nosotros from './pages/Nosotros';
 import Blogs from './pages/Blogs';
 import DetalleBlog1 from './pages/DetalleBlog1';
@@ -35,6 +37,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/productos" element={<Productos />} />
+          <Route path="/categoria/:categoria" element={<Categoria />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blog/harina-magica" element={<DetalleBlog1 />} />
@@ -62,10 +65,11 @@ function AppContent() {
 function App() {
   return (
     <CarritoProvider>
-      <Router>
-        <AppContent />
-      </Router>
-
+      <FiltroProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </FiltroProvider>
     </CarritoProvider>
   );
 }
