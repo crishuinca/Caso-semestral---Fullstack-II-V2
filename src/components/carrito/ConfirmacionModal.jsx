@@ -1,4 +1,5 @@
 import React from 'react';
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 function ConfirmacionModal({
   mostrarConfirmacion,
@@ -10,7 +11,9 @@ function ConfirmacionModal({
   calcularTotal,
   onConfirmar,
   onCancelar,
-  estilos
+  estilos, 
+  btnpago,
+  initialOptions, redirigir, redirigirFallo
 }) {
   if (!mostrarConfirmacion) return null;
 
@@ -172,6 +175,46 @@ function ConfirmacionModal({
           <button style={estilos.btnConfirmar} onClick={onConfirmar}>
             Confirmar
           </button>
+          {btnpago && 
+                
+            <PayPalScriptProvider options={initialOptions}>
+              <PayPalButtons
+                style={{
+                  layout: 'vertical', 
+                  color: 'gold',   
+                  shape: 'rect',    
+                  label: 'pay', 
+                  tagline: false     
+                }}
+                forceReRender={[carrito, calcularTotal()]} // opcional si necesitas forzar re-render
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: {
+                          value: calcularTotal().toString(), // total como string
+                        },
+                      },
+                    ],
+                  });
+                }}
+                onCancel={(data) =>{
+                  alert("Se ha cancelado el pago")
+                  navigate("/carrito")
+                }}
+                onError={(error) => {
+                  redirigirFallo(error)
+                }}
+                onApprove={(data, actions) => {
+                  return actions.order.capture().then((details) => {
+                    redirigir(details)
+                  }).catch((error) => {
+                    redirigirFallo(error)
+                  })
+                }}
+              />
+            </PayPalScriptProvider>
+          }
           <button style={estilos.btnConfirmar} onClick={onCancelar}>
             Cancelar
           </button>

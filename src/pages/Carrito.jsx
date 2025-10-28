@@ -89,22 +89,8 @@ function Carrito() {
     };
     localStorage.setItem("temporal_info", JSON.stringify(pedido))
 
-    console.log('Pedido confirmado:', pedido);
-    mostrarMensaje('¡Pedido confirmado exitosamente!', 'ok');
-
-    vaciarCarrito();
-    setMostrarConfirmacion(false);
-    setDatosCompra({
-      nombre: '',
-      rut: '',
-      direccion: '',
-      dia: '',
-      mes: '',
-      ano: '',
-      tipoEntrega: 'despacho'
-    });
   };
-
+//---------------------------------------------------------------------------
   const handleContinuar = () => {
     if (carrito.length > 0) {
       cargarDatosUsuario();
@@ -312,6 +298,11 @@ function Carrito() {
           onConfirmar={confirmarPedido}
           onCancelar={handleCancelarModal}
           estilos={estilos}
+          btnpago={btnpago}
+          initialOptions={initialOptions}
+
+          redirigirFallo={redirigirFallo}
+          redirigir={redirigir}
         />
       </main>
     </div>
