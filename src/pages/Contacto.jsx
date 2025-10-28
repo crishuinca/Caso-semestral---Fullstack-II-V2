@@ -53,7 +53,7 @@ function Contacto() {
     <div style={{ 
       backgroundColor: '#FFF5E1', 
       minHeight: '100vh',
-      paddingTop: '700px',
+      paddingTop: '80px',
       fontFamily: "'Lato', sans-serif",
       color: '#8B4513'
     }}>

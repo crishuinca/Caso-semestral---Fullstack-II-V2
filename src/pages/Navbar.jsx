@@ -2,6 +2,7 @@
 import { useCarrito } from '../context/CarritoContext';
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/Navbar.css';
 
 function Navbar() {
   const { obtenerCantidadTotal } = useCarrito();
@@ -10,7 +11,6 @@ function Navbar() {
   const [usuarioActual, setUsuarioActual] = useState(null);
 
   useEffect(() => {
-    
     const usuario = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
     setUsuarioActual(usuario);
 
@@ -36,6 +36,28 @@ function Navbar() {
     window.dispatchEvent(new Event('usuarioActualizado'));
     navigate('/');
   };
+
+  const cerrarNavbar = (e) => {
+    // Obtener el elemento del navbar
+    const navCollapse = document.getElementById('navbarNav');
+    if (navCollapse && navCollapse.classList.contains('show')) {
+      // Quitar la clase show para cerrar el menú
+      navCollapse.classList.remove('show');
+      // Actualizar el aria-expanded del botón
+      const navbarToggler = document.querySelector('.navbar-toggler');
+      if (navbarToggler) {
+        navbarToggler.setAttribute('aria-expanded', 'false');
+      }
+    }
+    
+    // Pequeño delay para asegurar que el navegador procese la navegación
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }, 50);
+  };
   return (
     <header>
       <nav 
@@ -53,7 +75,7 @@ function Navbar() {
             <img 
               src="/img/Logotipo_pasteleria.png" 
               alt="Logo de Pastelería Mil Sabores" 
-              height="70"
+              height="50"
               className="me-2"
               onError={(e) => {
                 e.target.style.display = 'none';
@@ -83,6 +105,7 @@ function Navbar() {
                   style={{ color: '#8B4513' }}
                   role="menuitem"
                   aria-label="Ir a página de inicio"
+                  onClick={cerrarNavbar}
                 >
                   Home
                 </Link>
@@ -94,6 +117,7 @@ function Navbar() {
                   style={{ color: '#8B4513' }}
                   role="menuitem"
                   aria-label="Ver catálogo de productos"
+                  onClick={cerrarNavbar}
                 >
                   Productos
                 </Link>
@@ -105,6 +129,7 @@ function Navbar() {
                   style={{ color: '#8B4513' }}
                   role="menuitem"
                   aria-label="Conocer sobre nosotros"
+                  onClick={cerrarNavbar}
                 >
                   Nosotros
                 </Link>
@@ -116,6 +141,7 @@ function Navbar() {
                   style={{ color: '#8B4513' }}
                   role="menuitem"
                   aria-label="Leer nuestros blogs"
+                  onClick={cerrarNavbar}
                 >
                   Blogs
                 </Link>
@@ -127,6 +153,7 @@ function Navbar() {
                   style={{ color: '#8B4513' }}
                   role="menuitem"
                   aria-label="Información de contacto"
+                  onClick={cerrarNavbar}
                 >
                   Contacto
                 </Link>
@@ -138,6 +165,7 @@ function Navbar() {
                   style={{ color: '#8B4513' }}
                   role="menuitem"
                   aria-label="Ver carrito de compras"
+                  onClick={cerrarNavbar}
                 >
                   <i className="fas fa-cart-shopping me-2"></i>
                   Carrito
@@ -154,10 +182,27 @@ function Navbar() {
               </li>
               {usuarioActual ? (
                 <>
+                  {!usuarioActual.isAdmin && (
+                    <li className="nav-item" role="none">
+                      <Link 
+                        className="nav-link px-4 py-2 rounded" 
+                        to="/perfil"
+                        style={{ color: '#8B4513' }}
+                        role="menuitem"
+                        aria-label="Ver mi perfil"
+                        onClick={cerrarNavbar}
+                      >
+                        Mi Perfil
+                      </Link>
+                    </li>
+                  )}
                   <li className="nav-item" role="none">
                     <button
                       className="nav-link px-4 py-2 rounded btn btn-link"
-                      onClick={cerrarSesion}
+                      onClick={() => {
+                        cerrarNavbar();
+                        cerrarSesion();
+                      }}
                       style={{ color: '#8B4513', textDecoration: 'none', border: 'none' }}
                       role="menuitem"
                       aria-label="Cerrar sesión"
@@ -173,6 +218,7 @@ function Navbar() {
                         style={{ color: '#8B4513' }}
                         role="menuitem"
                         aria-label="Panel de administración"
+                        onClick={cerrarNavbar}
                       >
                         Panel de Admin
                       </Link>
@@ -187,6 +233,7 @@ function Navbar() {
                     style={{ color: '#8B4513' }}
                     role="menuitem"
                     aria-label="Iniciar sesión"
+                    onClick={cerrarNavbar}
                   >
                     Iniciar sesión
                   </Link>

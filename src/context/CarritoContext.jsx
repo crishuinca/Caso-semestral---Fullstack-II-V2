@@ -239,7 +239,7 @@ export const CarritoProvider = ({ children }) => {
     setTimeout(() => { toast.remove(); }, 3000);
   };
 
-  const agregarProducto = (codigo, cantidad = 1, mensaje = '') => {
+  const agregarProducto = (codigo, cantidad = 1, mensaje = '', precioEspecial = null) => {
     const productoExistente = carrito.find(item => item.codigo === codigo);
     const producto = productosDisponibles.find(p => p.prod_codigo === codigo);
     
@@ -254,11 +254,16 @@ export const CarritoProvider = ({ children }) => {
         codigo: codigo,
         cantidad: cantidad,
         mensaje: mensaje,
+        precioEspecial: precioEspecial,
         enCarrito: true
       }]);
     }
     
-    mostrarMensaje(`${producto?.nombre || 'Producto'} agregado al carrito`, 'ok');
+    const mensajeConDescuento = precioEspecial 
+      ? `${producto?.nombre || 'Producto'} agregado al carrito con descuento! 🎁`
+      : `${producto?.nombre || 'Producto'} agregado al carrito`;
+    
+    mostrarMensaje(mensajeConDescuento, 'ok');
   };
 
   const eliminarProducto = (codigo) => {
@@ -299,7 +304,10 @@ export const CarritoProvider = ({ children }) => {
   const calcularTotal = () => {
     return carrito.reduce((total, item) => {
       const producto = productosDisponibles.find(p => p.prod_codigo === item.codigo);
-      return total + (producto ? producto.precio * item.cantidad : 0);
+      const precio = item.precioEspecial !== null && item.precioEspecial !== undefined 
+        ? item.precioEspecial 
+        : (producto ? producto.precio : 0);
+      return total + (precio * item.cantidad);
     }, 0);
   };
 

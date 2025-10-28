@@ -11,7 +11,7 @@ function ProductCard({ producto }) {
   };
 
   const handleAddToCart = () => {
-    agregarProducto(producto.prod_codigo, 1, '');
+    agregarProducto(producto.prod_codigo, 1, '', producto.prod_precio_oferta || null);
   };
 
   return (
@@ -36,10 +36,24 @@ function ProductCard({ producto }) {
         <p className="card-text">{producto.prod_desc}</p>
         
         <div className="mt-auto">
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <span className="h5" style={{ color: '#D2691E' }}>
-              {formatPrice(producto.prod_precio)}
-            </span>
+          <div className="d-flex flex-column justify-content-between align-items-start mb-2">
+            {producto.prod_precio_oferta ? (
+              <>
+                <div className="d-flex align-items-center gap-2">
+                  <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.9rem' }}>
+                    {formatPrice(producto.prod_precio)}
+                  </span>
+                  <span className="badge bg-danger">OFERTA</span>
+                </div>
+                <span className="h5" style={{ color: '#dc3545', fontWeight: 'bold' }}>
+                  {formatPrice(producto.prod_precio_oferta)}
+                </span>
+              </>
+            ) : (
+              <span className="h5" style={{ color: '#D2691E' }}>
+                {formatPrice(producto.prod_precio)}
+              </span>
+            )}
           </div>
           
           <div className="d-grid gap-2">

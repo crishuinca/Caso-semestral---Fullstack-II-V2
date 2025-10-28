@@ -3,7 +3,7 @@
 .productos-container {
   background: linear-gradient(135deg, #FFC0CB, #FFB6C1);
   min-height: 100vh;
-  padding-top: 100px;
+  padding-top: 80px;
 }
 
 .productos-header {
@@ -90,4 +90,191 @@
   background: white;
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Estilos para la sección de ofertas */
+.ofertas-container {
+  margin-bottom: 3rem;
+}
+
+.ofertas-header {
+  background: linear-gradient(135deg, #FFC0CB, #FFB6C1, #FF91A4);
+  color: #8B4513;
+  padding: 2rem 1.5rem;
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 25px rgba(255, 192, 203, 0.4);
+  position: relative;
+  overflow: hidden;
+  border: 3px solid rgba(255, 182, 193, 0.8);
+}
+
+.ofertas-header::before {
+  content: '🎉';
+  font-size: 4rem;
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(20deg);
+  opacity: 0.3;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(-50%) rotate(20deg); }
+  50% { transform: translateY(-55%) rotate(25deg); }
+}
+
+.ofertas-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 2.5rem;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.1);
+  color: #8B4513;
+}
+
+.ofertas-subtitle {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  opacity: 1;
+  color: #8B4513;
+  font-weight: 500;
+}
+
+.oferta-card {
+  background: linear-gradient(180deg, #ffffff 0%, #FFE5F0 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(255, 192, 203, 0.3);
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.oferta-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(255, 192, 203, 0.4);
+  border-color: #FF91A4;
+}
+
+.oferta-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #FF91A4, #FFB6C1);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 1rem;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(255, 145, 164, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.oferta-image-container {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.oferta-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.oferta-card:hover .oferta-image {
+  transform: scale(1.1);
+}
+
+.oferta-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.oferta-nombre {
+  color: #8B4513;
+  font-family: 'Pacifico', cursive;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.oferta-categoria {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.oferta-precio-container {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 3px dashed #FFB6C1;
+  background: linear-gradient(135deg, #FFF5F5, #FFE5F0);
+  border-radius: 0 0 15px 15px;
+  padding: 1rem;
+  margin: 0 -1.5rem -1.5rem -1.5rem;
+}
+
+.oferta-precio-antes {
+  color: #999;
+  text-decoration: line-through;
+  font-size: 1rem;
+}
+
+.oferta-precio-ahora {
+  color: #D2691E;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(255, 192, 203, 0.2);
+}
+
+.oferta-descuento {
+  display: inline-block;
+  background: linear-gradient(135deg, #FF91A4, #FFB6C1);
+  color: #8B4513;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  box-shadow: 0 3px 10px rgba(255, 145, 164, 0.3);
+}
+
+.oferta-button {
+  margin-top: 1rem;
+  background: linear-gradient(135deg, #FF91A4, #FFB6C1, #FFC0CB);
+  border: 2px solid #FFB6C1;
+  color: #8B4513;
+  padding: 0.9rem;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 192, 203, 0.3);
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.oferta-button:hover {
+  background: linear-gradient(135deg, #FFB6C1, #FFC0CB, #FFD6E0);
+  border-color: #FF91A4;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 192, 203, 0.5);
+  color: #8B4513;
 }

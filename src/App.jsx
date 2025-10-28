@@ -11,6 +11,7 @@ import Contacto from './pages/Contacto';
 import Carrito from './pages/Carrito';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Perfil from './pages/Perfil';
 import AdminPanel from './pages/AdminPanel';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -35,6 +36,7 @@ function AppContent() {
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/perfil" element={<Perfil />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="*" element={<Home />} />
         </Routes>
