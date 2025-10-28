@@ -11,6 +11,7 @@ import Contacto from './pages/Contacto';
 import Carrito from './pages/Carrito';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Perfil from './pages/Perfil';
 import AdminPanel from './pages/AdminPanel';
 import CompraExitosa from './pages/CompraExitosa'
 import CompraErronea from './pages/CompraErronea'
@@ -18,6 +19,7 @@ import Boletas from './pages/Boletas'
 import DetalleBoleta from './pages/DetalleBoleta'
 import ComprasHistorial from './pages/ComprasHistorial'
 import ComprasDetalle from './pages/ComprasDetalle'
+import ReportesProductos from './pages/ReportesProductos';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
@@ -41,7 +43,9 @@ function AppContent() {
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/perfil" element={<Perfil />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin/reportes-productos" element={<ReportesProductos />} />
           <Route path="*" element={<Home />} />
           <Route path="/compra-exitosa" element={<CompraExitosa />} />
           <Route path="/compra-erronea" element={<CompraErronea />} />

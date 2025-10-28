@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function DetalleBlog2() {
   return (
-    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '400px' }}>
+    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '80px' }}>
       <div className="container-fluid py-4">
         <div className="row" style={{ marginTop: '80px' }}>
           

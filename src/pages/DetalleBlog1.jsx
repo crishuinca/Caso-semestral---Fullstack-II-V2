@@ -6,7 +6,7 @@ function DetalleBlog1() {
     <div className="container-fluid" style={{ 
       backgroundColor: '#FFF5E1', 
       minHeight: '100vh',
-      paddingTop: '400px'
+      paddingTop: '80px'
     }}>
       <div className="container-fluid py-4">
         <div className="row" style={{ marginTop: '80px' }}>

@@ -1,13 +1,15 @@
 ﻿import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { useCarrito } from '../context/CarritoContext';
+import '../styles/Productos.css';
 
 function Productos() {
-  const { productosDisponibles } = useCarrito();
+  const { productosDisponibles, agregarProducto } = useCarrito();
   const [productos, setProductos] = useState([]);
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
+  const [ofertas, setOfertas] = useState([]);
 
   useEffect(() => {
     
@@ -24,7 +26,8 @@ function Productos() {
         prod_precio: producto.precio,
         prod_imagen: producto.imagen,
         prod_stock: producto.stock,
-        prod_stock_critico: producto.stock_critico
+        prod_stock_critico: producto.stock_critico,
+        prod_precio_oferta: producto.precioEspecial || null
       }));
     } else {
       
@@ -57,7 +60,8 @@ function Productos() {
           prod_precio: producto.precio,
           prod_imagen: producto.imagen,
           prod_stock: producto.stock,
-          prod_stock_critico: producto.stock_critico
+          prod_stock_critico: producto.stock_critico,
+          prod_precio_oferta: producto.precioEspecial || null
         }));
         setProductos(productosActualizados);
         setFilteredProductos(productosActualizados);
@@ -70,6 +74,21 @@ function Productos() {
       window.removeEventListener('productosActualizados', handleProductosActualizados);
     };
   }, []);
+
+  // Generar ofertas dinámicamente de productos con descuento
+  useEffect(() => {
+    const productosConOferta = productos.filter(producto => producto.prod_precio_oferta);
+    
+    const ofertasGeneradas = productosConOferta.map(producto => {
+      const descuento = Math.round(((producto.prod_precio - producto.prod_precio_oferta) / producto.prod_precio) * 100);
+      return {
+        ...producto,
+        descuento: descuento
+      };
+    });
+    
+    setOfertas(ofertasGeneradas);
+  }, [productos]);
 
   useEffect(() => {
     let filtered = productos;
@@ -90,11 +109,22 @@ function Productos() {
 
   const categorias = ['Todos', ...new Set(productos.map(p => p.prod_categoria))];
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP'
+    }).format(price);
+  };
+
+  const handleAddOfertaToCart = (producto) => {
+    agregarProducto(producto.prod_codigo, 1, '', producto.prod_precio_oferta);
+  };
+
   return (
-    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '2500px' }}>
+    <div style={{ backgroundColor: '#FFF5E1', paddingTop: '100px', paddingBottom: '40px' }}>
       <div className="container py-4">
         {}
-        <div className="text-center mb-4" style={{ marginTop: '100px' }}>
+        <div className="text-center mb-4">
           <h1 style={{ 
             color: '#8B4513', 
             fontFamily: 'Pacifico, cursive', 
@@ -142,6 +172,69 @@ function Productos() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Sección de Ofertas */}
+        {ofertas.length > 0 && (
+          <div className="ofertas-container">
+            <div className="ofertas-header text-center">
+              <h2 className="ofertas-title">🎁 Ofertas Especiales</h2>
+              <p className="ofertas-subtitle">Aprovecha estos increíbles descuentos</p>
+            </div>
+
+            <div className="row g-4 mb-5">
+              {ofertas.map(producto => (
+                <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
+                  <div className="oferta-card">
+                    <div className="oferta-badge">
+                      -{producto.descuento}%
+                    </div>
+                    <div className="oferta-image-container">
+                      <img 
+                        src={producto.prod_imagen} 
+                        alt={producto.prod_nombre}
+                        className="oferta-image"
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/300x200/D2691E/FFF?text=Producto';
+                        }}
+                      />
+                    </div>
+                    <div className="oferta-body">
+                      <h5 className="oferta-nombre">{producto.prod_nombre}</h5>
+                      <p className="oferta-categoria">{producto.prod_categoria}</p>
+                      <p className="text-muted small" style={{ flexGrow: 1 }}>
+                        {producto.prod_desc}
+                      </p>
+                      <div className="oferta-precio-container">
+                        <p className="oferta-precio-antes">{formatPrice(producto.prod_precio)}</p>
+                        <div className="oferta-precio-ahora">{formatPrice(producto.prod_precio_oferta)}</div>
+                        <span className="oferta-descuento">
+                          Ahorra {formatPrice(producto.prod_precio - producto.prod_precio_oferta)}
+                        </span>
+                      </div>
+                      <button 
+                        className="oferta-button w-100"
+                        onClick={() => handleAddOfertaToCart(producto)}
+                      >
+                        Agregar al Carrito 🛒
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Título para el resto de productos */}
+        <div className="text-center mb-4">
+          <h2 style={{ 
+            color: '#8B4513', 
+            fontFamily: 'Pacifico, cursive', 
+            fontSize: '2rem' 
+          }}>
+            Todos Nuestros Productos
+          </h2>
         </div>
 
         {}

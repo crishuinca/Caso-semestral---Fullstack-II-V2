@@ -1,5 +1,8 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useCarrito } from '../context/CarritoContext';
+import CartItem from '../components/carrito/CartItem';
+import CarritoResumen from '../components/carrito/CarritoResumen';
+import ConfirmacionModal from '../components/carrito/ConfirmacionModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/Carrito.css';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
@@ -27,9 +30,26 @@ function Carrito() {
     dia: '',
     mes: '',
     ano: '',
-    tipoEntrega: 'retiro'
+    tipoEntrega: 'despacho'
   });
-//-----------------------------------------------------------------------------------
+
+  // Cargar datos del usuario si está logueado
+  const cargarDatosUsuario = () => {
+    try {
+      const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || 'null');
+      if (usuarioActual) {
+        setDatosCompra(prev => ({
+          ...prev,
+          nombre: usuarioActual.nombre || '',
+          rut: usuarioActual.rut || '',
+          direccion: usuarioActual.direccion || ''
+        }));
+      }
+    } catch (error) {
+      console.error('Error al cargar datos del usuario:', error);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setDatosCompra(prev => ({
@@ -69,6 +89,45 @@ function Carrito() {
     };
     localStorage.setItem("temporal_info", JSON.stringify(pedido))
 
+    console.log('Pedido confirmado:', pedido);
+    mostrarMensaje('¡Pedido confirmado exitosamente!', 'ok');
+
+    vaciarCarrito();
+    setMostrarConfirmacion(false);
+    setDatosCompra({
+      nombre: '',
+      rut: '',
+      direccion: '',
+      dia: '',
+      mes: '',
+      ano: '',
+      tipoEntrega: 'despacho'
+    });
+  };
+
+  const handleContinuar = () => {
+    if (carrito.length > 0) {
+      cargarDatosUsuario();
+      setMostrarConfirmacion(true);
+    }
+  };
+
+  const handleTipoEntregaChange = (tipo) => {
+    setDatosCompra(prev => ({ ...prev, tipoEntrega: tipo }));
+  };
+
+  const handleCancelarModal = () => {
+    setMostrarConfirmacion(false);
+    // Resetear datos al cerrar
+    setDatosCompra({
+      nombre: '',
+      rut: '',
+      direccion: '',
+      dia: '',
+      mes: '',
+      ano: '',
+      tipoEntrega: 'despacho'
+    });
   };
 //-----------------------------------------------------------------------------------
   const redirigir = (details) => {
@@ -119,7 +178,7 @@ function Carrito() {
     body: {
       backgroundColor: '#FFF5E1',
       minHeight: '100vh',
-      paddingTop: '300px',
+      paddingTop: '80px',
       fontFamily: 'sans-serif',
       color: '#5D4037'
     },
@@ -170,9 +229,9 @@ function Carrito() {
       fontFamily: 'sans-serif',
       color: '#5D4037',
       maxWidth: '780px',
-      width: '100%',
-      maxHeight: "800px",
-      overflow: "auto"
+      maxHeight: '85vh',
+      overflowY: 'auto',
+      width: '100%'
     },
     overlay: {
       position: 'fixed',
@@ -199,6 +258,7 @@ function Carrito() {
         
         <div className="row g-0 m-0">
           {}
+          {/* Productos del carrito */}
           <div className="col-lg-7 col-md-12 col-sm-12">
             <div className="pb-4 pt-4 ps-4">
               {carrito.length === 0 ? (
@@ -212,316 +272,47 @@ function Carrito() {
                   if (!producto) return null;
                   
                   return (
-                    <div key={index} className="card mb-3" style={{ border: '1px solid #ff2600a9' }}>
-                      <div className="row g-0">
-                        <div className="col-md-4">
-                          <img 
-                            src={producto.imagen} 
-                            className="img-fluid rounded-start" 
-                            alt={producto.nombre}
-                            style={{ 
-                              objectFit: 'cover', 
-                              height: '200px', 
-                              width: '100%' 
-                            }}
-                            onError={(e) => {
-                              e.target.src = 'https://via.placeholder.com/200x200/D2691E/FFF?text=Producto';
-                            }}
-                          />
-                        </div>
-                        <div className="col-md-8">
-                          <div className="card-body">
-                            <h5 className="card-title" style={{ color: '#5D4037' }}>
-                              {producto.nombre}
-                            </h5>
-                            <p className="card-text">
-                              <strong>Precio: ${producto.precio.toLocaleString()}</strong>
-                            </p>
-                            
-                            <div className="row mb-2">
-                              <div className="col-md-3">
-                                <label>Cantidad:</label>
-                                <input
-                                  type="number"
-                                  min="1"
-                                  value={item.cantidad}
-                                  onChange={(e) => actualizarCantidad(item.codigo, e.target.value)}
-                                  style={estilos.inputCarrito}
-                                  className="form-control"
-                                />
-                              </div>
-                              <div className="col-md-9">
-                                <label>Mensaje personalizado:</label>
-                                <input
-                                  type="text"
-                                  placeholder="Ej: Feliz cumpleaños..."
-                                  value={item.mensaje}
-                                  onChange={(e) => actualizarMensaje(item.codigo, e.target.value)}
-                                  style={estilos.inputCarrito}
-                                  className="form-control"
-                                />
-                              </div>
-                            </div>
-                            
-                            <div className="d-flex justify-content-between align-items-center">
-                              <span style={{ fontWeight: 'bold', color: '#5D4037' }}>
-                                Subtotal: ${(producto.precio * item.cantidad).toLocaleString()}
-                              </span>
-                              <button
-                                onClick={() => {
-                                  console.log('Eliminando producto:', item.codigo);
-                                  eliminarProducto(item.codigo);
-                                }}
-                                className="btn btn-danger btn-sm"
-                              >
-                                Eliminar
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <CartItem
+                      key={index}
+                      item={item}
+                      producto={producto}
+                      onCantidadChange={actualizarCantidad}
+                      onMensajeChange={actualizarMensaje}
+                      onEliminar={eliminarProducto}
+                      estilos={estilos}
+                    />
                   );
                 })
               )}
             </div>
           </div>
 
-          {}
+          {/* Resumen del carrito */}
           <div className="col-lg-5 col-sm-12 pb-4 pt-4 ps-4 pe-4">
-            <div style={estilos.resumenCarro} className="p-4">
-              <h3>Resumen del carrito:</h3>
-              
-              <strong>Productos en el carrito:</strong>
-              <div className="row" style={{ marginTop: '10px' }}>
-                <div>
-                  {carrito.map((item, index) => {
-                    const producto = productosDisponibles.find(p => p.prod_codigo === item.codigo);
-                    return (
-                      <div key={index} style={{ marginBottom: '5px' }}>
-                        {producto?.nombre} (x{item.cantidad})
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              
-              <div className="row" style={{ marginTop: '10px' }}>
-                <strong>Total productos:</strong>
-                <p>{carrito.reduce((total, item) => total + item.cantidad, 0)}</p>
-              </div>
-              
-              <div className="row" style={{ marginTop: '10px' }}>
-                <strong>Total de la compra:</strong>
-                <p>${calcularTotal().toLocaleString()}</p>
-              </div>
-              
-              <button
-                style={estilos.btnConfirmar}
-                onClick={() => carrito.length > 0 && setMostrarConfirmacion(true)}
-                disabled={carrito.length === 0}
-              >
-                Continuar
-              </button>
-              
-              <button
-                style={estilos.btnConfirmar}
-                onClick={vaciarCarrito}
-              >
-                Vaciar carrito
-              </button>
-            </div>
+            <CarritoResumen
+              carrito={carrito}
+              productosDisponibles={productosDisponibles}
+              calcularTotal={calcularTotal}
+              onContinuar={handleContinuar}
+              onVaciar={vaciarCarrito}
+              estilos={estilos}
+            />
           </div>
         </div>
 
-        {}
-        {mostrarConfirmacion && (
-          <>
-            <div style={estilos.overlay} onClick={() => setMostrarConfirmacion(false)}></div>
-            <div className="div_confirmacion_pago" style={estilos.modalConfirmar}>
-              <div className="row g-0" style={{ columnGap: '15px' }}>
-                <div className="col-md-6 col-sm-12">
-                  <p>Nombre del comprador</p>
-                  <input
-                    type="text"
-                    name="nombre"
-                    value={datosCompra.nombre}
-                    onChange={handleInputChange}
-                    placeholder=" Nombre del destinatario"
-                    style={estilos.inputCarrito}
-                    className="form-control"
-                    required
-                  />
-                </div>
-                <div className="col-md-6 col-sm-12">
-                  <p>RUT del comprador</p>
-                  <input
-                    type="text"
-                    name="rut"
-                    value={datosCompra.rut}
-                    onChange={handleInputChange}
-                    placeholder=" RUT (con guión, ej: 12345678-9)"
-                    style={estilos.inputCarrito}
-                    className="form-control"
-                    required
-                  />
-                </div>
-              </div>
-
-              <p>Dirección</p>
-              <input
-                type="text"
-                name="direccion"
-                value={datosCompra.direccion}
-                onChange={handleInputChange}
-                placeholder=" Dirección de despacho"
-                style={{
-                  ...estilos.inputCarrito,
-                  backgroundColor: datosCompra.tipoEntrega === 'retiro' ? '#fff5e149' : '#fff5e1',
-                  borderColor: datosCompra.tipoEntrega === 'retiro' ? '#ff260038' : '#ff2600a9'
-                }}
-                className="form-control"
-                disabled={datosCompra.tipoEntrega === 'retiro'}
-              />
-
-              <p>Fecha de entrega</p>
-              <div className="row g-0" style={{ columnGap: '15px' }}>
-                <p className="col-3" style={{ marginBottom: '0' }}>Día:</p>
-                <p className="col-3" style={{ marginBottom: '0' }}>Mes:</p>
-                <p className="col-3" style={{ marginBottom: '0' }}>Año:</p>
-                <input
-                  type="number"
-                  name="dia"
-                  value={datosCompra.dia}
-                  onChange={handleInputChange}
-                  placeholder=" Día"
-                  min="1"
-                  max="31"
-                  style={estilos.inputCarrito}
-                  className="col-3 form-control"
-                  required
-                />
-                <input
-                  type="number"
-                  name="mes"
-                  value={datosCompra.mes}
-                  onChange={handleInputChange}
-                  placeholder=" Mes"
-                  min="1"
-                  max="12"
-                  style={estilos.inputCarrito}
-                  className="col-3 form-control"
-                  required
-                />
-                <input
-                  type="number"
-                  name="ano"
-                  value={datosCompra.ano}
-                  onChange={handleInputChange}
-                  placeholder=" Año"
-                  min="2025"
-                  style={estilos.inputCarrito}
-                  className="col-3 form-control"
-                  required
-                />
-              </div>
-
-              <p>Tipo de pedido:</p>
-              <div style={{ marginBottom: '15px' }}>
-                <button
-                  style={{
-                    ...estilos.btnConfirmar,
-                    backgroundColor: datosCompra.tipoEntrega === 'retiro' ? '#8B4513' : '#FFC0CB',
-                    color: datosCompra.tipoEntrega === 'retiro' ? '#FFF5E1' : '#8B4513'
-                  }}
-                  onClick={() => setDatosCompra(prev => ({ ...prev, tipoEntrega: 'retiro' }))}
-                >
-                  Retiro
-                </button>
-                <button
-                  style={{
-                    ...estilos.btnConfirmar,
-                    backgroundColor: datosCompra.tipoEntrega === 'despacho' ? '#8B4513' : '#FFC0CB',
-                    color: datosCompra.tipoEntrega === 'despacho' ? '#FFF5E1' : '#8B4513'
-                  }}
-                  onClick={() => setDatosCompra(prev => ({ ...prev, tipoEntrega: 'despacho' }))}
-                >
-                  Despacho
-                </button>
-              </div>
-
-              <strong>Productos a comprar:</strong>
-              <div style={{ marginBottom: '15px' }}>
-                {carrito.map((item, index) => {
-                  const producto = productosDisponibles.find(p => p.prod_codigo === item.codigo);
-                  return (
-                    <div key={index}>
-                      {producto?.nombre} - Cantidad: {item.cantidad} - ${(producto?.precio * item.cantidad).toLocaleString()}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <strong>Total de la compra:</strong>
-              <p>${calcularTotal().toLocaleString()}</p>
-
-              <div>
-                <button style={estilos.btnConfirmar} onClick={confirmarPedido}>
-                  Continuar al pago
-                </button>
-              
-                {btnpago && 
-                
-                <PayPalScriptProvider options={initialOptions}>
-                  <PayPalButtons
-                    style={{
-                      layout: 'vertical', 
-                      color: 'gold',   
-                      shape: 'rect',    
-                      label: 'pay', 
-                      tagline: false     
-                    }}
-                    forceReRender={[carrito, calcularTotal()]} // opcional si necesitas forzar re-render
-                    createOrder={(data, actions) => {
-                      return actions.order.create({
-                        purchase_units: [
-                          {
-                            amount: {
-                              value: calcularTotal().toString(), // total como string
-                            },
-                          },
-                        ],
-                      });
-                    }}
-                    onCancel={(data) =>{
-                      alert("Se ha cancelado el pago")
-                      navigate("/carrito")
-                    }}
-                    onError={(error) => {
-                      redirigirFallo(error)
-                    }}
-                    onApprove={(data, actions) => {
-                      return actions.order.capture().then((details) => {
-                        redirigir(details)
-                      }).catch((error) => {
-                        redirigirFallo(error)
-                      })
-                    }}
-                  />
-                </PayPalScriptProvider>
-                }
-                
-
-                <button 
-                  style={estilos.btnConfirmar} 
-                  onClick={() => setMostrarConfirmacion(false)}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </>
-        )}
+        {/* Modal de confirmación */}
+        <ConfirmacionModal
+          mostrarConfirmacion={mostrarConfirmacion}
+          datosCompra={datosCompra}
+          onInputChange={handleInputChange}
+          onTipoEntregaChange={handleTipoEntregaChange}
+          carrito={carrito}
+          productosDisponibles={productosDisponibles}
+          calcularTotal={calcularTotal}
+          onConfirmar={confirmarPedido}
+          onCancelar={handleCancelarModal}
+          estilos={estilos}
+        />
       </main>
     </div>
   );

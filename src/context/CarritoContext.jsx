@@ -12,6 +12,7 @@ export const useCarrito = () => {
 
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState([]);
+  const [productosStock, setProductosStock] = useState([]);
 
   const productosDisponibles = [
     {
@@ -177,6 +178,16 @@ export const CarritoProvider = ({ children }) => {
   ];
 
   useEffect(() => {
+    const stockGuardado = localStorage.getItem('productosStock');
+    if (stockGuardado) {
+      setProductosStock(JSON.parse(stockGuardado));
+    } else {
+      setProductosStock(productosDisponibles);
+      localStorage.setItem('productosStock', JSON.stringify(productosDisponibles));
+    }
+  }, []);
+
+  useEffect(() => {
     const carritoGuardado = localStorage.getItem('carritoCompras');
     
     if (carritoGuardado) {
@@ -239,13 +250,36 @@ export const CarritoProvider = ({ children }) => {
     setTimeout(() => { toast.remove(); }, 3000);
   };
 
-  const agregarProducto = (codigo, cantidad = 1, mensaje = '') => {
-    const productoExistente = carrito.find(item => item.codigo === codigo);
-    const producto = productosDisponibles.find(p => p.prod_codigo === codigo);
+  const agregarProducto = (codigo, cantidad = 1, mensaje = '', precioEspecial = null) => {
+    const producto = productosStock.find(p => p.prod_codigo === codigo);
     
-    if (productoExistente) {
-      setCarrito(prev => prev.map(item => 
-        item.codigo === codigo 
+    if (!producto) {
+      mostrarMensaje('Producto no encontrado', 'error');
+      return;
+    }
+
+    if (producto.stock < cantidad) {
+      mostrarMensaje(`Stock insuficiente. Solo quedan ${producto.stock} unidades disponibles`, 'error');
+      return;
+    }
+
+    if (producto.stock === 0) {
+      mostrarMensaje('Producto sin stock', 'error');
+      return;
+    }
+
+    const nuevosProductos = productosStock.map(p =>
+      p.prod_codigo === codigo
+        ? { ...p, stock: p.stock - cantidad }
+        : p
+    );
+    setProductosStock(nuevosProductos);
+    localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+
+    const itemEnCarrito = carrito.find(item => item.codigo === codigo);
+    if (itemEnCarrito) {
+      setCarrito(prev => prev.map(item =>
+        item.codigo === codigo
           ? { ...item, cantidad: item.cantidad + cantidad }
           : item
       ));
@@ -254,32 +288,85 @@ export const CarritoProvider = ({ children }) => {
         codigo: codigo,
         cantidad: cantidad,
         mensaje: mensaje,
+        precioEspecial: precioEspecial,
         enCarrito: true
       }]);
     }
+
+    const mensajeConDescuento = precioEspecial 
+      ? `${producto.nombre} agregado al carrito con descuento! 🎁`
+      : `${producto.nombre} agregado al carrito`;
     
-    mostrarMensaje(`${producto?.nombre || 'Producto'} agregado al carrito`, 'ok');
+    mostrarMensaje(mensajeConDescuento, 'ok');
+    
+    window.dispatchEvent(new Event('productosActualizados'));
   };
 
   const eliminarProducto = (codigo) => {
-    const productoAEliminar = productosDisponibles.find(p => p.prod_codigo === codigo);
+    const itemEnCarrito = carrito.find(item => item.codigo === codigo);
+    if (!itemEnCarrito) return;
+
+    const nuevosProductos = productosStock.map(p =>
+      p.prod_codigo === codigo
+        ? { ...p, stock: p.stock + itemEnCarrito.cantidad }
+        : p
+    );
+    setProductosStock(nuevosProductos);
+    localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+
+    const productoAEliminar = productosStock.find(p => p.prod_codigo === codigo);
     setCarrito(prev => prev.filter(item => item.codigo !== codigo));
     mostrarMensaje(`${productoAEliminar?.nombre || 'Producto'} eliminado del carrito`, 'info');
+    
+    window.dispatchEvent(new Event('productosActualizados'));
   };
 
   const actualizarCantidad = (codigo, nuevaCantidad) => {
     const cantidad = parseInt(nuevaCantidad) || 1;
-    
+
     if (cantidad <= 0) {
       eliminarProducto(codigo);
       return;
     }
-    
-    setCarrito(prev => prev.map(item => 
-      item.codigo === codigo 
+
+    const itemEnCarrito = carrito.find(item => item.codigo === codigo);
+    if (!itemEnCarrito) return;
+
+    const producto = productosStock.find(p => p.prod_codigo === codigo);
+    if (!producto) return;
+
+    const diferencia = cantidad - itemEnCarrito.cantidad;
+
+    if (diferencia > 0) {
+      if (producto.stock < diferencia) {
+        mostrarMensaje(`Stock insuficiente. Solo quedan ${producto.stock} unidades disponibles`, 'error');
+        return;
+      }
+
+      const nuevosProductos = productosStock.map(p =>
+        p.prod_codigo === codigo
+          ? { ...p, stock: p.stock - diferencia }
+          : p
+      );
+      setProductosStock(nuevosProductos);
+      localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+    } else if (diferencia < 0) {
+      const nuevosProductos = productosStock.map(p =>
+        p.prod_codigo === codigo
+          ? { ...p, stock: p.stock + Math.abs(diferencia) }
+          : p
+      );
+      setProductosStock(nuevosProductos);
+      localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+    }
+
+    setCarrito(prev => prev.map(item =>
+      item.codigo === codigo
         ? { ...item, cantidad: cantidad }
         : item
     ));
+    
+    window.dispatchEvent(new Event('productosActualizados'));
   };
 
   const actualizarMensaje = (codigo, nuevoMensaje) => {
@@ -291,15 +378,30 @@ export const CarritoProvider = ({ children }) => {
   };
 
   const vaciarCarrito = () => {
+    const nuevosProductos = productosStock.map(p => {
+      const itemEnCarrito = carrito.find(item => item.codigo === p.prod_codigo);
+      return itemEnCarrito
+        ? { ...p, stock: p.stock + itemEnCarrito.cantidad }
+        : p;
+    });
+    
+    setProductosStock(nuevosProductos);
+    localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
+    
     setCarrito([]);
     localStorage.removeItem('carritoCompras');
     mostrarMensaje('Carrito vaciado', 'info');
+    
+    window.dispatchEvent(new Event('productosActualizados'));
   };
 
   const calcularTotal = () => {
     return carrito.reduce((total, item) => {
       const producto = productosDisponibles.find(p => p.prod_codigo === item.codigo);
-      return total + (producto ? producto.precio * item.cantidad : 0);
+      const precio = item.precioEspecial !== null && item.precioEspecial !== undefined 
+        ? item.precioEspecial 
+        : (producto ? producto.precio : 0);
+      return total + (precio * item.cantidad);
     }, 0);
   };
 
@@ -310,6 +412,7 @@ export const CarritoProvider = ({ children }) => {
   const value = {
     carrito,
     productosDisponibles,
+    productosStock,
     agregarProducto,
     eliminarProducto,
     actualizarCantidad,

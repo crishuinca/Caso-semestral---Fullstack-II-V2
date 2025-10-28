@@ -1,0 +1,37 @@
+.cuerpo-productos {
+  flex: auto;
+  background-color: #FFF5E1;
+  min-height: 100vh;
+  padding-top: 2500px;
+}
+
+.encabezado-productos {
+  text-align: center;
+  margin-bottom: 2rem;
+  margin-top: 100px;
+}
+
+.titulo-productos {
+  color: #8B4513;
+  font-family: 'Pacifico', cursive;
+  font-size: 3rem;
+}
+
+.boton-categoria {
+  border-color: #D2691E !important;
+}
+
+.boton-categoria-activo {
+  background-color: #D2691E !important;
+  color: white !important;
+}
+
+.boton-categoria-inactivo {
+  background-color: transparent !important;
+  color: #6c757d !important;
+}
+
+.mensaje-sin-productos {
+  text-align: center;
+  padding: 3rem 0;
+}
