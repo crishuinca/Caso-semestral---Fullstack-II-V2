@@ -1,5 +1,5 @@
 ﻿import 'bootstrap/dist/css/bootstrap.min.css';
-import Footer from '../components/Footer';
+import Footer from '../components/footer/Footer';
 
 function Nosotros() {
   return (

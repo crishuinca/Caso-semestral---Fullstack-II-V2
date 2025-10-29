@@ -1,4 +1,4 @@
-import "../styles/cssESCALONA.css"
+import "../../styles/cssESCALONA.css"
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 function CardBoletas({brp, prods, regresar}){

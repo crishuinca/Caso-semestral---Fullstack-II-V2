@@ -1,6 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Footer from '../components/Footer';
+import Footer from '../components/footer/Footer';
 
 function Home() {
   const usuario = JSON.parse(localStorage.getItem("usuarioActual") || "null");

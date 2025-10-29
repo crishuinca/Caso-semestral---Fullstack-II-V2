@@ -1,6 +1,6 @@
 import { useState,useEffect } from "react"
 import "../styles/cssESCALONA.css"
-import CardBoletas from "../components/CardBoletas"
+import CardBoletas from "../components/cardBoletas/CardBoletas"
 import { useNavigate } from "react-router-dom"
 
 function ComprasDetalle(){

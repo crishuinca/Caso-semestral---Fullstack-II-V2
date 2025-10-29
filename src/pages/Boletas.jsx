@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import CardBoletasPreview from "../components/CardBoletasPreview"
+import CardBoletasPreview from "../components/cardBoletasPreview/CardBoletasPreview"
 import "../styles/cssESCALONA.css"
 
 function Boletas(){

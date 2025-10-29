@@ -1,4 +1,4 @@
-import "../styles/cssESCALONA.css"
+import "../../styles/cssESCALONA.css"
 function CardBoletasPreview({lsb,ver}){
 
     return(

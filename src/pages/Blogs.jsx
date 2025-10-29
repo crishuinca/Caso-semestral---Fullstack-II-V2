@@ -1,7 +1,7 @@
 ﻿import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/Blogs.css';
-import Footer from '../components/Footer';
+import Footer from '../components/footer/Footer';
 
 function Blogs() {
   return (

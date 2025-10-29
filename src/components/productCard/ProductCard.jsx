@@ -1,4 +1,4 @@
-﻿import { useCarrito } from '../context/CarritoContext';
+﻿import { useCarrito } from '../../context/CarritoContext';
 import { useEffect, useState } from 'react';
 
 function ProductCard({ producto }) {

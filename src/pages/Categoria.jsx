@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
+import ProductCard from '../components/productCard/ProductCard';
 import { useCarrito } from '../context/CarritoContext';
 import '../styles/Categoria.css';
-import Footer from '../components/Footer';
+import Footer from '../components/footer/Footer';
 
 function Categoria() {
   const { categoria } = useParams();

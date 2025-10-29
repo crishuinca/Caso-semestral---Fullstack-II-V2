@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import CardBoletas from "../components/CardBoletas"
+import CardBoletas from "../components/cardBoletas/CardBoletas"
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import "../styles/cssESCALONA.css"

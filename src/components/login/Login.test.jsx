@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import Login from './Login';
+import { MemoryRouter } from 'react-router-dom';
+import Login from '../../pages/Login';
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -15,16 +15,19 @@ Object.defineProperty(window, 'localStorage', {
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', () => ({
-  ...vi.importActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 const renderWithProviders = (component) => {
   return render(
-    <BrowserRouter>
+    <MemoryRouter>
       {component}
-    </BrowserRouter>
+    </MemoryRouter>
   );
 };
 

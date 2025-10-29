@@ -1,9 +1,9 @@
 ﻿import { useState, useEffect } from 'react';
-import ProductCard from '../components/ProductCard';
+import ProductCard from '../components/productCard/ProductCard';
 import { useCarrito } from '../context/CarritoContext';
 import { useFiltro } from '../context/FiltroContext';
 import '../styles/Productos.css';
-import Footer from '../components/Footer';
+import Footer from '../components/footer/Footer';
 
 function Productos() {
   const { productosDisponibles, agregarProducto } = useCarrito();

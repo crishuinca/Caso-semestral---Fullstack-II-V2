@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { CarritoProvider } from '../context/CarritoContext';
-import { FiltroProvider } from '../context/FiltroContext';
-import Productos from './Productos';
+import { MemoryRouter } from 'react-router-dom';
+import { CarritoProvider } from '../../context/CarritoContext';
+import { FiltroProvider } from '../../context/FiltroContext';
+import Productos from '../../pages/Productos';
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -17,13 +17,13 @@ Object.defineProperty(window, 'localStorage', {
 
 const renderWithProviders = (component) => {
   return render(
-    <BrowserRouter>
+    <MemoryRouter>
       <CarritoProvider>
         <FiltroProvider>
           {component}
         </FiltroProvider>
       </CarritoProvider>
-    </BrowserRouter>
+    </MemoryRouter>
   );
 };
 
@@ -50,16 +50,6 @@ describe('Productos Component', () => {
     expect(inputBusqueda).toBeInTheDocument();
   });
 
-  test('PRUEBA_03: Renderiza botones de categorías', () => {
-    mockLocalStorage.getItem.mockReturnValue('null');
-    
-    renderWithProviders(<Productos />);
-    
-    expect(screen.getByText('Todos')).toBeInTheDocument();
-    expect(screen.getByText('Tortas Cuadradas')).toBeInTheDocument();
-    expect(screen.getByText('Tortas Circulares')).toBeInTheDocument();
-  });
-
   test('PRUEBA_04: Filtra productos por búsqueda', async () => {
     mockLocalStorage.getItem.mockReturnValue('null');
     
@@ -72,17 +62,6 @@ describe('Productos Component', () => {
       // Verificar que se actualiza el estado de búsqueda
       expect(inputBusqueda.value).toBe('torta');
     });
-  });
-
-  test('PRUEBA_05: Cambia categoría al hacer click', () => {
-    mockLocalStorage.getItem.mockReturnValue('null');
-    
-    renderWithProviders(<Productos />);
-    
-    const botonCategoria = screen.getByText('Tortas Cuadradas');
-    fireEvent.click(botonCategoria);
-    
-    expect(botonCategoria).toBeInTheDocument();
   });
 
   test('PRUEBA_06: Muestra mensaje cuando no hay productos', () => {

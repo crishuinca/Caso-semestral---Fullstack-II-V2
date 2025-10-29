@@ -180,7 +180,7 @@ export const CarritoProvider = ({ children }) => {
   useEffect(() => {
     // Primero verificar si hay productos del admin
     const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
-    if (productosAdmin) {
+    if (productosAdmin && Array.isArray(productosAdmin)) {
       // Usar productos del admin si existen
       const productosActualizados = productosAdmin.map(producto => ({
         prod_codigo: producto.prod_codigo,
@@ -209,24 +209,29 @@ export const CarritoProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const carritoGuardado = localStorage.getItem('carritoCompras');
-    
-    if (carritoGuardado) {
-      try {
-        const carritoParseado = JSON.parse(carritoGuardado);
-        setCarrito(carritoParseado);
-      } catch (error) {
-        console.error('Error al cargar carrito desde localStorage:', error);
+    try {
+      const carritoGuardado = localStorage.getItem('carritoCompras');
+      
+      if (carritoGuardado) {
+        try {
+          const carritoParseado = JSON.parse(carritoGuardado);
+          setCarrito(carritoParseado);
+        } catch (error) {
+          console.error('Error al parsear carrito desde localStorage:', error);
+          setCarrito([]);
+          localStorage.removeItem('carritoCompras');
+        }
+      } else {
         setCarrito([]);
-        localStorage.removeItem('carritoCompras');
       }
-    } else {
+    } catch (error) {
+      console.error('Error al acceder a localStorage:', error);
       setCarrito([]);
     }
   }, []);
 
   useEffect(() => {
-    if (carrito.length > 0) {
+    if (carrito && carrito.length > 0) {
       localStorage.setItem('carritoCompras', JSON.stringify(carrito));
     } else {
       localStorage.removeItem('carritoCompras');
