@@ -110,7 +110,14 @@ function ModalEditarProducto({
               name="categoria"
               value={productoEditado.categoria}
               onChange={handleInputChangeProducto}
-              style={estilos.select}
+              style={{
+                ...estilos.select,
+                backgroundColor: '#FFF5E1',
+                background: '#FFF5E1',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
             >
               <option value="Tortas Cuadradas">Tortas Cuadradas</option>
               <option value="Tortas Circulares">Tortas Circulares</option>

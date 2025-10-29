@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { useCarrito } from '../context/CarritoContext';
 import '../styles/Categoria.css';
+import Footer from '../components/Footer';
 
 function Categoria() {
   const { categoria } = useParams();
@@ -252,6 +253,7 @@ function Categoria() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

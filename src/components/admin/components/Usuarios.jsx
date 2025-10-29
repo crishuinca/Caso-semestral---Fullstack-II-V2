@@ -10,15 +10,11 @@ function Usuarios({ usuarios, abrirModalEditarUsuario, estilos }) {
         {usuarios.map(usuario => (
           <div 
             key={usuario.id} 
-            style={estilos.tarjetaUsuario}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-3px)';
-              e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.12)';
+            style={{
+              ...estilos.tarjetaUsuario,
+              cursor: 'pointer'
             }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.08)';
-            }}
+            onClick={() => abrirModalEditarUsuario(usuario)}
           >
             <div style={estilos.avatarUsuarioTarjeta}>
               <i className="fas fa-user-circle" style={estilos.iconoUsuario}></i>
@@ -29,6 +25,9 @@ function Usuarios({ usuarios, abrirModalEditarUsuario, estilos }) {
               <div style={estilos.detallesUsuario}>
                 <div><strong>Región:</strong> {usuario.region}</div>
                 <div><strong>Comuna:</strong> {usuario.comuna}</div>
+                {usuario.run && (
+                  <div><strong>RUT:</strong> {usuario.run}</div>
+                )}
                 <div style={estilos.tipoUsuarioInfo}>
                   <strong>Tipo:</strong> 
                   <span style={{
@@ -42,22 +41,20 @@ function Usuarios({ usuarios, abrirModalEditarUsuario, estilos }) {
                   <div><strong>Dirección:</strong> {usuario.direccion}</div>
                 )}
               </div>
-              {!usuario.isAdmin && (
-                <div style={estilos.accionesUsuario}>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      abrirModalEditarUsuario(usuario);
-                    }}
-                    style={estilos.botonEditar}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
-                  >
-                    <i className="fas fa-edit me-1"></i>
-                    Editar
-                  </button>
-                </div>
-              )}
+              <div style={estilos.accionesUsuario}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    abrirModalEditarUsuario(usuario);
+                  }}
+                  style={estilos.botonEditar}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
+                >
+                  <i className="fas fa-edit me-1"></i>
+                  Editar
+                </button>
+              </div>
             </div>
           </div>
         ))}

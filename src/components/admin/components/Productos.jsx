@@ -22,16 +22,10 @@ function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV }
               ...estilos.tarjetaProducto,
               maxWidth: '100%',
               padding: '1rem',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              cursor: 'pointer'
             }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-3px)';
-              e.target.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.12)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.08)';
-            }}
+            onClick={() => abrirModalEditar(producto)}
           >
             <div style={{
               ...estilos.avatarProductoTarjeta,
@@ -106,10 +100,7 @@ function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV }
                 marginTop: '1rem'
               }}>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    abrirModalEditar(producto);
-                  }}
+                  onClick={() => abrirModalEditar(producto)}
                   style={estilos.botonEditar}
                   onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
                   onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}

@@ -13,6 +13,11 @@ import ModalEditarUsuario from '../components/admin/components/ModalEditarUsuari
 import ProductosCriticos from '../components/admin/components/ProductosCriticos';
 import Reportes from '../components/admin/components/Reportes';
 import Perfil from './Perfil';
+import { 
+  validarRUT, 
+  formatearRUTEnTiempoReal, 
+  obtenerMensajeErrorRUT 
+} from '../utils/rutUtils';
 
 function AdminPanel() {
   const [esMovil, setEsMovil] = useState(window.innerWidth < 768);
@@ -37,6 +42,9 @@ function AdminPanel() {
     apellidos: '',
     correo: '',
     fecha_nacimiento: '',
+    dia_nacimiento: '',
+    mes_nacimiento: '',
+    ano_nacimiento: '',
     region: '',
     comuna: '',
     direccion: '',
@@ -63,6 +71,7 @@ function AdminPanel() {
     nombre: '',
     apellidos: '',
     correo: '',
+    run: '',
     fecha_nacimiento: '',
     region: '',
     comuna: '',
@@ -131,10 +140,20 @@ function AdminPanel() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNuevoUsuario(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Manejo especial para el campo RUT
+    if (name === 'run') {
+      const valorFormateado = formatearRUTEnTiempoReal(value);
+      setNuevoUsuario(prev => ({
+        ...prev,
+        [name]: valorFormateado
+      }));
+    } else {
+      setNuevoUsuario(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
 
     if (name === 'region') {
       setComunas(regionesComunas[value] || []);
@@ -161,8 +180,10 @@ function AdminPanel() {
       return;
     }
 
-    if (nuevoUsuario.run.length < 7 || nuevoUsuario.run.length > 9) {
-      setResultado('El RUN debe tener entre 7 y 9 caracteres');
+    // Validar RUT
+    const errorRUT = obtenerMensajeErrorRUT(nuevoUsuario.run);
+    if (errorRUT) {
+      setResultado(errorRUT);
       return;
     }
 
@@ -172,9 +193,16 @@ function AdminPanel() {
       return;
     }
 
+    // Convertir fecha de nacimiento al formato correcto
+    let fechaNacimientoFormateada = '';
+    if (nuevoUsuario.dia_nacimiento && nuevoUsuario.mes_nacimiento && nuevoUsuario.ano_nacimiento) {
+      fechaNacimientoFormateada = `${nuevoUsuario.ano_nacimiento}-${nuevoUsuario.mes_nacimiento}-${nuevoUsuario.dia_nacimiento}`;
+    }
+
     const usuarioCreado = {
       id: Date.now(),
       ...nuevoUsuario,
+      fecha_nacimiento: fechaNacimientoFormateada,
       isAdmin: nuevoUsuario.rol === 'admin',
       fechaRegistro: new Date().toISOString()
     };
@@ -193,6 +221,9 @@ function AdminPanel() {
       apellidos: '',
       correo: '',
       fecha_nacimiento: '',
+      dia_nacimiento: '',
+      mes_nacimiento: '',
+      ano_nacimiento: '',
       region: '',
       comuna: '',
       direccion: '',
@@ -310,6 +341,20 @@ function AdminPanel() {
     
     localStorage.setItem('productosAdmin', JSON.stringify(productosParaStorage));
     
+    // También actualizar productosStock para sincronización con CarritoContext
+    const productosStockActualizados = productosParaStorage.map(producto => ({
+      prod_codigo: producto.prod_codigo,
+      nombre: producto.nombre,
+      descripcion: producto.descripcion,
+      categoria: producto.categoria,
+      precio: producto.precio,
+      imagen: producto.imagen,
+      stock: producto.stock,
+      stock_critico: producto.stock_critico,
+      precioEspecial: producto.precioEspecial
+    }));
+    localStorage.setItem('productosStock', JSON.stringify(productosStockActualizados));
+    
     // Disparar evento para actualizar productos en otras páginas
     window.dispatchEvent(new Event('productosActualizados'));
     
@@ -318,16 +363,12 @@ function AdminPanel() {
   };
 
   const abrirModalEditarUsuario = (usuario) => {
-    if (usuario.isAdmin) {
-      alert('No se pueden editar usuarios administradores');
-      return;
-    }
-    
     setUsuarioEditando(usuario);
     setUsuarioEditado({
       nombre: usuario.nombre,
       apellidos: usuario.apellidos,
       correo: usuario.correo,
+      run: usuario.run || '',
       fecha_nacimiento: usuario.fecha_nacimiento,
       region: usuario.region,
       comuna: usuario.comuna,
@@ -358,10 +399,20 @@ function AdminPanel() {
 
   const handleInputChangeUsuario = (e) => {
     const { name, value } = e.target;
-    setUsuarioEditado(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Manejo especial para el campo RUT
+    if (name === 'run') {
+      const valorFormateado = formatearRUTEnTiempoReal(value);
+      setUsuarioEditado(prev => ({
+        ...prev,
+        [name]: valorFormateado
+      }));
+    } else {
+      setUsuarioEditado(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
 
     if (name === 'region') {
       setComunas(regionesComunas[value] || []);
@@ -388,6 +439,15 @@ function AdminPanel() {
       return;
     }
 
+    // Validar RUT si se proporciona
+    if (usuarioEditado.run && usuarioEditado.run.trim() !== '') {
+      const errorRUT = obtenerMensajeErrorRUT(usuarioEditado.run);
+      if (errorRUT) {
+        alert(errorRUT);
+        return;
+      }
+    }
+
     const usuariosExistentes = JSON.parse(localStorage.getItem('usuarios') || '[]');
     const correoEnUso = usuariosExistentes.find(u => 
       u.correo === usuarioEditado.correo && u.id !== usuarioEditando.id
@@ -405,6 +465,7 @@ function AdminPanel() {
             nombre: usuarioEditado.nombre,
             apellidos: usuarioEditado.apellidos,
             correo: usuarioEditado.correo,
+            run: usuarioEditado.run,
             fecha_nacimiento: usuarioEditado.fecha_nacimiento,
             region: usuarioEditado.region,
             comuna: usuarioEditado.comuna,

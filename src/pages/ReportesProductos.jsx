@@ -194,6 +194,13 @@ function ReportesProductos() {
                     value={productoSeleccionado}
                     onChange={(e) => setProductoSeleccionado(e.target.value)}
                     className="select-producto"
+                    style={{
+                      backgroundColor: '#FFF5E1',
+                      background: '#FFF5E1',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      appearance: 'none'
+                    }}
                   >
                     <option value="todos">Todos los productos</option>
                     {productos.map(producto => (

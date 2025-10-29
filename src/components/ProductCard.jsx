@@ -53,6 +53,13 @@ function ProductCard({ producto }) {
             <span className="badge bg-danger fs-5">Sin Stock</span>
           </div>
         )}
+        {stockCritico && !sinStock && (
+          <div className="position-absolute top-0 start-0 m-2">
+            <span className="badge bg-warning text-dark fs-6">
+              ⚠️ Últimas unidades
+            </span>
+          </div>
+        )}
       </div>
       
       <div className="card-body d-flex flex-column">
@@ -89,6 +96,12 @@ function ProductCard({ producto }) {
           </div>
           
           <div className="d-grid gap-2">
+            {stockCritico && !sinStock && (
+              <div className="alert alert-warning py-2 mb-2" style={{ fontSize: '0.85rem' }}>
+                <i className="fas fa-exclamation-triangle me-1"></i>
+                ¡Solo quedan {stockActual} unidades!
+              </div>
+            )}
             <button 
               onClick={handleAddToCart}
               className={`btn text-white ${sinStock ? 'btn-secondary' : ''}`}

@@ -42,6 +42,25 @@ function Contacto() {
       return;
     }
 
+    // Guardar mensaje de contacto en localStorage
+    const mensajeContacto = {
+      id: Date.now(),
+      nombre: formData.nombre,
+      correo: formData.correo,
+      razon: formData.razon,
+      fecha: new Date().toISOString(),
+      estado: 'pendiente'
+    };
+
+    // Obtener mensajes existentes o crear array vacío
+    const mensajesExistentes = JSON.parse(localStorage.getItem('mensajesContacto') || '[]');
+    
+    // Agregar nuevo mensaje
+    mensajesExistentes.push(mensajeContacto);
+    
+    // Guardar en localStorage
+    localStorage.setItem('mensajesContacto', JSON.stringify(mensajesExistentes));
+
     alert('¡Mensaje enviado exitosamente! Nos contactaremos contigo pronto.');
 
     setFormData({

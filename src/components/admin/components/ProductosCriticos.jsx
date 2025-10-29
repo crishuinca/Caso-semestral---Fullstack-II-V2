@@ -10,8 +10,8 @@ function ProductosCriticos({
   
   return (
     <div style={estilos.areaContenido}>
-      <div style={estilos.encabezadoSeccion}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
           <button 
             style={{
               background: 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)',
@@ -44,19 +44,24 @@ function ProductosCriticos({
             <i className="fas fa-arrow-left"></i>
             Volver a Reportes
           </button>
-          <h2 style={{...estilos.tituloPagina, color: '#8B4513'}}>Productos con Stock Crítico</h2>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{
-            background: '#c82333',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '20px',
-            fontWeight: '600',
-            fontSize: '0.9rem'
-          }}>
-            {productosCriticos.length} productos críticos encontrados
-          </span>
+        
+        <div style={estilos.encabezadoSeccion}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <h2 style={{...estilos.tituloPagina, color: '#8B4513'}}>Productos con Stock Crítico</h2>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{
+              background: '#c82333',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '20px',
+              fontWeight: '600',
+              fontSize: '0.9rem'
+            }}>
+              {productosCriticos.length} productos críticos encontrados
+            </span>
+          </div>
         </div>
       </div>
       

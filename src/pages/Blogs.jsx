@@ -1,6 +1,7 @@
 ﻿import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/Blogs.css';
+import Footer from '../components/Footer';
 
 function Blogs() {
   return (
@@ -99,6 +100,7 @@ function Blogs() {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }

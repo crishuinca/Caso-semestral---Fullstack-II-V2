@@ -3,6 +3,7 @@ import ProductCard from '../components/ProductCard';
 import { useCarrito } from '../context/CarritoContext';
 import { useFiltro } from '../context/FiltroContext';
 import '../styles/Productos.css';
+import Footer from '../components/Footer';
 
 function Productos() {
   const { productosDisponibles, agregarProducto } = useCarrito();
@@ -254,6 +255,7 @@ function Productos() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

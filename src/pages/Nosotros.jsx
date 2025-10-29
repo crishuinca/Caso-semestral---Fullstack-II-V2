@@ -1,4 +1,5 @@
 ﻿import 'bootstrap/dist/css/bootstrap.min.css';
+import Footer from '../components/Footer';
 
 function Nosotros() {
   return (
@@ -217,6 +218,7 @@ function Nosotros() {
           />
         </section>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -178,12 +178,33 @@ export const CarritoProvider = ({ children }) => {
   ];
 
   useEffect(() => {
-    const stockGuardado = localStorage.getItem('productosStock');
-    if (stockGuardado) {
-      setProductosStock(JSON.parse(stockGuardado));
+    // Primero verificar si hay productos del admin
+    const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+    if (productosAdmin) {
+      // Usar productos del admin si existen
+      const productosActualizados = productosAdmin.map(producto => ({
+        prod_codigo: producto.prod_codigo,
+        nombre: producto.nombre,
+        descripcion: producto.descripcion,
+        categoria: producto.categoria,
+        precio: producto.precio,
+        imagen: producto.imagen,
+        stock: producto.stock,
+        stock_critico: producto.stock_critico,
+        precioEspecial: producto.precioEspecial
+      }));
+      
+      setProductosStock(productosActualizados);
+      localStorage.setItem('productosStock', JSON.stringify(productosActualizados));
     } else {
-      setProductosStock(productosDisponibles);
-      localStorage.setItem('productosStock', JSON.stringify(productosDisponibles));
+      // Si no hay productos del admin, usar los hardcodeados
+      const stockGuardado = localStorage.getItem('productosStock');
+      if (stockGuardado) {
+        setProductosStock(JSON.parse(stockGuardado));
+      } else {
+        setProductosStock(productosDisponibles);
+        localStorage.setItem('productosStock', JSON.stringify(productosDisponibles));
+      }
     }
   }, []);
 
@@ -211,6 +232,36 @@ export const CarritoProvider = ({ children }) => {
       localStorage.removeItem('carritoCompras');
     }
   }, [carrito]);
+
+  // Escuchar actualizaciones de productos desde el admin
+  useEffect(() => {
+    const handleProductosActualizados = () => {
+      const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
+      if (productosAdmin) {
+        // Actualizar productosStock con los datos del admin
+        const productosActualizados = productosAdmin.map(producto => ({
+          prod_codigo: producto.prod_codigo,
+          nombre: producto.nombre,
+          descripcion: producto.descripcion,
+          categoria: producto.categoria,
+          precio: producto.precio,
+          imagen: producto.imagen,
+          stock: producto.stock,
+          stock_critico: producto.stock_critico,
+          precioEspecial: producto.precioEspecial
+        }));
+        
+        setProductosStock(productosActualizados);
+        localStorage.setItem('productosStock', JSON.stringify(productosActualizados));
+      }
+    };
+
+    window.addEventListener('productosActualizados', handleProductosActualizados);
+    
+    return () => {
+      window.removeEventListener('productosActualizados', handleProductosActualizados);
+    };
+  }, []);
 
   const mostrarMensaje = (texto, tipo = 'info') => {
     const existente = document.getElementById('toast_carrito');

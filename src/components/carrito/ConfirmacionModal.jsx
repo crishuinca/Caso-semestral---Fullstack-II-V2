@@ -110,9 +110,10 @@ function ConfirmacionModal({
               name="rut"
               value={datosCompra.rut}
               onChange={onInputChange}
-              placeholder=" RUT (con guión, ej: 12345678-9)"
+              placeholder="RUT (ej: 12345678-9)"
               style={estilos.inputCarrito}
               className="form-control"
+              maxLength="10"
               required
             />
           </div>

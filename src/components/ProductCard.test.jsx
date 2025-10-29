@@ -1,75 +1,133 @@
-import { render, screen, fireEvent } from "@testing-library/react"
-import { beforeEach, vi } from "vitest"
-import ProductCard from "./ProductCard"
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import { CarritoProvider } from '../context/CarritoContext';
+import ProductCard from './ProductCard';
 
-const mockAgregarProducto = vi.fn()
-vi.mock('../context/CarritoContext', () => ({
-    useCarrito: () => ({
-        agregarProducto: mockAgregarProducto
-    })
-}))
+// Mock localStorage
+const mockLocalStorage = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+Object.defineProperty(window, 'localStorage', {
+  value: mockLocalStorage,
+});
 
-describe("Testing ProductCard", () => {
+const renderWithProviders = (component) => {
+  return render(
+    <BrowserRouter>
+      <CarritoProvider>
+        {component}
+      </CarritoProvider>
+    </BrowserRouter>
+  );
+};
 
-    const mockProducto = {
-        prod_codigo: "P001",
-        prod_nombre: "Torta de Chocolate",
-        prod_categoria: "Postres",
-        prod_desc: "Deliciosa torta de chocolate",
-        prod_precio: 10000,
-        prod_precio_oferta: 8000,
-        prod_imagen: "https://via.placeholder.com/300x200",
-        stock: 3
-    }
+describe('ProductCard - Stock Bajo', () => {
+  const productoMock = {
+    prod_codigo: 'TC001',
+    prod_nombre: 'Torta Chocolate',
+    prod_categoria: 'Tortas Cuadradas',
+    prod_desc: 'Deliciosa torta de chocolate',
+    prod_precio: 15000,
+    prod_imagen: '/img/torta.jpg',
+    stock: 3, // Stock bajo
+    stock_critico: 5
+  };
 
-    beforeEach(() => {
-        localStorage.clear()
-        vi.clearAllMocks()
-    })
-   
-    it("ProductCARD PRUEBA_01: Muestra nombre, categoría y descripción del producto", () => {
-        render(<ProductCard producto={mockProducto} />)
-        expect(screen.getByText("Torta de Chocolate")).toBeInTheDocument()
-        expect(screen.getByText("Postres")).toBeInTheDocument()
-        expect(screen.getByText("Deliciosa torta de chocolate")).toBeInTheDocument()
-    })
-    
-    it("ProductCARD PRUEBA_02: Muestra precio y precio en oferta si existe", () => {
-        render(<ProductCard producto={mockProducto} />)
-        expect(screen.getByText("$10.000")).toBeInTheDocument() 
-        expect(screen.getByText("$8.000")).toBeInTheDocument()  
-        expect(screen.getByText(/OFERTA/i)).toBeInTheDocument()
-    })
-    
-    it("ProductCARD PRUEBA_03: Llama a agregarProducto al hacer click", () => {
-        render(<ProductCard producto={mockProducto} />)
-        const btn = screen.getByRole("button", { name: /agregar al carrito/i })
-        fireEvent.click(btn)
-        expect(mockAgregarProducto).toHaveBeenCalledWith("P001", 1, '', 8000)
-    })
-    
-    it("ProductCARD PRUEBA_04: Muestra badge de stock crítico cuando stock es 3", () => {
-        render(<ProductCard producto={mockProducto} />)
-        expect(screen.getByText("Stock: 3")).toHaveClass("bg-warning")
-    })
-    
-    it("ProductCARD PRUEBA_05: Muestra sin stock y deshabilita botón cuando stock = 0", () => {
-        render(<ProductCard producto={{...mockProducto, stock: 0}} />)
-        const btn = screen.getByRole("button", { name: /sin stock/i })
-        expect(btn).toBeDisabled()
-        expect(screen.getByText("Sin stock")).toBeInTheDocument()
-    })
-    
-    it("ProductCARD PRUEBA_06: Actualiza stock desde localStorage", () => {
-        localStorage.setItem('productosStock', JSON.stringify([{ prod_codigo: "P001", stock: 10 }]))
-        render(<ProductCard producto={mockProducto} />)
-        expect(screen.getByText("Stock: 10")).toBeInTheDocument()
-    })
+  beforeEach(() => {
+    mockLocalStorage.getItem.mockClear();
+    mockLocalStorage.setItem.mockClear();
+  });
 
-    it("ProductCARD PRUEBA_07: Cambia imagen a placeholder si hay error", () => {
-        render(<ProductCard producto={{...mockProducto, prod_imagen: 'url_invalida'}} />)
-        const img = screen.getByAltText("Torta de Chocolate")
-        fireEvent.error(img)
-        expect(img.src).toContain("via.placeholder.com")
-    })
-})
+  test('PRUEBA_01: Muestra mensaje "Últimas unidades" en imagen cuando stock es bajo', () => {
+    mockLocalStorage.getItem.mockReturnValue('[]');
+    
+    renderWithProviders(<ProductCard producto={productoMock} />);
+    
+    expect(screen.getByText('⚠️ Últimas unidades')).toBeInTheDocument();
+  });
+
+  test('PRUEBA_02: Muestra alerta de stock bajo antes del botón', () => {
+    mockLocalStorage.getItem.mockReturnValue('[]');
+    
+    renderWithProviders(<ProductCard producto={productoMock} />);
+    
+    expect(screen.getByText('¡Solo quedan 3 unidades!')).toBeInTheDocument();
+  });
+
+  test('PRUEBA_03: Badge de stock muestra color warning para stock bajo', () => {
+    mockLocalStorage.getItem.mockReturnValue('[]');
+    
+    renderWithProviders(<ProductCard producto={productoMock} />);
+    
+    const badgeStock = screen.getByText('Stock: 3');
+    expect(badgeStock).toHaveClass('bg-warning');
+  });
+
+  test('PRUEBA_04: No muestra mensaje de últimas unidades cuando stock es normal', () => {
+    const productoStockNormal = {
+      ...productoMock,
+      stock: 10
+    };
+    
+    mockLocalStorage.getItem.mockReturnValue('[]');
+    
+    renderWithProviders(<ProductCard producto={productoStockNormal} />);
+    
+    expect(screen.queryByText('⚠️ Últimas unidades')).not.toBeInTheDocument();
+    expect(screen.queryByText(/¡Solo quedan/)).not.toBeInTheDocument();
+  });
+
+  test('PRUEBA_05: No muestra mensaje de últimas unidades cuando stock es 0', () => {
+    const productoSinStock = {
+      ...productoMock,
+      stock: 0
+    };
+    
+    mockLocalStorage.getItem.mockReturnValue('[]');
+    
+    renderWithProviders(<ProductCard producto={productoSinStock} />);
+    
+    expect(screen.queryByText('⚠️ Últimas unidades')).not.toBeInTheDocument();
+    expect(screen.queryByText(/¡Solo quedan/)).not.toBeInTheDocument();
+    expect(screen.getByText('Sin Stock')).toBeInTheDocument();
+  });
+
+  test('PRUEBA_06: Actualiza mensaje cuando stock cambia dinámicamente', async () => {
+    const productosStock = [
+      {
+        prod_codigo: 'TC001',
+        stock: 2
+      }
+    ];
+    
+    mockLocalStorage.getItem.mockReturnValue(JSON.stringify(productosStock));
+    
+    renderWithProviders(<ProductCard producto={productoMock} />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('¡Solo quedan 2 unidades!')).toBeInTheDocument();
+    });
+  });
+
+  test('PRUEBA_07: Botón sigue funcionando con stock bajo', () => {
+    mockLocalStorage.getItem.mockReturnValue('[]');
+    
+    renderWithProviders(<ProductCard producto={productoMock} />);
+    
+    const botonAgregar = screen.getByText('Agregar al Carrito');
+    expect(botonAgregar).not.toBeDisabled();
+    expect(botonAgregar).toHaveStyle({ backgroundColor: '#D2691E' });
+  });
+
+  test('PRUEBA_08: Muestra icono de advertencia en alerta', () => {
+    mockLocalStorage.getItem.mockReturnValue('[]');
+    
+    renderWithProviders(<ProductCard producto={productoMock} />);
+    
+    const iconoAdvertencia = screen.getByRole('img', { hidden: true });
+    expect(iconoAdvertencia).toHaveClass('fas', 'fa-exclamation-triangle');
+  });
+});

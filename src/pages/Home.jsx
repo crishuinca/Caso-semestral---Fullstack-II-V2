@@ -1,5 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Footer from '../components/Footer';
 
 function Home() {
   const usuario = JSON.parse(localStorage.getItem("usuarioActual") || "null");
@@ -71,16 +72,27 @@ function Home() {
       </div>
 
       {}
-      <div className="text-center mb-4">
-        <img 
-          src="/img/imagen_fondo.png" 
-          alt="Imagen principal" 
-          className="img-fluid rounded"
-          style={{ maxHeight: '400px' }}
-          onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/800x400/8B4513/FFF8DC?text=Mil+Sabores';
-          }}
-        />
+      <div className="container mb-4">
+        <div className="row justify-content-center">
+          <div className="col-12">
+            <div className="text-center">
+              <img 
+                src="/img/imagen_fondo.png" 
+                alt="Imagen principal" 
+                className="img-fluid rounded"
+                style={{ 
+                  maxHeight: '400px',
+                  width: '100%',
+                  maxWidth: '100%',
+                  objectFit: 'cover'
+                }}
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/800x400/8B4513/FFF8DC?text=Mil+Sabores';
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {}
@@ -196,12 +208,7 @@ function Home() {
       </div>
 
       {}
-      <footer 
-        className="text-center text-white py-3 mt-5"
-        style={{ backgroundColor: '#8B4513' }}
-      >
-        &copy; 2025 Mil Sabores. Todos los derechos reservados.
-      </footer>
+      <Footer />
     </div>
   );
 }

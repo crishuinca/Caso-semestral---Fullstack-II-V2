@@ -63,6 +63,19 @@ function ModalEditarUsuario({
           </div>
 
           <div style={estilos.inputGroup}>
+            <label style={estilos.label}>RUT</label>
+            <input
+              type="text"
+              name="run"
+              value={usuarioEditado.run || ''}
+              onChange={handleInputChangeUsuario}
+              style={estilos.input}
+              placeholder="RUT (ej: 12345678-9)"
+              maxLength="10"
+            />
+          </div>
+
+          <div style={estilos.inputGroup}>
             <label style={estilos.label}>Fecha de Nacimiento</label>
             <input
               type="date"
@@ -79,7 +92,14 @@ function ModalEditarUsuario({
               name="region"
               value={usuarioEditado.region}
               onChange={handleInputChangeUsuario}
-              style={estilos.select}
+              style={{ 
+                ...estilos.input,
+                backgroundColor: '#FFF5E1',
+                background: '#FFF5E1',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
               required
             >
               <option value="">Seleccionar región</option>
@@ -95,7 +115,14 @@ function ModalEditarUsuario({
               name="comuna"
               value={usuarioEditado.comuna}
               onChange={handleInputChangeUsuario}
-              style={estilos.select}
+              style={{ 
+                ...estilos.input,
+                backgroundColor: '#FFF5E1',
+                background: '#FFF5E1',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
               required
               disabled={!usuarioEditado.region}
             >

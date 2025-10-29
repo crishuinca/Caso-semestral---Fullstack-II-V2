@@ -42,7 +42,14 @@ function NuevoUsuario({
               required
               value={nuevoUsuario.rol}
               onChange={handleInputChange}
-              style={estilos.select}
+              style={{ 
+                ...estilos.input,
+                backgroundColor: '#FFF5E1',
+                background: '#FFF5E1',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
             >
               <option value="">Seleccionar rol</option>
               <option value="cliente">Cliente</option>
@@ -56,10 +63,9 @@ function NuevoUsuario({
               type="text" 
               id="run" 
               name="run" 
-              maxLength="9" 
-              minLength="7" 
+              maxLength="10" 
               required 
-              placeholder="Ej: 19011022K"
+              placeholder="Ej: 12345678-9"
               value={nuevoUsuario.run}
               onChange={handleInputChange}
               style={estilos.input}
@@ -111,14 +117,77 @@ function NuevoUsuario({
 
           <div style={estilos.inputGroup}>
             <label htmlFor="fecha_nacimiento" style={estilos.label}>Fecha de nacimiento</label>
-            <input 
-              type="date" 
-              id="fecha_nacimiento" 
-              name="fecha_nacimiento"
-              value={nuevoUsuario.fecha_nacimiento}
-              onChange={handleInputChange}
-              style={estilos.input}
-            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <select
+                name="dia_nacimiento"
+                value={nuevoUsuario.dia_nacimiento || ''}
+                onChange={handleInputChange}
+                style={{ 
+                  ...estilos.input, 
+                  flex: 1.2,
+                  minWidth: '80px',
+                  backgroundColor: '#FFF5E1',
+                  background: '#FFF5E1',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
+              >
+                <option value="">Día</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map(dia => (
+                  <option key={dia} value={dia.toString().padStart(2, '0')}>{dia}</option>
+                ))}
+              </select>
+              <select
+                name="mes_nacimiento"
+                value={nuevoUsuario.mes_nacimiento || ''}
+                onChange={handleInputChange}
+                style={{ 
+                  ...estilos.input, 
+                  flex: 1.5,
+                  minWidth: '120px',
+                  backgroundColor: '#FFF5E1',
+                  background: '#FFF5E1',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
+              >
+                <option value="">Mes</option>
+                <option value="01">Enero</option>
+                <option value="02">Febrero</option>
+                <option value="03">Marzo</option>
+                <option value="04">Abril</option>
+                <option value="05">Mayo</option>
+                <option value="06">Junio</option>
+                <option value="07">Julio</option>
+                <option value="08">Agosto</option>
+                <option value="09">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+              </select>
+              <select
+                name="ano_nacimiento"
+                value={nuevoUsuario.ano_nacimiento || ''}
+                onChange={handleInputChange}
+                style={{ 
+                  ...estilos.input, 
+                  flex: 1.2,
+                  minWidth: '100px',
+                  backgroundColor: '#FFF5E1',
+                  background: '#FFF5E1',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
+              >
+                <option value="">Año</option>
+                {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(ano => (
+                  <option key={ano} value={ano}>{ano}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div style={estilos.inputGroup}>
@@ -129,7 +198,14 @@ function NuevoUsuario({
               required
               value={nuevoUsuario.region}
               onChange={handleInputChange}
-              style={estilos.select}
+              style={{ 
+                ...estilos.input,
+                backgroundColor: '#FFF5E1',
+                background: '#FFF5E1',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
             >
               <option value="">Seleccione región</option>
               {Object.keys(regiones).map(region => (
@@ -146,7 +222,14 @@ function NuevoUsuario({
               required
               value={nuevoUsuario.comuna}
               onChange={handleInputChange}
-              style={estilos.select}
+              style={{ 
+                ...estilos.input,
+                backgroundColor: '#FFF5E1',
+                background: '#FFF5E1',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
               disabled={!nuevoUsuario.region}
             >
               <option value="">Seleccione comuna</option>

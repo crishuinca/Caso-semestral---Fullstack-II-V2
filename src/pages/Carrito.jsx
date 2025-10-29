@@ -7,6 +7,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/Carrito.css';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useNavigate } from 'react-router-dom';
+import { 
+  validarRUT, 
+  formatearRUTEnTiempoReal, 
+  obtenerMensajeErrorRUT 
+} from '../utils/rutUtils';
 
 function Carrito() {
 
@@ -41,7 +46,7 @@ function Carrito() {
         setDatosCompra(prev => ({
           ...prev,
           nombre: usuarioActual.nombre || '',
-          rut: usuarioActual.rut || '',
+          rut: usuarioActual.run || '',
           direccion: usuarioActual.direccion || ''
         }));
       }
@@ -50,12 +55,27 @@ function Carrito() {
     }
   };
 
+  // Cargar datos del usuario al montar el componente
+  useEffect(() => {
+    cargarDatosUsuario();
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setDatosCompra(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Manejo especial para el campo RUT
+    if (name === 'rut') {
+      const valorFormateado = formatearRUTEnTiempoReal(value);
+      setDatosCompra(prev => ({
+        ...prev,
+        [name]: valorFormateado
+      }));
+    } else {
+      setDatosCompra(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
 //-----------------------------------------------------------------------------------
@@ -67,6 +87,13 @@ function Carrito() {
     }
     if (!datosCompra.rut.trim()) {
       mostrarMensaje('Ingrese el RUT del comprador', 'error');
+      return;
+    }
+    
+    // Validar RUT
+    const errorRUT = obtenerMensajeErrorRUT(datosCompra.rut);
+    if (errorRUT) {
+      mostrarMensaje(errorRUT, 'error');
       return;
     }
     if (datosCompra.tipoEntrega === 'despacho' && !datosCompra.direccion.trim()) {

@@ -11,6 +11,7 @@ function Navbar() {
   const cantidadTotal = obtenerCantidadTotal();
   const [usuarioActual, setUsuarioActual] = useState(null);
   const [showCategories, setShowCategories] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   // Categorías disponibles
   const categorias = [
@@ -73,11 +74,14 @@ function Navbar() {
     };
   }, []);
 
-  // Cerrar dropdown de categorías al hacer clic fuera
+  // Cerrar dropdowns al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showCategories && !event.target.closest('.nav-item.dropdown')) {
         setShowCategories(false);
+      }
+      if (showProfile && !event.target.closest('.nav-item.dropdown')) {
+        setShowProfile(false);
       }
     };
 
@@ -85,7 +89,7 @@ function Navbar() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showCategories]);
+  }, [showCategories, showProfile]);
 
   const cerrarSesion = () => {
     localStorage.removeItem('usuarioActual');
@@ -96,8 +100,9 @@ function Navbar() {
   };
 
   const cerrarNavbar = (e) => {
-    // Cerrar dropdown de categorías
+    // Cerrar dropdowns
     setShowCategories(false);
+    setShowProfile(false);
     
     // Obtener el elemento del navbar
     const navCollapse = document.getElementById('navbarNav');
@@ -146,14 +151,13 @@ function Navbar() {
           </Link>
           
           <button 
-            className="navbar-toggler border-0 " 
+            className="navbar-toggler border-0" 
             type="button" 
             data-bs-toggle="collapse" 
             data-bs-target="#navbarNav"
             aria-controls="navbarNav"
             aria-expanded="false"
             aria-label="Alternar menú de navegación"
-            style={{ boxShadow: 'none' }}
           >
             <span className="navbar-toggler-icon"></span>
           </button>
@@ -273,46 +277,84 @@ function Navbar() {
               {usuarioActual ? (
                 <>
                   {!usuarioActual.isAdmin && (
-                    <li className="nav-item" role="none">
-                      <Link 
-                        className="nav-link px-4 py-2 rounded" 
-                        to="/perfil"
-                        style={{ color: '#8B4513' }}
-                        role="menuitem"
-                        aria-label="Ver mi perfil"
-                        onClick={cerrarNavbar}
+                    <li className="nav-item dropdown" role="none">
+                      <button
+                        className="nav-link px-4 py-2 rounded dropdown-toggle btn btn-link"
+                        style={{ color: '#8B4513', textDecoration: 'none', border: 'none' }}
+                        onClick={() => setShowProfile(!showProfile)}
+                        aria-expanded={showProfile}
+                        aria-label="Mi perfil"
                       >
                         Mi Perfil
-                      </Link>
+                      </button>
+                      {showProfile && (
+                        <div className="dropdown-menu show" style={{ backgroundColor: '#FFF5E1', border: '1px solid #D2691E' }}>
+                          <button
+                            className="dropdown-item"
+                            style={{ color: '#8B4513' }}
+                            onClick={() => {
+                              setShowProfile(false);
+                              cerrarNavbar();
+                              navigate('/perfil');
+                            }}
+                          >
+                            Ver Perfil
+                          </button>
+                          <button
+                            className="dropdown-item"
+                            style={{ color: '#8B4513' }}
+                            onClick={() => {
+                              setShowProfile(false);
+                              cerrarNavbar();
+                              cerrarSesion();
+                            }}
+                          >
+                            Cerrar Sesión
+                          </button>
+                        </div>
+                      )}
                     </li>
                   )}
-                  <li className="nav-item" role="none">
-                    <button
-                      className="nav-link px-4 py-2 rounded btn btn-link"
-                      onClick={() => {
-                        cerrarNavbar();
-                        cerrarSesion();
-                      }}
-                      style={{ color: '#8B4513', textDecoration: 'none', border: 'none' }}
-                      role="menuitem"
-                      aria-label="Cerrar sesión"
-                    >
-                      Cerrar Sesión
-                    </button>
-                  </li>
                   {usuarioActual.isAdmin && (
-                    <li className="nav-item" role="none">
-                      <Link 
-                        className="nav-link px-4 py-2 rounded" 
-                        to="/admin"
-                        style={{ color: '#8B4513' }}
-                        role="menuitem"
-                        aria-label="Panel de administración"
-                        onClick={cerrarNavbar}
-                      >
-                        Panel de Admin
-                      </Link>
-                    </li>
+                    <>
+                      <li className="nav-item dropdown" role="none">
+                        <button
+                          className="nav-link px-4 py-2 rounded dropdown-toggle btn btn-link"
+                          style={{ color: '#8B4513', textDecoration: 'none', border: 'none' }}
+                          onClick={() => setShowProfile(!showProfile)}
+                          aria-expanded={showProfile}
+                          aria-label="Mi perfil"
+                        >
+                          Mi Perfil
+                        </button>
+                        {showProfile && (
+                          <div className="dropdown-menu show" style={{ backgroundColor: '#FFF5E1', border: '1px solid #D2691E' }}>
+                            <button
+                              className="dropdown-item"
+                              style={{ color: '#8B4513' }}
+                              onClick={() => {
+                                setShowProfile(false);
+                                cerrarNavbar();
+                                navigate('/admin');
+                              }}
+                            >
+                              Panel de Admin
+                            </button>
+                            <button
+                              className="dropdown-item"
+                              style={{ color: '#8B4513' }}
+                              onClick={() => {
+                                setShowProfile(false);
+                                cerrarNavbar();
+                                cerrarSesion();
+                              }}
+                            >
+                              Cerrar Sesión
+                            </button>
+                          </div>
+                        )}
+                      </li>
+                    </>
                   )}
                 </>
               ) : (
