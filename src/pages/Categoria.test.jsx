@@ -4,18 +4,18 @@ import { CarritoProvider } from '../context/CarritoContext';
 import Categoria from './Categoria';
 
 // Mock useParams
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+vi.mock('react-router-dom', () => ({
+  ...vi.importActual('react-router-dom'),
   useParams: () => ({ categoria: 'Tortas Cuadradas' }),
-  useNavigate: () => jest.fn(),
+  useNavigate: () => vi.fn(),
 }));
 
 // Mock localStorage
 const mockLocalStorage = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
 };
 Object.defineProperty(window, 'localStorage', {
   value: mockLocalStorage,
@@ -95,9 +95,9 @@ describe('Categoria Component', () => {
   test('PRUEBA_06: Maneja categoría "Todos" correctamente', () => {
     // Mock para categoría "Todos"
     jest.doMock('react-router-dom', () => ({
-      ...jest.requireActual('react-router-dom'),
+      ...vi.importActual('react-router-dom'),
       useParams: () => ({ categoria: 'Todos' }),
-      useNavigate: () => jest.fn(),
+      useNavigate: () => vi.fn(),
     }));
     
     mockLocalStorage.getItem.mockReturnValue('null');

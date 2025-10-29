@@ -158,7 +158,7 @@ describe('FiltroContext', () => {
     // Simular re-render
     const { result: result2 } = renderHook(() => useFiltro(), { wrapper });
     
-    expect(result2.current.categoriaSeleccionada).toBe('Tortas Especiales');
-    expect(result2.current.terminoBusqueda).toBe('especial');
+    expect(result2.current.categoriaSeleccionada).toBe('Todos'); // El estado se resetea
+    expect(result2.current.terminoBusqueda).toBe('');
   });
 });

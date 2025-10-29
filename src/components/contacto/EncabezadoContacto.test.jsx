@@ -14,75 +14,85 @@ describe('EncabezadoContacto Component', () => {
   test('PRUEBA_01: Renderiza título principal', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    expect(screen.getByText('Contáctanos')).toBeInTheDocument();
+    expect(screen.getByText('Pastelería Mil Sabores')).toBeInTheDocument();
   });
 
-  test('PRUEBA_02: Renderiza subtítulo', () => {
+  test('PRUEBA_02: Renderiza imagen del logo', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    expect(screen.getByText('Estamos aquí para ayudarte')).toBeInTheDocument();
+    const logo = screen.getByAltText('Pastelería Mil Sabores');
+    expect(logo).toBeInTheDocument();
+    expect(logo).toHaveAttribute('src', '/img/Logotipo_pasteleria.png');
   });
 
-  test('PRUEBA_03: Renderiza descripción', () => {
+  test('PRUEBA_03: Renderiza sección con estilos correctos', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    expect(screen.getByText(/Si tienes alguna pregunta/)).toBeInTheDocument();
+    const section = screen.getByText('Pastelería Mil Sabores').closest('section');
+    expect(section).toBeInTheDocument();
   });
 
-  test('PRUEBA_04: Renderiza información de contacto', () => {
+  test('PRUEBA_04: Logo tiene estilos correctos', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    expect(screen.getByText('Información de Contacto')).toBeInTheDocument();
-    expect(screen.getByText('📧 Correo:')).toBeInTheDocument();
-    expect(screen.getByText('📞 Teléfono:')).toBeInTheDocument();
-    expect(screen.getByText('📍 Dirección:')).toBeInTheDocument();
+    const logo = screen.getByAltText('Pastelería Mil Sabores');
+    expect(logo).toHaveStyle({
+      width: '150px',
+      height: '150px',
+      borderRadius: '50%'
+    });
   });
 
-  test('PRUEBA_05: Muestra datos de contacto correctos', () => {
+  test('PRUEBA_05: Título tiene estilos correctos', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    expect(screen.getByText('contacto@milsabores.cl')).toBeInTheDocument();
-    expect(screen.getByText('+56 9 1234 5678')).toBeInTheDocument();
-    expect(screen.getByText('Av. Principal 123, Santiago')).toBeInTheDocument();
+    const titulo = screen.getByText('Pastelería Mil Sabores');
+    expect(titulo).toHaveStyle({
+      fontFamily: "'Pacifico', cursive",
+      fontSize: '3rem',
+      color: '#8B4513'
+    });
   });
 
-  test('PRUEBA_06: Renderiza horarios de atención', () => {
+  test('PRUEBA_06: Maneja error de imagen', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    expect(screen.getByText('Horarios de Atención')).toBeInTheDocument();
-    expect(screen.getByText('Lunes a Viernes:')).toBeInTheDocument();
-    expect(screen.getByText('Sábados:')).toBeInTheDocument();
-    expect(screen.getByText('Domingos:')).toBeInTheDocument();
+    const logo = screen.getByAltText('Pastelería Mil Sabores');
+    fireEvent.error(logo);
+    
+    expect(logo).toHaveAttribute('src', 'https://via.placeholder.com/150x150/FFC0CB/8B4513?text=Logo');
   });
 
-  test('PRUEBA_07: Muestra horarios correctos', () => {
-    renderWithProviders(<EncabezadoContacto />);
-    
-    expect(screen.getByText('8:00 AM - 8:00 PM')).toBeInTheDocument();
-    expect(screen.getByText('9:00 AM - 6:00 PM')).toBeInTheDocument();
-    expect(screen.getByText('10:00 AM - 4:00 PM')).toBeInTheDocument();
+  test('PRUEBA_07: Renderiza sin errores', () => {
+    expect(() => renderWithProviders(<EncabezadoContacto />)).not.toThrow();
   });
 
-  test('PRUEBA_08: Renderiza con estilos correctos', () => {
+  test('PRUEBA_08: Estructura del componente es correcta', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    const titulo = screen.getByText('Contáctanos');
-    expect(titulo).toHaveClass('contacto-title');
+    const section = screen.getByText('Pastelería Mil Sabores').closest('section');
+    const div = section.querySelector('div');
+    expect(div).toBeInTheDocument();
   });
 
-  test('PRUEBA_09: Renderiza iconos correctamente', () => {
+  test('PRUEBA_09: Contenedor tiene estilos responsivos', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    expect(screen.getByText('📧')).toBeInTheDocument();
-    expect(screen.getByText('📞')).toBeInTheDocument();
-    expect(screen.getByText('📍')).toBeInTheDocument();
+    const div = screen.getByText('Pastelería Mil Sabores').closest('div');
+    expect(div).toHaveStyle({
+      maxWidth: '800px',
+      margin: '0 auto'
+    });
   });
 
-  test('PRUEBA_10: Estructura del componente es correcta', () => {
+  test('PRUEBA_10: Sección tiene padding correcto', () => {
     renderWithProviders(<EncabezadoContacto />);
     
-    // Verificar que tiene la estructura esperada
-    const container = screen.getByText('Contáctanos').closest('div');
-    expect(container).toBeInTheDocument();
+    const section = screen.getByText('Pastelería Mil Sabores').closest('section');
+    expect(section).toHaveStyle({
+      padding: '4rem 2rem',
+      textAlign: 'center',
+      marginBottom: '3rem'
+    });
   });
 });

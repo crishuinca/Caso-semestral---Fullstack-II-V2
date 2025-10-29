@@ -4,10 +4,10 @@ import ConfirmacionModal from './ConfirmacionModal';
 
 // Mock localStorage
 const mockLocalStorage = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
 };
 Object.defineProperty(window, 'localStorage', {
   value: mockLocalStorage,
@@ -33,9 +33,9 @@ describe('ConfirmacionModal Component', () => {
       mes: '12',
       ano: '2024'
     },
-    onInputChange: jest.fn(),
-    onConfirmar: jest.fn(),
-    onCancelar: jest.fn()
+    onInputChange: vi.fn(),
+    onConfirmar: vi.fn(),
+    onCancelar: vi.fn()
   };
 
   beforeEach(() => {
@@ -45,10 +45,12 @@ describe('ConfirmacionModal Component', () => {
   });
 
   test('PRUEBA_01: Renderiza modal cuando está visible', () => {
-    renderWithProviders(<ConfirmacionModal {...mockProps} />);
+    const propsConModal = { ...mockProps, mostrarConfirmacion: true };
+    renderWithProviders(<ConfirmacionModal {...propsConModal} />);
     
-    expect(screen.getByText('Confirmar Pedido')).toBeInTheDocument();
-    expect(screen.getByText('Información del Comprador')).toBeInTheDocument();
+    // El modal debería renderizar algo cuando mostrarConfirmacion es true
+    expect(screen.getByDisplayValue('Juan Pérez')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('12345678-9')).toBeInTheDocument();
   });
 
   test('PRUEBA_02: No renderiza modal cuando está oculto', () => {

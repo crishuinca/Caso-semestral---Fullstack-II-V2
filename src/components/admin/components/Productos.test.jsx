@@ -69,7 +69,7 @@ describe('Componente Productos', () => {
     expect(screen.getByText('Sin descripción disponible')).toBeInTheDocument();
   });
 
-  test('Productos PRUEBA_02: Ejecuta función abrirModalEditar al hacer click en Editar', () => {
+  test('Productos PRUEBA_02: Ejecuta función abrirModalEditar al hacer click en la tarjeta', () => {
     const abrirModalEditarMock = crearMock();
 
     render(
@@ -80,8 +80,9 @@ describe('Componente Productos', () => {
       />
     );
 
-    const botonEditar = screen.getAllByText(/Editar/i)[0];
-    fireEvent.click(botonEditar);
+    // Hacer click en la tarjeta del producto (no en el botón específico)
+    const tarjetaProducto = screen.getByText('Pastel de Chocolate').closest('div');
+    fireEvent.click(tarjetaProducto);
 
     if (abrirModalEditarMock.calls.length !== 1) {
       throw new Error('abrirModalEditar no fue llamado');
