@@ -1,11 +1,65 @@
 ﻿import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Footer from '../components/footer/Footer';
 
 function Home() {
   const usuario = JSON.parse(localStorage.getItem("usuarioActual") || "null");
+  
+  // Inicializar historial de boletas con datos de ejemplo si está vacío
+  if(!localStorage.getItem("historial_boletas")){
+    const boletasEjemplo = [
+      {
+        n_boleta: "HBLT_0",
+        recibidor: {
+          nombre_recibidor: "Juan Pérez",
+          rut_recibidor: "12345678-9",
+          direccion_recibidor: "Av. Principal 123, Santiago"
+        },
+        comprador: {
+          nombre_comprador: "María González",
+          rut_comprador: "98765432-1",
+          fecha_compra: "2024-10-28T10:30:00"
+        },
+        productos_comprados: [
+          {
+            codigo_producto: "TC001",
+            cantidad_producto: "2"
+          },
+          {
+            codigo_producto: "TT001", 
+            cantidad_producto: "1"
+          }
+        ]
+      },
+      {
+        n_boleta: "HBLT_1",
+        recibidor: {
+          nombre_recibidor: "Ana Silva",
+          rut_recibidor: "11223344-5",
+          direccion_recibidor: "Los Pinos 456, Providencia"
+        },
+        comprador: {
+          nombre_comprador: "Carlos Rojas",
+          rut_comprador: "55667788-9",
+          fecha_compra: "2024-10-27T15:45:00"
+        },
+        productos_comprados: [
+          {
+            codigo_producto: "TC002",
+            cantidad_producto: "1"
+          },
+          {
+            codigo_producto: "CU001",
+            cantidad_producto: "6"
+          }
+        ]
+      }
+    ];
+    localStorage.setItem("historial_boletas", JSON.stringify(boletasEjemplo));
+  }
 
   return (
-    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '290px' }}>
+    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '80px' }}>
       {}
       <div className="text-center py-4" style={{ marginTop: '50px' }}>
         <h1 style={{ 
@@ -18,16 +72,27 @@ function Home() {
       </div>
 
       {}
-      <div className="text-center mb-4">
-        <img 
-          src="/img/imagen_fondo.png" 
-          alt="Imagen principal" 
-          className="img-fluid rounded"
-          style={{ maxHeight: '400px' }}
-          onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/800x400/8B4513/FFF8DC?text=Mil+Sabores';
-          }}
-        />
+      <div className="container mb-4">
+        <div className="row justify-content-center">
+          <div className="col-12">
+            <div className="text-center">
+              <img 
+                src="/img/imagen_fondo.png" 
+                alt="Imagen principal" 
+                className="img-fluid rounded"
+                style={{ 
+                  maxHeight: '400px',
+                  width: '100%',
+                  maxWidth: '100%',
+                  objectFit: 'cover'
+                }}
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/800x400/8B4513/FFF8DC?text=Mil+Sabores';
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {}
@@ -143,12 +208,7 @@ function Home() {
       </div>
 
       {}
-      <footer 
-        className="text-center text-white py-3 mt-5"
-        style={{ backgroundColor: '#8B4513' }}
-      >
-        &copy; 2025 Mil Sabores. Todos los derechos reservados.
-      </footer>
+      <Footer />
     </div>
   );
 }

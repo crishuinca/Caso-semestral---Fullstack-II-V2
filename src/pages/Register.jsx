@@ -1,6 +1,12 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Register.css';
+import { regionesComunas } from '../components/admin/data/regionesComunas';
+import { 
+  validarRUT, 
+  formatearRUTEnTiempoReal, 
+  obtenerMensajeErrorRUT 
+} from '../utils/rutUtils';
 
 function Register() {
   const navigate = useNavigate();
@@ -10,6 +16,9 @@ function Register() {
     apellidos: '',
     correo: '',
     fecha_nacimiento: '',
+    dia_nacimiento: '',
+    mes_nacimiento: '',
+    ano_nacimiento: '',
     region: '',
     comuna: '',
     direccion: '',
@@ -46,10 +55,20 @@ function Register() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Manejo especial para el campo RUT
+    if (name === 'run') {
+      const valorFormateado = formatearRUTEnTiempoReal(value);
+      setFormData(prev => ({
+        ...prev,
+        [name]: valorFormateado
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
 
     if (name === 'region') {
       setComunas(regionesComunas[value] || []);
@@ -75,8 +94,10 @@ function Register() {
       return;
     }
 
-    if (formData.run.length < 7 || formData.run.length > 9) {
-      setResultado('El RUN debe tener entre 7 y 9 caracteres');
+    // Validar RUT
+    const errorRUT = obtenerMensajeErrorRUT(formData.run);
+    if (errorRUT) {
+      setResultado(errorRUT);
       return;
     }
 
@@ -86,9 +107,16 @@ function Register() {
       return;
     }
 
+    // Convertir fecha de nacimiento al formato correcto
+    let fechaNacimientoFormateada = '';
+    if (formData.dia_nacimiento && formData.mes_nacimiento && formData.ano_nacimiento) {
+      fechaNacimientoFormateada = `${formData.ano_nacimiento}-${formData.mes_nacimiento}-${formData.dia_nacimiento}`;
+    }
+
     const nuevoUsuario = {
       id: Date.now(),
       ...formData,
+      fecha_nacimiento: fechaNacimientoFormateada,
       fechaRegistro: new Date().toISOString()
     };
 
@@ -103,6 +131,9 @@ function Register() {
       apellidos: '',
       correo: '',
       fecha_nacimiento: '',
+      dia_nacimiento: '',
+      mes_nacimiento: '',
+      ano_nacimiento: '',
       region: '',
       comuna: '',
       direccion: '',
@@ -131,10 +162,9 @@ function Register() {
                 type="text" 
                 id="run" 
                 name="run" 
-                maxLength="9" 
-                minLength="7" 
+                maxLength="10" 
                 required 
-                placeholder="Ej: 19011022K"
+                placeholder="Ej: 12345678-9"
                 value={formData.run}
                 onChange={handleInputChange}
                 className="form-input"
@@ -186,14 +216,77 @@ function Register() {
 
           <div className="form-group">
             <label htmlFor="fecha_nacimiento" className="form-label">Fecha de nacimiento</label>
-            <input 
-              type="date" 
-              id="fecha_nacimiento" 
-              name="fecha_nacimiento"
-              value={formData.fecha_nacimiento}
-              onChange={handleInputChange}
-              className="form-input"
-            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <select
+                name="dia_nacimiento"
+                value={formData.dia_nacimiento || ''}
+                onChange={handleInputChange}
+                className="form-input"
+                style={{ 
+                  flex: 1.2,
+                  minWidth: '80px',
+                  backgroundColor: '#FFF5E1',
+                  background: '#FFF5E1',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
+              >
+                <option value="">Día</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map(dia => (
+                  <option key={dia} value={dia.toString().padStart(2, '0')}>{dia}</option>
+                ))}
+              </select>
+              <select
+                name="mes_nacimiento"
+                value={formData.mes_nacimiento || ''}
+                onChange={handleInputChange}
+                className="form-input"
+                style={{ 
+                  flex: 1.5,
+                  minWidth: '120px',
+                  backgroundColor: '#FFF5E1',
+                  background: '#FFF5E1',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
+              >
+                <option value="">Mes</option>
+                <option value="01">Enero</option>
+                <option value="02">Febrero</option>
+                <option value="03">Marzo</option>
+                <option value="04">Abril</option>
+                <option value="05">Mayo</option>
+                <option value="06">Junio</option>
+                <option value="07">Julio</option>
+                <option value="08">Agosto</option>
+                <option value="09">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+              </select>
+              <select
+                name="ano_nacimiento"
+                value={formData.ano_nacimiento || ''}
+                onChange={handleInputChange}
+                className="form-input"
+                style={{ 
+                  flex: 1.2,
+                  minWidth: '100px',
+                  backgroundColor: '#FFF5E1',
+                  background: '#FFF5E1',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
+              >
+                <option value="">Año</option>
+                {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(ano => (
+                  <option key={ano} value={ano}>{ano}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="form-row">
@@ -206,6 +299,13 @@ function Register() {
                 value={formData.region}
                 onChange={handleInputChange}
                 className="form-input"
+                style={{ 
+                  backgroundColor: '#FFF5E1',
+                  background: '#FFF5E1',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
               >
                 <option value="">Seleccione región</option>
                 {regiones.map(region => (
@@ -222,6 +322,13 @@ function Register() {
                 value={formData.comuna}
                 onChange={handleInputChange}
                 className="form-input"
+                style={{ 
+                  backgroundColor: '#FFF5E1',
+                  background: '#FFF5E1',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  appearance: 'none'
+                }}
                 disabled={!formData.region}
               >
                 <option value="">Seleccione comuna</option>

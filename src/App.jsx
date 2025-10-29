@@ -1,8 +1,10 @@
 ﻿import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CarritoProvider } from './context/CarritoContext';
+import { FiltroProvider } from './context/FiltroContext';
 import Navbar from './pages/Navbar';
 import Home from './pages/Home';
 import Productos from './pages/Productos';
+import Categoria from './pages/Categoria';
 import Nosotros from './pages/Nosotros';
 import Blogs from './pages/Blogs';
 import DetalleBlog1 from './pages/DetalleBlog1';
@@ -11,7 +13,15 @@ import Contacto from './pages/Contacto';
 import Carrito from './pages/Carrito';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Perfil from './pages/Perfil';
 import AdminPanel from './pages/AdminPanel';
+import CompraExitosa from './pages/CompraExitosa'
+import CompraErronea from './pages/CompraErronea'
+import Boletas from './pages/Boletas'
+import DetalleBoleta from './pages/DetalleBoleta'
+import ComprasHistorial from './pages/ComprasHistorial'
+import ComprasDetalle from './pages/ComprasDetalle'
+import ReportesProductos from './pages/ReportesProductos';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
@@ -27,6 +37,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/productos" element={<Productos />} />
+          <Route path="/categoria/:categoria" element={<Categoria />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blog/harina-magica" element={<DetalleBlog1 />} />
@@ -35,7 +46,15 @@ function AppContent() {
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/perfil" element={<Perfil />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin/reportes-productos" element={<ReportesProductos />} />
+          <Route path="/compra-exitosa" element={<CompraExitosa />} />
+          <Route path="/compra-erronea" element={<CompraErronea />} />
+          <Route path='/admin/boletas' element={<Boletas/>}/>
+          <Route path="/admin/boletas/detalle-boleta" element={<DetalleBoleta/>}/>
+          <Route path="/admin/historial-compras" element={<ComprasHistorial/>}/>
+          <Route path="/admin/historial-compras/detalle-compra" element={<ComprasDetalle/>}/>
           <Route path="*" element={<Home />} />
         </Routes>
       </main>
@@ -46,9 +65,11 @@ function AppContent() {
 function App() {
   return (
     <CarritoProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <FiltroProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </FiltroProvider>
     </CarritoProvider>
   );
 }

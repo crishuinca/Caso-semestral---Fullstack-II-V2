@@ -1,8 +1,9 @@
 ﻿import 'bootstrap/dist/css/bootstrap.min.css';
+import Footer from '../components/footer/Footer';
 
 function Nosotros() {
   return (
-    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '1100px' }}>
+    <div style={{ backgroundColor: '#FFF5E1', minHeight: '100vh', paddingTop: '80px' }}>
       <div className="container py-4">
         {}
         <div className="text-center mb-5" style={{ marginTop: '80px' }}>
@@ -217,6 +218,7 @@ function Nosotros() {
           />
         </section>
       </div>
+      <Footer />
     </div>
   );
 }
