@@ -13,9 +13,19 @@ export const getProductos = async () => {
         console.error("Error:",ex)
     }
 }
-export const geDATO = async () => {
+
+
+
+
+export const updateProducto = async (data) => {
     try {
-        
+        const resp = fetch(`${API}/modificarProducto`,{
+            method: "PUT",
+            body: data
+        })
+        if(!resp.ok) throw new Error("ERROR no se pudo actualizar el PRODUCTO en la BASE DE DATOS")
+        const datos = resp.json()
+        return datos
     } catch (ex) {
         console.error("Error:",ex)
     }

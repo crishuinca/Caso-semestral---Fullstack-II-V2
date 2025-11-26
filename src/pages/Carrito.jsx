@@ -12,6 +12,7 @@ import {
   formatearRUTEnTiempoReal, 
   obtenerMensajeErrorRUT 
 } from '../utils/rutUtils';
+import { getProductos, updateProducto } from '../utils/apiHelper';
 
 function Carrito() {
 
@@ -37,6 +38,61 @@ function Carrito() {
     ano: '',
     tipoEntrega: 'despacho'
   });
+  const [prodsBDD, setProdsBDD] = useState([])
+
+  useEffect(()=>{
+    const recuperarPRODS = async()=>{
+      const productos_enBDD = await getProductos()
+      let productos_guardados;
+      productos_guardados = productos_enBDD.map(producto => ({
+        prod_codigo: producto.p_codigo,
+        prod_nombre: producto.p_nombre,
+        prod_desc: producto.p_descripcion || 'Sin descripción',
+        prod_categoria: producto.p_categoria,
+        prod_precio: producto.p_precio,
+        prod_imagen: producto.p_imagen,
+        prod_stock: producto.p_stock,
+        prod_stock_critico: producto.p_stock_critico,
+        prod_precio_oferta: producto.p_precio_oferta || null
+      }));
+      setProdsBDD(productos_guardados)
+    }
+    recuperarPRODS()
+  },[])
+
+  const actualizarStock = async()=>{
+    const productos_enBDD = await getProductos()
+    let productos_guardados;
+    productos_guardados = productos_enBDD.map(p => ({
+      p_id: p.p_id,
+      p_codigo: p.p_codigo,
+      prod_nombre: p.p_nombre,
+      p_descripcion: p.p_descripcion || 'Sin descripción',
+      p_categoria: p.p_categoria,
+      p_precio: p.p_precio,
+      p_imagen: p.p_imagen,
+      p_stock: p.p_stock,
+      p_stock_critico: p.p_stock_critico,
+      p_precio_oferta: p.p_precio_oferta || null
+    }));
+
+    let stock_productos = JSON.parse(localStorage.getItem("productosStock"))
+    let stock_actualizar = productos_guardados
+    console.log(stock_productos)
+    console.log(stock_actualizar)
+    stock_actualizar.map(ap=>{
+      stock_productos.map(sp=>{
+        if(sp.prod_codigo == ap.p_codigo){
+          ap.p_stock = sp.stock
+          console.log(ap.prod_stock)
+        }
+      })
+    })
+    stock_actualizar.map(async(p)=>{
+      const resp = await updateProducto(p)
+      console.log(resp)
+    })
+  }
 
   // Cargar datos del usuario si está logueado
   const cargarDatosUsuario = () => {
@@ -337,6 +393,7 @@ function Carrito() {
           estilos={estilos}
           btnpago={btnpago}
           initialOptions={initialOptions}
+          actualizar_el_stock={()=>actualizarStock()}
 
           redirigirFallo={redirigirFallo}
           redirigir={redirigir}

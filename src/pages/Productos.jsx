@@ -62,15 +62,15 @@ function Productos() {
         const productosAdmin = await getProductos()
         if (productosAdmin) {
           const productosActualizados = productosAdmin.map(producto => ({
-            prod_codigo: producto.prod_codigo,
-            prod_nombre: producto.nombre,
-            prod_desc: producto.descripcion || 'Sin descripción',
-            prod_categoria: producto.categoria,
-            prod_precio: producto.precio,
-            prod_imagen: producto.imagen,
-            prod_stock: producto.stock,
-            prod_stock_critico: producto.stock_critico,
-            prod_precio_oferta: producto.precioEspecial || null
+            prod_codigo: producto.p_codigo,
+            prod_nombre: producto.p_nombre,
+            prod_desc: producto.p_descripcion || 'Sin descripción',
+            prod_categoria: producto.p_categoria,
+            prod_precio: producto.p_precio,
+            prod_imagen: producto.p_imagen,
+            prod_stock: producto.p_stock,
+            prod_stock_critico: producto.p_stock_critico,
+            prod_precio_oferta: producto.p_precio_oferta || null
           }));
           setProductos(productosActualizados);
           setFilteredProductos(productosActualizados);

@@ -13,7 +13,8 @@ function ConfirmacionModal({
   onCancelar,
   estilos, 
   btnpago,
-  initialOptions, redirigir, redirigirFallo
+  initialOptions, redirigir, redirigirFallo,
+  actualizar_el_stock
 }) {
   if (!mostrarConfirmacion) return null;
 
@@ -270,6 +271,7 @@ function ConfirmacionModal({
                 }}
                 onApprove={(data, actions) => {
                   return actions.order.capture().then((details) => {
+                    actualizar_el_stock()
                     redirigir(details)
                   }).catch((error) => {
                     redirigirFallo(error)
