@@ -40,12 +40,13 @@ function ProductCard({ producto }) {
     <div className="card h-100 shadow">
       <div className="position-relative">
         <img 
-          src={producto.prod_imagen} 
+          src={producto.prod_imagen || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect width="300" height="200" fill="%23D2691E"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23FFF"%3EProducto%3C/text%3E%3C/svg%3E'} 
           className={`card-img-top ${sinStock ? 'opacity-50' : ''}`}
           alt={producto.prod_nombre}
           style={{ height: '200px', objectFit: 'cover' }}
           onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/300x200/D2691E/FFF?text=Producto';
+            e.target.onerror = null;
+            e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect width="300" height="200" fill="%23D2691E"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23FFF"%3EProducto%3C/text%3E%3C/svg%3E';
           }}
         />
         {sinStock && (
