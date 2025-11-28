@@ -1,4 +1,4 @@
-const API = 'http://localhost:8094'
+const API = 'http://localhost:8094/api/v1'
 
 export const getProductos = async () => {
     console.log("Cargando productos ctm")
@@ -11,6 +11,24 @@ export const getProductos = async () => {
         return data
     } catch (ex) {
         console.error("Error:",ex)
+    }
+}
+
+export const loginUser = async (correo, password) => {
+    try {
+        const resp = await fetch(`${API}/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ correo, password })
+        })
+        if(!resp.ok) throw new Error("ERROR en login")
+        const data = await resp.json()
+        return data
+    } catch (ex) {
+        console.error("Error en login:", ex)
+        return { success: false, message: "Error de conexión" }
     }
 }
 
