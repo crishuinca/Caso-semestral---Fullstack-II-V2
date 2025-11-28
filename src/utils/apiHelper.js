@@ -53,37 +53,67 @@ export const registerUser = async (userData) => {
 
 
 
-export const updateProducto = async (data) => {
+// Obtener todos los usuarios
+export const getUsuarios = async () => {
     try {
-        const resp = fetch(`${API}/modificarProducto`,{
+        const resp = await fetch(`${API}/usuarios`)
+        if(!resp.ok) throw new Error("ERROR al cargar usuarios")
+        const data = await resp.json()
+        return data
+    } catch (ex) {
+        console.error("Error al obtener usuarios:", ex)
+        return []
+    }
+}
+
+// Actualizar producto
+export const updateProducto = async (producto) => {
+    try {
+        const resp = await fetch(`${API}/modificarProducto`, {
             method: "PUT",
-            body: data
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(producto)
         })
-        if(!resp.ok) throw new Error("ERROR no se pudo actualizar el PRODUCTO en la BASE DE DATOS")
-        const datos = resp.json()
-        return datos
+        if(!resp.ok) throw new Error("ERROR al actualizar producto")
+        const data = await resp.json()
+        return { success: true, data }
     } catch (ex) {
-        console.error("Error:",ex)
+        console.error("Error al actualizar producto:", ex)
+        return { success: false, message: "Error al actualizar producto" }
     }
 }
-export const saveDATO = async () => {
+
+// Actualizar usuario
+export const updateUsuario = async (usuario) => {
     try {
-        
+        const resp = await fetch(`${API}/modificarUsuario`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(usuario)
+        })
+        if(!resp.ok) throw new Error("ERROR al actualizar usuario")
+        const data = await resp.json()
+        return { success: true, data }
     } catch (ex) {
-        console.error("Error:",ex)
+        console.error("Error al actualizar usuario:", ex)
+        return { success: false, message: "Error al actualizar usuario" }
     }
 }
-export const updateDATO = async () => {
+
+// Eliminar usuario
+export const deleteUsuario = async (id) => {
     try {
-        
+        const resp = await fetch(`${API}/eliminarUsuario/${id}`, {
+            method: "DELETE"
+        })
+        if(!resp.ok) throw new Error("ERROR al eliminar usuario")
+        return { success: true }
     } catch (ex) {
-        console.error("Error:",ex)
-    }
-}
-export const deleteDATO = async () => {
-    try {
-        
-    } catch (ex) {
-        console.error("Error:",ex)
+        console.error("Error al eliminar usuario:", ex)
+        return { success: false, message: "Error al eliminar usuario" }
     }
 }

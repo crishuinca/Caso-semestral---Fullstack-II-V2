@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCarrito } from '../context/CarritoContext';
+import { getProductos, getUsuarios, updateProducto, registerUser, updateUsuario } from '../utils/apiHelper';
 import { regionesComunas } from '../components/admin/data/regionesComunas';
 import { estilos } from '../components/admin/styles/adminStyles';
 import Sidebar from '../components/admin/components/Sidebar';
@@ -85,54 +86,50 @@ function AdminPanel() {
       return;
     }
 
-    const productosGuardados = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
-    
-    if (productosGuardados) {
-      const productosConStock = productosGuardados.map(producto => ({
-        id: producto.prod_codigo,
-        codigo: producto.prod_codigo,
-        nombre: producto.nombre,
-        precio: producto.precio,
-        descripcion: producto.descripcion,
-        categoria: producto.categoria,
-        stock: producto.stock,
-        imagen: producto.imagen,
-        stock_critico: producto.stock_critico,
-        precioEspecial: producto.precioEspecial || null
-      }));
-      setProductos(productosConStock);
-    } else {
-      const productosConStock = productosDisponibles.map(producto => ({
-        id: producto.prod_codigo,
-        codigo: producto.prod_codigo,
-        nombre: producto.nombre,
-        precio: producto.precio,
-        descripcion: producto.descripcion,
-        categoria: producto.categoria,
-        stock: producto.stock,
-        imagen: producto.imagen,
-        stock_critico: producto.stock_critico,
-        precioEspecial: null
-      }));
-      setProductos(productosConStock);
-      
-      const productosParaStorage = productosConStock.map(producto => ({
-        prod_codigo: producto.codigo,
-        nombre: producto.nombre,
-        precio: producto.precio,
-        descripcion: producto.descripcion,
-        imagen: producto.imagen,
-        stock: producto.stock,
-        categoria: producto.categoria,
-        stock_critico: producto.stock_critico,
-        precioEspecial: producto.precioEspecial
-      }));
-      localStorage.setItem('productosAdmin', JSON.stringify(productosParaStorage));
-    }
+    // Cargar productos desde el backend
+    const cargarProductos = async () => {
+      const productosDB = await getProductos();
+      if (productosDB && productosDB.length > 0) {
+        const productosConStock = productosDB.map(producto => ({
+          id: producto.p_id,
+          codigo: producto.p_codigo,
+          nombre: producto.p_nombre,
+          precio: producto.p_precio,
+          descripcion: producto.p_descripcion,
+          categoria: producto.p_categoria,
+          stock: producto.p_stock,
+          imagen: producto.p_imagen,
+          stock_critico: producto.p_stock_critico,
+          precioEspecial: producto.p_precio_oferta || null
+        }));
+        setProductos(productosConStock);
+      }
+    };
 
-    const usuariosGuardados = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    setUsuarios(usuariosGuardados);
-  }, [navigate, productosDisponibles]);
+    // Cargar usuarios desde el backend
+    const cargarUsuarios = async () => {
+      const usuariosDB = await getUsuarios();
+      if (usuariosDB && usuariosDB.length > 0) {
+        const usuariosFormateados = usuariosDB.map(usuario => ({
+          id: usuario.u_id,
+          run: usuario.u_run || '',
+          nombre: usuario.u_nombre,
+          apellidos: usuario.u_apellido,
+          correo: usuario.u_correo,
+          fecha_nacimiento: usuario.u_f_nacimiento || '',
+          region: usuario.u_region,
+          comuna: usuario.u_comuna,
+          direccion: usuario.u_direccion,
+          isAdmin: usuario.u_rol === 'ADMIN',
+          fechaRegistro: usuario.u_f_registro
+        }));
+        setUsuarios(usuariosFormateados);
+      }
+    };
+
+    cargarProductos();
+    cargarUsuarios();
+  }, [navigate]);
 
   const alternarMenu = () => {
     setMenuColapsado(!menuColapsado);
@@ -164,7 +161,7 @@ function AdminPanel() {
     }
   };
 
-  const handleSubmitUsuario = (e) => {
+  const handleSubmitUsuario = async (e) => {
     e.preventDefault();
 
     if (!nuevoUsuario.rol || !nuevoUsuario.run || !nuevoUsuario.nombre || 
@@ -187,55 +184,77 @@ function AdminPanel() {
       return;
     }
 
-    const usuariosExistentes = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    if (usuariosExistentes.find(u => u.correo === nuevoUsuario.correo)) {
-      setResultado('Ya existe un usuario con este correo electrónico');
-      return;
-    }
-
     // Convertir fecha de nacimiento al formato correcto
     let fechaNacimientoFormateada = '';
     if (nuevoUsuario.dia_nacimiento && nuevoUsuario.mes_nacimiento && nuevoUsuario.ano_nacimiento) {
       fechaNacimientoFormateada = `${nuevoUsuario.ano_nacimiento}-${nuevoUsuario.mes_nacimiento}-${nuevoUsuario.dia_nacimiento}`;
     }
 
-    const usuarioCreado = {
-      id: Date.now(),
-      ...nuevoUsuario,
-      fecha_nacimiento: fechaNacimientoFormateada,
-      isAdmin: nuevoUsuario.rol === 'admin',
-      fechaRegistro: new Date().toISOString()
+    const usuarioParaBackend = {
+      u_nombre: nuevoUsuario.nombre,
+      u_apellido: nuevoUsuario.apellidos,
+      u_correo: nuevoUsuario.correo,
+      u_contrasenia: nuevoUsuario.password,
+      u_direccion: nuevoUsuario.direccion,
+      u_f_nacimiento: fechaNacimientoFormateada,
+      u_f_registro: new Date().toISOString(),
+      u_rol: nuevoUsuario.rol === 'admin' ? 'ADMIN' : 'USER',
+      u_comuna: nuevoUsuario.comuna,
+      u_region: nuevoUsuario.region,
+      u_descuento_10: false,
+      u_descuento_50: false,
+      u_regalo_cumpleanios: false
     };
 
-    usuariosExistentes.push(usuarioCreado);
-    localStorage.setItem('usuarios', JSON.stringify(usuariosExistentes));
+    const response = await registerUser(usuarioParaBackend);
 
-    setResultado('¡Usuario registrado exitosamente!');
+    if (response.success) {
+      setResultado('¡Usuario registrado exitosamente!');
 
-    setUsuarios(usuariosExistentes);
+      // Recargar usuarios desde el backend
+      const usuariosDB = await getUsuarios();
+      if (usuariosDB && usuariosDB.length > 0) {
+        const usuariosFormateados = usuariosDB.map(usuario => ({
+          id: usuario.u_id,
+          run: usuario.u_run || '',
+          nombre: usuario.u_nombre,
+          apellidos: usuario.u_apellido,
+          correo: usuario.u_correo,
+          fecha_nacimiento: usuario.u_f_nacimiento || '',
+          region: usuario.u_region,
+          comuna: usuario.u_comuna,
+          direccion: usuario.u_direccion,
+          isAdmin: usuario.u_rol === 'ADMIN',
+          fechaRegistro: usuario.u_f_registro
+        }));
+        setUsuarios(usuariosFormateados);
+      }
 
-    setNuevoUsuario({
-      rol: '',
-      run: '',
-      nombre: '',
-      apellidos: '',
-      correo: '',
-      fecha_nacimiento: '',
-      dia_nacimiento: '',
-      mes_nacimiento: '',
-      ano_nacimiento: '',
-      region: '',
-      comuna: '',
-      direccion: '',
-      password: '',
-      confirmPassword: '',
-      codigo_descuento: ''
-    });
-    setComunas([]);
+      setNuevoUsuario({
+        rol: '',
+        run: '',
+        nombre: '',
+        apellidos: '',
+        correo: '',
+        fecha_nacimiento: '',
+        dia_nacimiento: '',
+        mes_nacimiento: '',
+        ano_nacimiento: '',
+        region: '',
+        comuna: '',
+        direccion: '',
+        password: '',
+        confirmPassword: '',
+        codigo_descuento: ''
+      });
+      setComunas([]);
 
-    setTimeout(() => {
-      setResultado('');
-    }, 3000);
+      setTimeout(() => {
+        setResultado('');
+      }, 3000);
+    } else {
+      setResultado(response.message || 'Error al registrar usuario');
+    }
   };
 
   const abrirModalEditar = (producto) => {
@@ -274,7 +293,7 @@ function AdminPanel() {
     }));
   };
 
-  const handleSubmitEditarProducto = (e) => {
+  const handleSubmitEditarProducto = async (e) => {
     e.preventDefault();
 
     if (!productoEditado.nombre || !productoEditado.precio || !productoEditado.stock) {
@@ -311,55 +330,48 @@ function AdminPanel() {
       precioEspecial = precioDesc;
     }
 
-    const productosActualizados = productos.map(producto => 
-      producto.codigo === productoEditando.codigo 
-        ? { 
-            ...producto, 
-            nombre: productoEditado.nombre,
-            descripcion: productoEditado.descripcion,
-            precio: parseInt(productoEditado.precio),
-            stock: parseInt(productoEditado.stock),
-            categoria: productoEditado.categoria,
-            precioEspecial: precioEspecial
-          }
-        : producto
-    );
-    
-    setProductos(productosActualizados);
+    // Preparar objeto para el backend
+    const productoParaBackend = {
+      p_id: productoEditando.id,
+      p_codigo: productoEditando.codigo,
+      p_nombre: productoEditado.nombre,
+      p_descripcion: productoEditado.descripcion,
+      p_precio: parseInt(productoEditado.precio),
+      p_stock: parseInt(productoEditado.stock),
+      p_categoria: productoEditado.categoria,
+      p_imagen: productoEditando.imagen,
+      p_stock_critico: productoEditando.stock_critico,
+      p_precio_oferta: precioEspecial
+    };
 
-    const productosParaStorage = productosActualizados.map(producto => ({
-      prod_codigo: producto.codigo,
-      nombre: producto.nombre,
-      descripcion: producto.descripcion,
-      precio: producto.precio,
-      imagen: producto.imagen,
-      stock: producto.stock,
-      categoria: producto.categoria,
-      stock_critico: producto.stock_critico,
-      precioEspecial: producto.precioEspecial
-    }));
-    
-    localStorage.setItem('productosAdmin', JSON.stringify(productosParaStorage));
-    
-    // También actualizar productosStock para sincronización con CarritoContext
-    const productosStockActualizados = productosParaStorage.map(producto => ({
-      prod_codigo: producto.prod_codigo,
-      nombre: producto.nombre,
-      descripcion: producto.descripcion,
-      categoria: producto.categoria,
-      precio: producto.precio,
-      imagen: producto.imagen,
-      stock: producto.stock,
-      stock_critico: producto.stock_critico,
-      precioEspecial: producto.precioEspecial
-    }));
-    localStorage.setItem('productosStock', JSON.stringify(productosStockActualizados));
-    
-    // Disparar evento para actualizar productos en otras páginas
-    window.dispatchEvent(new Event('productosActualizados'));
-    
-    alert('Producto actualizado exitosamente');
-    cerrarModalEditar();
+    const response = await updateProducto(productoParaBackend);
+
+    if (response.success) {
+      // Actualizar lista local
+      const productosActualizados = productos.map(producto => 
+        producto.codigo === productoEditando.codigo 
+          ? { 
+              ...producto, 
+              nombre: productoEditado.nombre,
+              descripcion: productoEditado.descripcion,
+              precio: parseInt(productoEditado.precio),
+              stock: parseInt(productoEditado.stock),
+              categoria: productoEditado.categoria,
+              precioEspecial: precioEspecial
+            }
+          : producto
+      );
+      
+      setProductos(productosActualizados);
+      
+      // Disparar evento para actualizar productos en otras páginas
+      window.dispatchEvent(new Event('productosActualizados'));
+      
+      alert('Producto actualizado exitosamente');
+      cerrarModalEditar();
+    } else {
+      alert(response.message || 'Error al actualizar producto');
+    }
   };
 
   const abrirModalEditarUsuario = (usuario) => {
@@ -424,7 +436,7 @@ function AdminPanel() {
     }
   };
 
-  const handleSubmitEditarUsuario = (e) => {
+  const handleSubmitEditarUsuario = async (e) => {
     e.preventDefault();
 
     if (!usuarioEditado.nombre || !usuarioEditado.apellidos || !usuarioEditado.correo || 
@@ -448,38 +460,53 @@ function AdminPanel() {
       }
     }
 
-    const usuariosExistentes = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    const correoEnUso = usuariosExistentes.find(u => 
-      u.correo === usuarioEditado.correo && u.id !== usuarioEditando.id
-    );
-    
-    if (correoEnUso) {
-      alert('El correo electrónico ya está en uso por otro usuario');
-      return;
+    // Encontrar usuario original para mantener datos que no se editan
+    const usuarioOriginal = usuarios.find(u => u.id === usuarioEditando.id);
+
+    const usuarioParaBackend = {
+      u_id: usuarioEditando.id,
+      u_nombre: usuarioEditado.nombre,
+      u_apellido: usuarioEditado.apellidos,
+      u_correo: usuarioEditado.correo,
+      u_contrasenia: usuarioOriginal.password || '123', // Mantener contraseña original
+      u_direccion: usuarioEditado.direccion,
+      u_f_nacimiento: usuarioEditado.fecha_nacimiento,
+      u_f_registro: usuarioOriginal.fechaRegistro,
+      u_rol: usuarioOriginal.isAdmin ? 'ADMIN' : 'USER',
+      u_comuna: usuarioEditado.comuna,
+      u_region: usuarioEditado.region,
+      u_descuento_10: false,
+      u_descuento_50: false,
+      u_regalo_cumpleanios: false
+    };
+
+    const response = await updateUsuario(usuarioParaBackend);
+
+    if (response.success) {
+      // Actualizar lista local
+      const usuariosActualizados = usuarios.map(usuario => 
+        usuario.id === usuarioEditando.id 
+          ? { 
+              ...usuario, 
+              nombre: usuarioEditado.nombre,
+              apellidos: usuarioEditado.apellidos,
+              correo: usuarioEditado.correo,
+              run: usuarioEditado.run,
+              fecha_nacimiento: usuarioEditado.fecha_nacimiento,
+              region: usuarioEditado.region,
+              comuna: usuarioEditado.comuna,
+              direccion: usuarioEditado.direccion
+            }
+          : usuario
+      );
+      
+      setUsuarios(usuariosActualizados);
+      
+      alert('Usuario actualizado exitosamente');
+      cerrarModalEditarUsuario();
+    } else {
+      alert(response.message || 'Error al actualizar usuario');
     }
-
-    const usuariosActualizados = usuarios.map(usuario => 
-      usuario.id === usuarioEditando.id 
-        ? { 
-            ...usuario, 
-            nombre: usuarioEditado.nombre,
-            apellidos: usuarioEditado.apellidos,
-            correo: usuarioEditado.correo,
-            run: usuarioEditado.run,
-            fecha_nacimiento: usuarioEditado.fecha_nacimiento,
-            region: usuarioEditado.region,
-            comuna: usuarioEditado.comuna,
-            direccion: usuarioEditado.direccion
-          }
-        : usuario
-    );
-    
-    setUsuarios(usuariosActualizados);
-
-    localStorage.setItem('usuarios', JSON.stringify(usuariosActualizados));
-    
-    alert('Usuario actualizado exitosamente');
-    cerrarModalEditarUsuario();
   };
 
   const descargarReporteCSV = (tipoReporte) => {
