@@ -199,6 +199,25 @@ export const createDetalleBoleta = async (detalle) => {
     }
 }
 
+// Actualizar detalle de boleta
+export const updateDetalleBoleta = async (detalle) => {
+    try {
+        const resp = await fetch(`${API}/modificarDetalle_boleta`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(detalle)
+        })
+        if(!resp.ok) throw new Error("ERROR al actualizar detalle")
+        const data = await resp.json()
+        return { success: true, data }
+    } catch (ex) {
+        console.error("Error al actualizar detalle de boleta:", ex)
+        return { success: false, message: "Error al actualizar detalle" }
+    }
+}
+
 // Obtener detalle de boleta por ID
 export const getDetalleBoletaById = async (id) => {
     try {

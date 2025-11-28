@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/cssESCALONA.css'
 import { useNavigate } from 'react-router-dom';
-import { createBoleta, createDetalleBoleta } from '../utils/apiHelper';
+import { createBoleta, createDetalleBoleta, updateDetalleBoleta } from '../utils/apiHelper';
 
 function CompraExitosa() {
     const [i_pago, setI_pago] = useState(null)
@@ -44,8 +44,10 @@ function CompraExitosa() {
             };
 
             // Crear detalle_boleta primero
-            const detalleCreado = await createDetalleBoleta(detalleBoleta);
-            console.log("Detalle boleta creado:", detalleCreado);
+            const detalleResponse = await createDetalleBoleta(detalleBoleta);
+            console.log("Detalle boleta creado:", detalleResponse);
+            
+            const detalleCreado = detalleResponse.data || detalleResponse;
 
             // Crear boleta con referencia al detalle
             const boleta = {
@@ -55,8 +57,19 @@ function CompraExitosa() {
                 b_monto_total: infodespacho.total
             };
 
-            const boletaCreada = await createBoleta(boleta);
-            console.log("Boleta creada en base de datos:", boletaCreada);
+            const boletaResponse = await createBoleta(boleta);
+            console.log("Boleta creada en base de datos:", boletaResponse);
+            
+            const boletaCreada = boletaResponse.data || boletaResponse;
+
+            // Actualizar detalle_boleta con el id de la boleta (relación bidireccional)
+            const detalleActualizado = {
+                ...detalleCreado,
+                db_id_boleta: boletaCreada.b_id
+            };
+            
+            await updateDetalleBoleta(detalleActualizado);
+            console.log("Detalle actualizado con db_id_boleta:", detalleActualizado);
 
             return boletaCreada;
         } catch (error) {
