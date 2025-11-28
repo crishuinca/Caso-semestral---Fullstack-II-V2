@@ -117,3 +117,97 @@ export const deleteUsuario = async (id) => {
         return { success: false, message: "Error al eliminar usuario" }
     }
 }
+
+// ========== BOLETAS ==========
+
+// Obtener todas las boletas
+export const getBoletas = async () => {
+    try {
+        const resp = await fetch(`${API}/boletas`)
+        if(!resp.ok) throw new Error("ERROR al cargar boletas")
+        const data = await resp.json()
+        return data
+    } catch (ex) {
+        console.error("Error al obtener boletas:", ex)
+        return []
+    }
+}
+
+// Crear nueva boleta
+export const createBoleta = async (boleta) => {
+    try {
+        const resp = await fetch(`${API}/addBoleta`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(boleta)
+        })
+        if(!resp.ok) throw new Error("ERROR al crear boleta")
+        const data = await resp.json()
+        return { success: true, data }
+    } catch (ex) {
+        console.error("Error al crear boleta:", ex)
+        return { success: false, message: "Error al crear boleta" }
+    }
+}
+
+// Obtener boleta por ID
+export const getBoletaById = async (id) => {
+    try {
+        const resp = await fetch(`${API}/boletasByID/${id}`)
+        if(!resp.ok) throw new Error("ERROR al cargar boleta")
+        const data = await resp.json()
+        return data
+    } catch (ex) {
+        console.error("Error al obtener boleta:", ex)
+        return null
+    }
+}
+
+// ========== DETALLE BOLETAS ==========
+
+// Obtener todos los detalles de boletas
+export const getDetalleBoletas = async () => {
+    try {
+        const resp = await fetch(`${API}/detalle_boletas`)
+        if(!resp.ok) throw new Error("ERROR al cargar detalles")
+        const data = await resp.json()
+        return data
+    } catch (ex) {
+        console.error("Error al obtener detalles de boletas:", ex)
+        return []
+    }
+}
+
+// Crear detalle de boleta
+export const createDetalleBoleta = async (detalle) => {
+    try {
+        const resp = await fetch(`${API}/addDetalle_boleta`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(detalle)
+        })
+        if(!resp.ok) throw new Error("ERROR al crear detalle")
+        const data = await resp.json()
+        return { success: true, data }
+    } catch (ex) {
+        console.error("Error al crear detalle de boleta:", ex)
+        return { success: false, message: "Error al crear detalle" }
+    }
+}
+
+// Obtener detalle de boleta por ID
+export const getDetalleBoletaById = async (id) => {
+    try {
+        const resp = await fetch(`${API}/detalle_boletaByID/${id}`)
+        if(!resp.ok) throw new Error("ERROR al cargar detalle")
+        const data = await resp.json()
+        return data
+    } catch (ex) {
+        console.error("Error al obtener detalle de boleta:", ex)
+        return null
+    }
+}

@@ -31,7 +31,7 @@ function AdminPanel() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   const navigate = useNavigate();
-  const { productosDisponibles } = useCarrito();
+  const { productosStock } = useCarrito();
   const [vistaActiva, setVistaActiva] = useState('tablero');
   const [productos, setProductos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);

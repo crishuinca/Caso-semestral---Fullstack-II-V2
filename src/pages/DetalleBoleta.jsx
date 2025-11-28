@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import CardBoletas from "../components/cardBoletas/CardBoletas"
+import { getBoletas, getDetalleBoletas, getProductos } from "../utils/apiHelper"
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import "../styles/cssESCALONA.css"
@@ -14,33 +15,52 @@ function DetalleBoleta(){
     const navigate = useNavigate()
 
     useEffect(()=>{
-
-        const pg = JSON.parse(localStorage.getItem("productosAdmin")) || []
-        const ls = JSON.parse(localStorage.getItem("historial_boletas")) || []
-        setLsBoletas(ls)
-
-        var codigo = JSON.parse(localStorage.getItem("BOLETA_SELECTED"))
-        
-        const encontrarBoleta = ls.find(boleta => boleta.n_boleta == codigo)
-        if (encontrarBoleta){setRecboleta(encontrarBoleta)}
-        
-        const prods = encontrarBoleta.productos_comprados
-        const listp = []
-
-        prods.forEach(p=>{
-            pg.forEach(pg=>{
-                if(pg.prod_codigo == p.codigo_producto){
-                    const producto_info = {
-                        nombre: pg.nombre,
-                        cantidad: parseInt(p.cantidad_producto),
-                        precio: parseInt(pg.precio)
+        const cargarDetalle = async () => {
+            const codigo = JSON.parse(localStorage.getItem("BOLETA_SELECTED"))
+            
+            const boletasDB = await getBoletas()
+            const detallesDB = await getDetalleBoletas()
+            const productosDB = await getProductos()
+            
+            if (boletasDB && detallesDB && productosDB) {
+                // Encontrar la boleta
+                const boletaEncontrada = boletasDB.find(b => b.b_id === codigo)
+                
+                if (boletaEncontrada) {
+                    // Obtener el detalle de la boleta
+                    const detalle = detallesDB.find(d => d.db_id === boletaEncontrada.b_id_detalle)
+                    
+                    const boletaCompleta = {
+                        n_boleta: boletaEncontrada.b_id,
+                        monto_total: boletaEncontrada.b_monto_total,
+                        fecha_compra: detalle?.db_fecha_compra || new Date().toISOString(),
+                        nombre_comprador: detalle?.db_nombre_comprador || '',
+                        nombre_recibidor: detalle?.db_nombre_recibidor || '',
+                        direccion_despacho: detalle?.db_direccion_despacho || '',
+                        fecha_despacho: detalle?.db_fecha_despacho || '',
+                        cantidad_total: detalle?.db_cantidad_total || 0,
+                        productos_comprados: detalle?.db_id_productos_comprados ? 
+                            JSON.parse(detalle.db_id_productos_comprados) : []
                     }
                     
-                    listp.push(producto_info)
+                    setRecboleta(boletaCompleta)
+                    
+                    // Mapear productos comprados con información completa
+                    const productosComprados = boletaCompleta.productos_comprados.map(pc => {
+                        const prod = productosDB.find(p => p.p_codigo === pc.codigo_producto)
+                        return {
+                            nombre: prod?.p_nombre || 'Producto no encontrado',
+                            cantidad: parseInt(pc.cantidad_producto),
+                            precio: prod?.p_precio || 0
+                        }
+                    })
+                    
+                    setProductos(productosComprados)
                 }
-            })
-        })
-        setProductos(listp)
+            }
+        }
+        
+        cargarDetalle()
     },[])
 
     return(
