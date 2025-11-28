@@ -1,4 +1,4 @@
-const API = 'http://localhost:8094'
+const API = 'http://localhost:8094/api/v1'
 
 export const getProductos = async () => {
     console.log("Cargando productos ctm")
@@ -14,37 +14,22 @@ export const getProductos = async () => {
     }
 }
 
-
-
-
 export const updateProducto = async (data) => {
     try {
-        const resp = fetch(`${API}/modificarProducto`,{
+        const resp = await fetch(`${API}/modificarProducto`,{
             method: "PUT",
-            body: data
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
         })
         if(!resp.ok) throw new Error("ERROR no se pudo actualizar el PRODUCTO en la BASE DE DATOS")
-        const datos = resp.json()
+        const datos = await resp.json()
         return datos
     } catch (ex) {
         console.error("Error:",ex)
     }
 }
-export const saveDATO = async () => {
-    try {
-        
-    } catch (ex) {
-        console.error("Error:",ex)
-    }
-}
-export const updateDATO = async () => {
-    try {
-        
-    } catch (ex) {
-        console.error("Error:",ex)
-    }
-}
-export const deleteDATO = async () => {
+
+export const API_FUNCION = async () => {
     try {
         
     } catch (ex) {

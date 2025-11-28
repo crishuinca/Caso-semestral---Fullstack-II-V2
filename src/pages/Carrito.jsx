@@ -60,38 +60,46 @@ function Carrito() {
     recuperarPRODS()
   },[])
 
-  const actualizarStock = async()=>{
-    const productos_enBDD = await getProductos()
-    let productos_guardados;
-    productos_guardados = productos_enBDD.map(p => ({
-      p_id: p.p_id,
-      p_codigo: p.p_codigo,
-      prod_nombre: p.p_nombre,
-      p_descripcion: p.p_descripcion || 'Sin descripción',
-      p_categoria: p.p_categoria,
-      p_precio: p.p_precio,
-      p_imagen: p.p_imagen,
-      p_stock: p.p_stock,
-      p_stock_critico: p.p_stock_critico,
-      p_precio_oferta: p.p_precio_oferta || null
-    }));
+  const actualizarStock = async () => {
+    try {
+      const productos_enBDD = await getProductos()
+      const productos_guardados = productos_enBDD.map(p => ({
+        p_id: p.p_id,
+        p_codigo: p.p_codigo,
+        p_nombre: p.p_nombre,
+        p_descripcion: p.p_descripcion || 'Sin descripción',
+        p_categoria: p.p_categoria,
+        p_precio: p.p_precio,
+        p_imagen: p.p_imagen,
+        p_stock: p.p_stock,
+        p_stock_critico: p.p_stock_critico,
+        p_precio_oferta: p.p_precio_oferta ?? null
+      }))
 
-    let stock_productos = JSON.parse(localStorage.getItem("productosStock"))
-    let stock_actualizar = productos_guardados
-    console.log(stock_productos)
-    console.log(stock_actualizar)
-    stock_actualizar.map(ap=>{
-      stock_productos.map(sp=>{
-        if(sp.prod_codigo == ap.p_codigo){
-          ap.p_stock = sp.stock
-          console.log(ap.prod_stock)
+      let stock_productos = JSON.parse(localStorage.getItem("productosStock") || "null")
+      if (!stock_productos) {return}
+
+      // traduccion pa entender: 
+      // contruye un producto por cada uno de la lista de productos
+      for (const producto of productos_guardados) {
+        const stock_pagina = stock_productos.find( s =>
+          s.prod_codigo == producto.p_codigo ||
+          s.p_codigo == producto.p_codigo
+        )
+        // esto codigo hace que si no encuentra algo, 
+        // pase al siguiente, para evitar un error
+        if (!stock_pagina) continue
+
+        const producto_actualizado = {
+          ...producto, p_stock: parseInt(stock_pagina.stock)
         }
-      })
-    })
-    stock_actualizar.map(async(p)=>{
-      const resp = await updateProducto(p)
-      console.log(resp)
-    })
+        await updateProducto(producto_actualizado)
+      }
+      
+    } catch (error) {
+      console.error("Error en actualizarStock:", error)
+      throw error
+    }
   }
 
   // Cargar datos del usuario si está logueado
