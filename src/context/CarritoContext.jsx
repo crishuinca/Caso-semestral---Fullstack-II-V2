@@ -18,6 +18,8 @@ export const CarritoProvider = ({ children }) => {
 
   // Cargar productos desde la base de datos al iniciar
   useEffect(() => {
+    let isMounted = true;
+    
     const cargarProductosBDD = async () => {
       try {
         const productosBDD = await getProductos();
@@ -33,16 +35,24 @@ export const CarritoProvider = ({ children }) => {
           precioEspecial: p.p_precio_oferta || null
         }));
         
-        setProductosStock(productosFormateados);
-        localStorage.setItem('productosStock', JSON.stringify(productosFormateados));
-        setCargandoProductos(false);
+        if (isMounted) {
+          setProductosStock(productosFormateados);
+          localStorage.setItem('productosStock', JSON.stringify(productosFormateados));
+          setCargandoProductos(false);
+        }
       } catch (error) {
         console.error('Error al cargar productos de la base de datos:', error);
-        setCargandoProductos(false);
+        if (isMounted) {
+          setCargandoProductos(false);
+        }
       }
     };
 
     cargarProductosBDD();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const productosDisponibles_DEPRECADO = [

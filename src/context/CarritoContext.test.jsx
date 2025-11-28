@@ -1,6 +1,12 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { CarritoProvider, useCarrito } from '../context/CarritoContext';
 import React from 'react';
+import * as apiHelper from '../utils/apiHelper';
+
+// Mock apiHelper
+vi.mock('../utils/apiHelper', () => ({
+  getProductos: vi.fn()
+}));
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -24,27 +30,49 @@ describe('CarritoContext', () => {
     mockLocalStorage.removeItem.mockClear();
     mockLocalStorage.clear.mockClear();
     
-    // Mock para productosAdmin y productosStock por defecto
+    // Mock getProductos para retornar productos de prueba
+    apiHelper.getProductos.mockResolvedValue([
+      {
+        p_codigo: 'TC001',
+        p_nombre: 'Torta Chocolate',
+        p_descripcion: 'Torta de chocolate',
+        p_categoria: 'Tortas Cuadradas',
+        p_precio: 45000,
+        p_imagen: '/img/TC001.png',
+        p_stock: 15,
+        p_stock_critico: 3,
+        p_precio_oferta: null
+      },
+      {
+        p_codigo: 'TC002',
+        p_nombre: 'Torta Frutas',
+        p_descripcion: 'Torta de frutas',
+        p_categoria: 'Tortas Cuadradas',
+        p_precio: 50000,
+        p_imagen: '/img/TC002.png',
+        p_stock: 10,
+        p_stock_critico: 2,
+        p_precio_oferta: null
+      }
+    ]);
+    
+    // Mock para localStorage
     mockLocalStorage.getItem.mockImplementation((key) => {
-      if (key === 'productosAdmin') return null;
-      if (key === 'productosStock') return null;
       if (key === 'carritoCompras') return '[]';
       return null;
     });
   });
 
-  test('PRUEBA_01: Maneja carrito inicial y agregar/incrementar productos', () => {
-    mockLocalStorage.getItem.mockImplementation((key) => {
-      if (key === 'productosAdmin') return null;
-      if (key === 'productosStock') return null;
-      if (key === 'carritoCompras') return '[]';
-      return null;
-    });
-    
+  test('PRUEBA_01: Maneja carrito inicial y agregar/incrementar productos', async () => {
     const { result } = renderHook(() => useCarrito(), { wrapper });
     
+    // Esperar a que carguen los productos
+    await waitFor(() => {
+      expect(result.current.productosStock.length).toBeGreaterThan(0);
+    });
+    
     expect(result.current.carrito).toEqual([]);
-    expect(result.current.productosDisponibles.length).toBeGreaterThan(0);
+    expect(result.current.productosStock.length).toBe(2);
     
     // Agregar producto
     act(() => {
@@ -80,7 +108,7 @@ describe('CarritoContext', () => {
     expect(result.current.carrito).toHaveLength(0);
   });
 
-  test('PRUEBA_03: Calcula totales correctamente', () => {
+  test('PRUEBA_03: Calcula totales correctamente', async () => {
     const carritoInicial = [
       { codigo: 'TC001', nombre: 'Torta Chocolate', precio: 45000, cantidad: 2 },
       { codigo: 'TC002', nombre: 'Torta Frutas', precio: 50000, cantidad: 1 }
@@ -89,6 +117,11 @@ describe('CarritoContext', () => {
     mockLocalStorage.getItem.mockReturnValue(JSON.stringify(carritoInicial));
     
     const { result } = renderHook(() => useCarrito(), { wrapper });
+    
+    // Esperar a que carguen los productos
+    await waitFor(() => {
+      expect(result.current.productosStock.length).toBeGreaterThan(0);
+    });
     
     expect(result.current.calcularTotal()).toBe(140000);
     expect(result.current.obtenerCantidadTotal()).toBe(3);
