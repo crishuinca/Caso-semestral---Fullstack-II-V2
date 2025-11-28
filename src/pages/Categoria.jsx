@@ -8,7 +8,7 @@ import Footer from '../components/footer/Footer';
 function Categoria() {
   const { categoria } = useParams();
   const navigate = useNavigate();
-  const { productosDisponibles, agregarProducto } = useCarrito();
+  const { productosStock, agregarProducto, cargandoProductos } = useCarrito();
   const [productos, setProductos] = useState([]);
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [ofertas, setOfertas] = useState([]);
@@ -33,12 +33,9 @@ function Categoria() {
       return;
     }
 
-    // Cargar productos
-    const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
-    
-    let productosFinales;
-    if (productosAdmin) {
-      productosFinales = productosAdmin.map(producto => ({
+    // Cargar productos desde productosStock
+    if (!cargandoProductos && productosStock.length > 0) {
+      const productosFormateados = productosStock.map(producto => ({
         prod_codigo: producto.prod_codigo,
         prod_nombre: producto.nombre,
         prod_desc: producto.descripcion || 'Sin descripción',
@@ -49,47 +46,9 @@ function Categoria() {
         prod_stock_critico: producto.stock_critico,
         prod_precio_oferta: producto.precioEspecial || null
       }));
-    } else {
-      productosFinales = productosDisponibles.map(producto => ({
-        prod_codigo: producto.prod_codigo,
-        prod_nombre: producto.nombre,
-        prod_desc: producto.descripcion || 'Sin descripción',
-        prod_categoria: producto.categoria,
-        prod_precio: producto.precio,
-        prod_imagen: producto.imagen,
-        prod_stock: producto.stock,
-        prod_stock_critico: producto.stock_critico
-      }));
+      setProductos(productosFormateados);
     }
-    
-    setProductos(productosFinales);
-  }, [productosDisponibles, categoria, navigate]);
-
-  useEffect(() => {
-    const handleProductosActualizados = () => {
-      const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
-      if (productosAdmin) {
-        const productosActualizados = productosAdmin.map(producto => ({
-          prod_codigo: producto.prod_codigo,
-          prod_nombre: producto.nombre,
-          prod_desc: producto.descripcion || 'Sin descripción',
-          prod_categoria: producto.categoria,
-          prod_precio: producto.precio,
-          prod_imagen: producto.imagen,
-          prod_stock: producto.stock,
-          prod_stock_critico: producto.stock_critico,
-          prod_precio_oferta: producto.precioEspecial || null
-        }));
-        setProductos(productosActualizados);
-      }
-    };
-
-    window.addEventListener('productosActualizados', handleProductosActualizados);
-    
-    return () => {
-      window.removeEventListener('productosActualizados', handleProductosActualizados);
-    };
-  }, []);
+  }, [productosStock, cargandoProductos, categoria, navigate, categoriasValidas]);
 
   // Filtrar productos por categoría
   useEffect(() => {
@@ -176,13 +135,14 @@ function Categoria() {
 
             <div className="row g-4 mb-5">
               {ofertas.map(producto => (
-                <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
+                <div key={`${categoria}-oferta-${producto.prod_codigo}`} className="col-lg-4 col-md-6">
                   <div className="oferta-card">
                     <div className="oferta-badge">
                       -{producto.descuento}%
                     </div>
                     <div className="oferta-image-container">
                       <img 
+                        key={`${categoria}-img-${producto.prod_codigo}`}
                         src={producto.prod_imagen} 
                         alt={producto.prod_nombre}
                         className="oferta-image"
@@ -231,8 +191,8 @@ function Categoria() {
 
           <div className="row g-4">
             {filteredProductos.map(producto => (
-              <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
-                <ProductCard producto={producto} />
+              <div key={`${categoria}-${producto.prod_codigo}`} className="col-lg-4 col-md-6">
+                <ProductCard key={`${categoria}-${producto.prod_codigo}`} producto={producto} />
               </div>
             ))}
           </div>

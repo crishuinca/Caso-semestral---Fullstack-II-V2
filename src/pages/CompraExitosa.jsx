@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/cssESCALONA.css'
 import { useNavigate } from 'react-router-dom';
+import { createBoleta, createDetalleBoleta, updateDetalleBoleta } from '../utils/apiHelper';
 
 function CompraExitosa() {
     const [i_pago, setI_pago] = useState(null)
@@ -16,6 +17,66 @@ function CompraExitosa() {
     const navigate = useNavigate()
 
     var com_rut
+
+    // Función para guardar boleta en la base de datos
+    const guardarBoletaEnBDD = async (boletaLocal, infodespacho, infopago) => {
+        try {
+            // Preparar datos del detalle_boleta
+            const fechaDespacho = new Date(
+                parseInt(infodespacho.cliente_despachar.ano),
+                parseInt(infodespacho.cliente_despachar.mes) - 1,
+                parseInt(infodespacho.cliente_despachar.dia)
+            );
+
+            const fechaCompra = infopago?.create_time 
+                ? new Date(infopago.create_time) 
+                : new Date();
+
+            const detalleBoleta = {
+                db_nombre_comprador: infopago?.payer?.name?.given_name || "Desconocido",
+                db_nombre_recibidor: infodespacho?.cliente_despachar?.nombre || "Desconocido",
+                db_direccion_despacho: infodespacho?.cliente_despachar?.direccion || "RETIRO EN TIENDA",
+                db_fecha_despacho: fechaDespacho.toISOString().split('T')[0],
+                db_fecha_compra: fechaCompra.toISOString().split('T')[0],
+                db_cantidad_total: boletaLocal.productos_comprados.reduce((sum, p) => sum + p.cantidad_producto, 0),
+                db_monto_total: infodespacho.total,
+                db_id_productos_comprados: JSON.stringify(boletaLocal.productos_comprados)
+            };
+
+            // Crear detalle_boleta primero
+            const detalleResponse = await createDetalleBoleta(detalleBoleta);
+            console.log("Detalle boleta creado:", detalleResponse);
+            
+            const detalleCreado = detalleResponse.data || detalleResponse;
+
+            // Crear boleta con referencia al detalle
+            const boleta = {
+                b_id_detalle: detalleCreado.db_id,
+                b_nombre_comprador: infopago?.payer?.name?.given_name || "Desconocido",
+                b_nombre_recibidor: infodespacho?.cliente_despachar?.nombre || "Desconocido",
+                b_monto_total: infodespacho.total
+            };
+
+            const boletaResponse = await createBoleta(boleta);
+            console.log("Boleta creada en base de datos:", boletaResponse);
+            
+            const boletaCreada = boletaResponse.data || boletaResponse;
+
+            // Actualizar detalle_boleta con el id de la boleta (relación bidireccional)
+            const detalleActualizado = {
+                ...detalleCreado,
+                db_id_boleta: boletaCreada.b_id
+            };
+            
+            await updateDetalleBoleta(detalleActualizado);
+            console.log("Detalle actualizado con db_id_boleta:", detalleActualizado);
+
+            return boletaCreada;
+        } catch (error) {
+            console.error("Error al guardar boleta en BDD:", error);
+            throw error;
+        }
+    };
 
     useEffect(() => {
     let lista_productos_comprados = []
@@ -96,6 +157,11 @@ function CompraExitosa() {
         localStorage.setItem("historial_boletas", JSON.stringify(lista_boletas_guardadas))
 
         console.log("Nueva boleta guardada:", guardar_boleta)
+
+        // Guardar en la base de datos
+        guardarBoletaEnBDD(guardar_boleta, infodespacho, infopago).catch(err => {
+            console.error("Error al guardar boleta en base de datos:", err)
+        })
 
     } catch (error) {
         console.error("Error al cargar la informacion: ", error)

@@ -1,5 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { loginUser } from '../utils/apiHelper';
 import '../styles/Login.css';
 
 function Login() {
@@ -10,34 +11,6 @@ function Login() {
   });
   const [resultado, setResultado] = useState('');
 
-  useEffect(() => {
-    const usuariosExistentes = JSON.parse(localStorage.getItem('usuarios') || '[]');
-
-    const adminExiste = usuariosExistentes.find(u => u.correo === 'admin@gmail.com');
-    
-    if (!adminExiste) {
-      
-      const adminUser = {
-        id: 'admin-001',
-        run: '11111111-1',
-        nombre: 'Administrador',
-        apellidos: 'Sistema',
-        correo: 'admin@gmail.com',
-        fecha_nacimiento: '',
-        region: 'Región Metropolitana',
-        comuna: 'Santiago',
-        direccion: 'Oficina Central',
-        password: '123',
-        codigo_descuento: '',
-        isAdmin: true,
-        fechaRegistro: new Date().toISOString()
-      };
-      
-      usuariosExistentes.push(adminUser);
-      localStorage.setItem('usuarios', JSON.stringify(usuariosExistentes));
-    }
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -46,7 +19,7 @@ function Login() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.correo || !formData.password) {
@@ -54,24 +27,19 @@ function Login() {
       return;
     }
 
-    const usuariosGuardados = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    const usuario = usuariosGuardados.find(u => 
-      u.correo === formData.correo && u.password === formData.password
-    );
-
-    if (usuario) {
-      
-      localStorage.setItem('usuarioActual', JSON.stringify(usuario));
-      
+    const response = await loginUser(formData.correo, formData.password);
+    
+    if (response.success) {
+      localStorage.setItem('usuarioActual', JSON.stringify(response.usuario));
       window.dispatchEvent(new Event('usuarioActualizado'));
       
-      if (usuario.isAdmin) {
+      if (response.usuario.isAdmin) {
         navigate('/admin');
       } else {
         navigate('/');
       }
     } else {
-      setResultado('Correo o contraseña incorrectos');
+      setResultado(response.message);
     }
   };
 

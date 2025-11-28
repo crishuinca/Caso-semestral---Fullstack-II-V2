@@ -19,7 +19,7 @@ function Carrito() {
   const navigate = useNavigate()
   const {
     carrito,
-    productosDisponibles,
+    productosStock,
     eliminarProducto,
     actualizarCantidad,
     actualizarMensaje,
@@ -355,7 +355,7 @@ function Carrito() {
                 </div>
               ) : (
                 carrito.map((item, index) => {
-                  const producto = productosDisponibles.find(p => p.prod_codigo === item.codigo);
+                  const producto = productosStock.find(p => p.prod_codigo === item.codigo);
                   if (!producto) return null;
                   
                   return (
@@ -378,7 +378,7 @@ function Carrito() {
           <div className="col-lg-5 col-sm-12 pb-4 pt-4 ps-4 pe-4">
             <CarritoResumen
               carrito={carrito}
-              productosDisponibles={productosDisponibles}
+              productosDisponibles={productosStock}
               calcularTotal={calcularTotal}
               onContinuar={handleContinuar}
               onVaciar={vaciarCarrito}
@@ -394,7 +394,7 @@ function Carrito() {
           onInputChange={handleInputChange}
           onTipoEntregaChange={handleTipoEntregaChange}
           carrito={carrito}
-          productosDisponibles={productosDisponibles}
+          productosDisponibles={productosStock}
           calcularTotal={calcularTotal}
           onConfirmar={confirmarPedido}
           onCancelar={handleCancelarModal}

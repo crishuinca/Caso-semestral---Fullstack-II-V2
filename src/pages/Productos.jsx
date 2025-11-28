@@ -7,7 +7,7 @@ import Footer from '../components/footer/Footer';
 import { getProductos } from '../utils/apiHelper';
 
 function Productos() {
-  const { productosDisponibles, agregarProducto } = useCarrito();
+  const { productosStock, agregarProducto, cargandoProductos } = useCarrito();
   const { categoriaSeleccionada, setCategoriaSeleccionada, terminoBusqueda, setTerminoBusqueda } = useFiltro();
   const [productos, setProductos] = useState([]);
   const [filteredProductos, setFilteredProductos] = useState([]);
@@ -15,44 +15,22 @@ function Productos() {
   const [ofertas, setOfertas] = useState([]);
 
   useEffect(() => {
-    
-    const recuperarDATOS = async()=>{
-      const productosAdmin = await getProductos()
-    /*|| await JSON.parse(localStorage.getItem('productosAdmin') || 'null');*/
-    
-    let productosFinales;
-    if (productosAdmin) {
-      
-      productosFinales = productosAdmin.map(producto => ({
-        prod_codigo: producto.p_codigo,
-        prod_nombre: producto.p_nombre,
-        prod_desc: producto.p_descripcion || 'Sin descripción',
-        prod_categoria: producto.p_categoria,
-        prod_precio: producto.p_precio,
-        prod_imagen: producto.p_imagen,
-        prod_stock: producto.p_stock,
-        prod_stock_critico: producto.p_stock_critico,
-        prod_precio_oferta: producto.p_precio_oferta || null
+    if (!cargandoProductos && productosStock.length > 0) {
+      const productosFormateados = productosStock.map(producto => ({
+        prod_codigo: producto.prod_codigo,
+        prod_nombre: producto.nombre,
+        prod_desc: producto.descripcion || 'Sin descripción',
+        prod_categoria: producto.categoria,
+        prod_precio: producto.precio,
+        prod_imagen: producto.imagen,
+        prod_stock: producto.stock,
+        prod_stock_critico: producto.stock_critico,
+        prod_precio_oferta: producto.precioEspecial || null
       }));
-    } else {
-      
-      productosFinales = productosDisponibles.map(producto => ({
-        prod_codigo: producto.p_codigo,
-        prod_nombre: producto.p_nombre,
-        prod_desc: producto.p_descripcion || 'Sin descripción',
-        prod_categoria: producto.p_categoria,
-        prod_precio: producto.p_precio,
-        prod_imagen: producto.p_imagen,
-        prod_stock: producto.p_stock,
-        prod_stock_critico: producto.p_stock_critico,
-      }));
+      setProductos(productosFormateados);
+      setFilteredProductos(productosFormateados);
     }
-    console.log("Backend data:", productosAdmin);
-    setProductos(productosFinales);
-    setFilteredProductos(productosFinales);
-    }
-    recuperarDATOS()
-  }, [productosDisponibles]);
+  }, [productosStock, cargandoProductos]);
   
 
   useEffect(() => {

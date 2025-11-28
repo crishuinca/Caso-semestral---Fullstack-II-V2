@@ -1,6 +1,7 @@
 ﻿import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CarritoProvider } from './context/CarritoContext';
 import { FiltroProvider } from './context/FiltroContext';
+import RutaProtegida from './components/RutaProtegida';
 import Navbar from './pages/Navbar';
 import Home from './pages/Home';
 import Productos from './pages/Productos';
@@ -46,15 +47,15 @@ function AppContent() {
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/admin/reportes-productos" element={<ReportesProductos />} />
-          <Route path="/compra-exitosa" element={<CompraExitosa />} />
-          <Route path="/compra-erronea" element={<CompraErronea />} />
-          <Route path='/admin/boletas' element={<Boletas/>}/>
-          <Route path="/admin/boletas/detalle-boleta" element={<DetalleBoleta/>}/>
-          <Route path="/admin/historial-compras" element={<ComprasHistorial/>}/>
-          <Route path="/admin/historial-compras/detalle-compra" element={<ComprasDetalle/>}/>
+          <Route path="/perfil" element={<RutaProtegida><Perfil /></RutaProtegida>} />
+          <Route path="/admin" element={<RutaProtegida requiereAdmin={true}><AdminPanel /></RutaProtegida>} />
+          <Route path="/admin/reportes-productos" element={<RutaProtegida requiereAdmin={true}><ReportesProductos /></RutaProtegida>} />
+          <Route path="/compra-exitosa" element={<RutaProtegida><CompraExitosa /></RutaProtegida>} />
+          <Route path="/compra-erronea" element={<RutaProtegida><CompraErronea /></RutaProtegida>} />
+          <Route path='/admin/boletas' element={<RutaProtegida requiereAdmin={true}><Boletas/></RutaProtegida>}/>
+          <Route path="/admin/boletas/detalle-boleta" element={<RutaProtegida requiereAdmin={true}><DetalleBoleta/></RutaProtegida>}/>
+          <Route path="/admin/historial-compras" element={<RutaProtegida requiereAdmin={true}><ComprasHistorial/></RutaProtegida>}/>
+          <Route path="/admin/historial-compras/detalle-compra" element={<RutaProtegida requiereAdmin={true}><ComprasDetalle/></RutaProtegida>}/>
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

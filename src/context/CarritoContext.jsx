@@ -1,4 +1,5 @@
 ﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getProductos } from '../utils/apiHelper';
 
 const CarritoContext = createContext();
 
@@ -13,8 +14,48 @@ export const useCarrito = () => {
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState([]);
   const [productosStock, setProductosStock] = useState([]);
+  const [cargandoProductos, setCargandoProductos] = useState(true);
 
-  const productosDisponibles = [
+  // Cargar productos desde la base de datos al iniciar
+  useEffect(() => {
+    let isMounted = true;
+    
+    const cargarProductosBDD = async () => {
+      try {
+        const productosBDD = await getProductos();
+        const productosFormateados = productosBDD.map(p => ({
+          prod_codigo: p.p_codigo,
+          nombre: p.p_nombre,
+          descripcion: p.p_descripcion || 'Sin descripción',
+          categoria: p.p_categoria,
+          precio: p.p_precio,
+          imagen: p.p_imagen,
+          stock: p.p_stock,
+          stock_critico: p.p_stock_critico,
+          precioEspecial: p.p_precio_oferta || null
+        }));
+        
+        if (isMounted) {
+          setProductosStock(productosFormateados);
+          localStorage.setItem('productosStock', JSON.stringify(productosFormateados));
+          setCargandoProductos(false);
+        }
+      } catch (error) {
+        console.error('Error al cargar productos de la base de datos:', error);
+        if (isMounted) {
+          setCargandoProductos(false);
+        }
+      }
+    };
+
+    cargarProductosBDD();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const productosDisponibles_DEPRECADO = [
     {
       prod_codigo: "TC001",
       nombre: "Torta Cuadrada de Chocolate",
@@ -177,37 +218,7 @@ export const CarritoProvider = ({ children }) => {
     }
   ];
 
-  useEffect(() => {
-    // Primero verificar si hay productos del admin
-    const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
-    if (productosAdmin && Array.isArray(productosAdmin)) {
-      // Usar productos del admin si existen
-      const productosActualizados = productosAdmin.map(producto => ({
-        prod_codigo: producto.prod_codigo,
-        nombre: producto.nombre,
-        descripcion: producto.descripcion,
-        categoria: producto.categoria,
-        precio: producto.precio,
-        imagen: producto.imagen,
-        stock: producto.stock,
-        stock_critico: producto.stock_critico,
-        precioEspecial: producto.precioEspecial
-      }));
-      
-      setProductosStock(productosActualizados);
-      localStorage.setItem('productosStock', JSON.stringify(productosActualizados));
-    } else {
-      // Si no hay productos del admin, usar los hardcodeados
-      const stockGuardado = localStorage.getItem('productosStock');
-      if (stockGuardado) {
-        setProductosStock(JSON.parse(stockGuardado));
-      } else {
-        setProductosStock(productosDisponibles);
-        localStorage.setItem('productosStock', JSON.stringify(productosDisponibles));
-      }
-    }
-  }, []);
-
+  // Cargar carrito desde localStorage
   useEffect(() => {
     try {
       const carritoGuardado = localStorage.getItem('carritoCompras');
@@ -238,26 +249,27 @@ export const CarritoProvider = ({ children }) => {
     }
   }, [carrito]);
 
-  // Escuchar actualizaciones de productos desde el admin
+  // Escuchar actualizaciones de productos y recargar desde la base de datos
   useEffect(() => {
-    const handleProductosActualizados = () => {
-      const productosAdmin = JSON.parse(localStorage.getItem('productosAdmin') || 'null');
-      if (productosAdmin) {
-        // Actualizar productosStock con los datos del admin
-        const productosActualizados = productosAdmin.map(producto => ({
-          prod_codigo: producto.prod_codigo,
-          nombre: producto.nombre,
-          descripcion: producto.descripcion,
-          categoria: producto.categoria,
-          precio: producto.precio,
-          imagen: producto.imagen,
-          stock: producto.stock,
-          stock_critico: producto.stock_critico,
-          precioEspecial: producto.precioEspecial
+    const handleProductosActualizados = async () => {
+      try {
+        const productosBDD = await getProductos();
+        const productosFormateados = productosBDD.map(p => ({
+          prod_codigo: p.p_codigo,
+          nombre: p.p_nombre,
+          descripcion: p.p_descripcion || 'Sin descripción',
+          categoria: p.p_categoria,
+          precio: p.p_precio,
+          imagen: p.p_imagen,
+          stock: p.p_stock,
+          stock_critico: p.p_stock_critico,
+          precioEspecial: p.p_precio_oferta || null
         }));
         
-        setProductosStock(productosActualizados);
-        localStorage.setItem('productosStock', JSON.stringify(productosActualizados));
+        setProductosStock(productosFormateados);
+        localStorage.setItem('productosStock', JSON.stringify(productosFormateados));
+      } catch (error) {
+        console.error('Error al recargar productos:', error);
       }
     };
 
@@ -314,6 +326,12 @@ export const CarritoProvider = ({ children }) => {
       return;
     }
 
+    // Verificar si el producto tiene nombre válido
+    if (!producto.nombre || producto.nombre === null) {
+      console.warn('Producto sin nombre detectado:', producto);
+      mostrarMensaje(`Producto ${codigo} agregado al carrito (datos incompletos)`, 'ok');
+    }
+
     if (producto.stock < cantidad) {
       mostrarMensaje(`Stock insuficiente. Solo quedan ${producto.stock} unidades disponibles`, 'error');
       return;
@@ -349,9 +367,11 @@ export const CarritoProvider = ({ children }) => {
       }]);
     }
 
+    // Usar nombre o código como fallback
+    const nombreProducto = producto.nombre || codigo;
     const mensajeConDescuento = precioEspecial 
-      ? `${producto.nombre} agregado al carrito con descuento! 🎁`
-      : `${producto.nombre} agregado al carrito`;
+      ? `${nombreProducto} agregado al carrito con descuento! 🎁`
+      : `${nombreProducto} agregado al carrito`;
     
     mostrarMensaje(mensajeConDescuento, 'ok');
     
@@ -453,7 +473,7 @@ export const CarritoProvider = ({ children }) => {
 
   const calcularTotal = () => {
     return carrito.reduce((total, item) => {
-      const producto = productosDisponibles.find(p => p.prod_codigo === item.codigo);
+      const producto = productosStock.find(p => p.prod_codigo === item.codigo);
       const precio = item.precioEspecial !== null && item.precioEspecial !== undefined 
         ? item.precioEspecial 
         : (producto ? producto.precio : 0);
@@ -467,8 +487,8 @@ export const CarritoProvider = ({ children }) => {
 
   const value = {
     carrito,
-    productosDisponibles,
     productosStock,
+    cargandoProductos,
     agregarProducto,
     eliminarProducto,
     actualizarCantidad,
