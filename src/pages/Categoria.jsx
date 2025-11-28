@@ -135,13 +135,14 @@ function Categoria() {
 
             <div className="row g-4 mb-5">
               {ofertas.map(producto => (
-                <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
+                <div key={`${categoria}-oferta-${producto.prod_codigo}`} className="col-lg-4 col-md-6">
                   <div className="oferta-card">
                     <div className="oferta-badge">
                       -{producto.descuento}%
                     </div>
                     <div className="oferta-image-container">
                       <img 
+                        key={`${categoria}-img-${producto.prod_codigo}`}
                         src={producto.prod_imagen} 
                         alt={producto.prod_nombre}
                         className="oferta-image"
@@ -190,8 +191,8 @@ function Categoria() {
 
           <div className="row g-4">
             {filteredProductos.map(producto => (
-              <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
-                <ProductCard producto={producto} />
+              <div key={`${categoria}-${producto.prod_codigo}`} className="col-lg-4 col-md-6">
+                <ProductCard key={`${categoria}-${producto.prod_codigo}`} producto={producto} />
               </div>
             ))}
           </div>
