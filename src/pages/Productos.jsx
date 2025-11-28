@@ -27,6 +27,7 @@ function Productos() {
         prod_stock_critico: producto.stock_critico,
         prod_precio_oferta: producto.precioEspecial || null
       }));
+
       setProductos(productosFormateados);
       setFilteredProductos(productosFormateados);
     }

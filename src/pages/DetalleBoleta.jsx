@@ -24,26 +24,26 @@ function DetalleBoleta(){
             
             if (boletasDB && detallesDB && productosDB) {
                 // Encontrar la boleta
-                const boletaEncontrada = boletasDB.find(b => b.b_id === codigo)
+                const boletaEncontrada = boletasDB.find(b => b.b_id == codigo)
                 
                 if (boletaEncontrada) {
                     // Obtener el detalle de la boleta
-                    const detalle = detallesDB.find(d => d.db_id === boletaEncontrada.b_id_detalle)
-                    
+
+                    const detalle = detallesDB.find(d => d.db_id == boletaEncontrada.b_id_detalle)
+
                     const boletaCompleta = {
                         n_boleta: boletaEncontrada.b_id,
                         monto_total: boletaEncontrada.b_monto_total,
-                        fecha_compra: detalle?.db_fecha_compra || new Date().toISOString(),
-                        nombre_comprador: detalle?.db_nombre_comprador || '',
-                        nombre_recibidor: detalle?.db_nombre_recibidor || '',
-                        direccion_despacho: detalle?.db_direccion_despacho || '',
-                        fecha_despacho: detalle?.db_fecha_despacho || '',
-                        cantidad_total: detalle?.db_cantidad_total || 0,
-                        productos_comprados: detalle?.db_id_productos_comprados ? 
+                        fecha_compra: detalle.db_fecha_compra || new Date().toISOString(),
+                        nombre_comprador: detalle.db_nombre_comprador || '',
+                        nombre_recibidor: detalle.db_nombre_recibidor || '',
+                        direccion_despacho: detalle.db_direccion_despacho || '',
+                        fecha_despacho: detalle.db_fecha_despacho || '',
+                        cantidad_total: detalle.db_cantidad_total || 0,
+                        productos_comprados: detalle.db_id_productos_comprados ? 
                             JSON.parse(detalle.db_id_productos_comprados) : []
                     }
-                    
-                    setRecboleta(boletaCompleta)
+                    setRecboleta(detalle)
                     
                     // Mapear productos comprados con información completa
                     const productosComprados = boletaCompleta.productos_comprados.map(pc => {

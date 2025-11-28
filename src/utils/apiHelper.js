@@ -1,13 +1,10 @@
 const API = 'http://localhost:8094/api/v1'
 
 export const getProductos = async () => {
-    console.log("Cargando productos ctm")
     try {
         const resp = await fetch(`${API}/productos`)
-        console.log("Respuesta base: " + resp)
         if(!resp.ok) throw new Error("ERROR cannot load PRODUCTOS from DATABASE")
         const data = await resp.json()
-        console.log("Datos base: " + data)
         return data
     } catch (ex) {
         console.error("Error:",ex)
@@ -64,7 +61,7 @@ export const registerUser = async (userData) => {
 
 
 
-
+// ========== USUSARIOS ======================================================================
 // Obtener todos los usuarios
 export const getUsuarios = async () => {
     try {
@@ -130,7 +127,7 @@ export const deleteUsuario = async (id) => {
     }
 }
 
-// ========== BOLETAS ==========
+// ========== BOLETAS ======================================================================
 
 // Obtener todas las boletas
 export const getBoletas = async () => {
@@ -177,7 +174,7 @@ export const getBoletaById = async (id) => {
     }
 }
 
-// ========== DETALLE BOLETAS ==========
+// ========== DETALLE BOLETAS ===============================================================
 
 // Obtener todos los detalles de boletas
 export const getDetalleBoletas = async () => {

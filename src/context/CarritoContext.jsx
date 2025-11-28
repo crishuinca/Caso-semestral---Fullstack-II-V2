@@ -331,7 +331,7 @@ export const CarritoProvider = ({ children }) => {
       console.warn('Producto sin nombre detectado:', producto);
       mostrarMensaje(`Producto ${codigo} agregado al carrito (datos incompletos)`, 'ok');
     }
-
+    console.log('REVISANDO: ',producto)
     if (producto.stock < cantidad) {
       mostrarMensaje(`Stock insuficiente. Solo quedan ${producto.stock} unidades disponibles`, 'error');
       return;
@@ -343,10 +343,11 @@ export const CarritoProvider = ({ children }) => {
     }
 
     const nuevosProductos = productosStock.map(p =>
-      p.prod_codigo === codigo
+      p.prod_codigo == codigo
         ? { ...p, stock: p.stock - cantidad }
         : p
     );
+    console.log("ASDASDASDASDASDASD",nuevosProductos)
     setProductosStock(nuevosProductos);
     localStorage.setItem('productosStock', JSON.stringify(nuevosProductos));
 

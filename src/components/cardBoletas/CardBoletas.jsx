@@ -2,8 +2,11 @@ import "../../styles/cssESCALONA.css"
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 function CardBoletas({brp, prods, regresar}){
-    let [ano,mes,dia] = brp.comprador.fecha_compra.split("-")
-    var ndia = dia.substring(0,2)
+    const fecha_compra_f = new Date(brp.db_fecha_compra)
+    var ano = fecha_compra_f.getFullYear() 
+    var mes = fecha_compra_f.getMonth()+1  
+    var dia = fecha_compra_f.getDate()     
+
     var total = 0
     prods.forEach(p=>{
         total += p.cantidad * p.precio
@@ -13,7 +16,7 @@ function CardBoletas({brp, prods, regresar}){
         <div className="base_tarjeta blt-tarjeta">
             <div className="blt-bordes">
                 <div className="blt-bordes mt-1 mb-1 p-2 blt-jst">
-                    <strong>BOLETA N° - {brp.n_boleta}</strong>
+                    <strong>BOLETA N° - {brp.db_id_boleta}</strong>
                 </div>
             </div>
             <div className="p-2">
@@ -22,11 +25,11 @@ function CardBoletas({brp, prods, regresar}){
                 </div>
                 <div className="row g-0">
                     <strong className="mb-1 col-6">Direccion despacho:</strong>
-                    <p className="mb-1 col-6 blt-mandar-end">{brp.recibidor.direccion_recibidor}</p>
+                    <p className="mb-1 col-6 blt-mandar-end">{brp.db_direccion_despacho}</p>
                 </div>
                 <div className="row g-0">
                     <strong className="mb-1 col-6">Fecha de compra:</strong>
-                    <p className="mb-1 col-6 blt-mandar-end">{ano}-{mes}-{ndia}</p>
+                    <p className="mb-1 col-6 blt-mandar-end">{ano}-{mes}-{dia}</p>
                 </div>
             </div>
             <div className="blt-bordes pt-3 pb-2">
