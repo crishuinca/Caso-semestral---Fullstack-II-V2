@@ -29,10 +29,6 @@ function Login() {
 
     const response = await loginUser(formData.correo, formData.password);
     
-    console.log('Login response:', response);
-    console.log('Usuario:', response.usuario);
-    console.log('isAdmin:', response.usuario?.isAdmin);
-    
     if (response.success) {
       localStorage.setItem('usuarioActual', JSON.stringify(response.usuario));
       window.dispatchEvent(new Event('usuarioActualizado'));

@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { registerUser } from '../utils/apiHelper';
 import '../styles/Register.css';
 import { regionesComunas } from '../components/admin/data/regionesComunas';
 import { 
@@ -79,7 +80,7 @@ function Register() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.run || !formData.nombre || !formData.apellidos || !formData.correo || 
@@ -101,50 +102,57 @@ function Register() {
       return;
     }
 
-    const usuariosExistentes = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    if (usuariosExistentes.find(u => u.correo === formData.correo)) {
-      setResultado('Ya existe un usuario con este correo electrónico');
-      return;
-    }
-
     // Convertir fecha de nacimiento al formato correcto
     let fechaNacimientoFormateada = '';
     if (formData.dia_nacimiento && formData.mes_nacimiento && formData.ano_nacimiento) {
       fechaNacimientoFormateada = `${formData.ano_nacimiento}-${formData.mes_nacimiento}-${formData.dia_nacimiento}`;
     }
 
+    // Crear objeto que coincida con la entidad usuario del backend
     const nuevoUsuario = {
-      id: Date.now(),
-      ...formData,
-      fecha_nacimiento: fechaNacimientoFormateada,
-      fechaRegistro: new Date().toISOString()
+      u_nombre: formData.nombre,
+      u_apellido: formData.apellidos,
+      u_correo: formData.correo,
+      u_contrasenia: formData.password,
+      u_direccion: formData.direccion,
+      u_f_nacimiento: fechaNacimientoFormateada,
+      u_f_registro: new Date().toISOString(),
+      u_rol: "USER",
+      u_comuna: formData.comuna,
+      u_region: formData.region,
+      u_descuento_10: false,
+      u_descuento_50: false,
+      u_regalo_cumpleanios: false
     };
 
-    usuariosExistentes.push(nuevoUsuario);
-    localStorage.setItem('usuarios', JSON.stringify(usuariosExistentes));
+    const response = await registerUser(nuevoUsuario);
 
-    setResultado('¡Registro exitoso! Redirigiendo al login...');
+    if (response.success) {
+      setResultado('¡Registro exitoso! Redirigiendo al login...');
+      
+      setFormData({
+        run: '',
+        nombre: '',
+        apellidos: '',
+        correo: '',
+        fecha_nacimiento: '',
+        dia_nacimiento: '',
+        mes_nacimiento: '',
+        ano_nacimiento: '',
+        region: '',
+        comuna: '',
+        direccion: '',
+        password: '',
+        confirmPassword: '',
+        codigo_descuento: ''
+      });
 
-    setFormData({
-      run: '',
-      nombre: '',
-      apellidos: '',
-      correo: '',
-      fecha_nacimiento: '',
-      dia_nacimiento: '',
-      mes_nacimiento: '',
-      ano_nacimiento: '',
-      region: '',
-      comuna: '',
-      direccion: '',
-      password: '',
-      confirmPassword: '',
-      codigo_descuento: ''
-    });
-
-    setTimeout(() => {
-      navigate('/login');
-    }, 2000);
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } else {
+      setResultado(response.message || 'Error al registrar usuario');
+    }
   };
 
   return (

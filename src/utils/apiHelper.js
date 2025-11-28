@@ -23,12 +23,30 @@ export const loginUser = async (correo, password) => {
             },
             body: JSON.stringify({ correo, password })
         })
-        if(!resp.ok) throw new Error("ERROR en login")
+        if(!resp.ok) throw new Error("Error en el login")
         const data = await resp.json()
         return data
     } catch (ex) {
         console.error("Error en login:", ex)
-        return { success: false, message: "Error de conexión" }
+        return { success: false, message: "Error de inicio de sesión" }
+    }
+}
+
+export const registerUser = async (userData) => {
+    try {
+        const resp = await fetch(`${API}/addUsuario`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(userData)
+        })
+        if(!resp.ok) throw new Error("Error en el registro")
+        const data = await resp.json()
+        return { success: true, data }
+    } catch (ex) {
+        console.error("Error en registro:", ex)
+        return { success: false, message: "Error al registrar usuario" }
     }
 }
 
