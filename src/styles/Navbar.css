@@ -119,3 +119,9 @@
   width: 1.5em;
   height: 1.5em;
 }
+
+/* Estilos para el badge del carrito que cambia con hover */
+.carrito-link:hover .carrito-badge {
+  background-color: #D2691E !important;
+  color: #FFC0CB !important;
+}

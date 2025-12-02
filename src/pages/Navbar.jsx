@@ -254,7 +254,7 @@ function Navbar() {
               </li>
               <li className="nav-item" role="none">
                 <Link 
-                  className="nav-link px-4 py-2 rounded position-relative" 
+                  className="nav-link px-4 py-2 rounded position-relative carrito-link" 
                   to="/carrito"
                   style={{ color: '#8B4513' }}
                   role="menuitem"
@@ -265,8 +265,13 @@ function Navbar() {
                   Carrito
                   {cantidadTotal > 0 && (
                     <span 
-                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                      style={{ fontSize: '0.75rem' }}
+                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill carrito-badge"
+                      style={{ 
+                        fontSize: '0.75rem',
+                        backgroundColor: '#8B4513',
+                        color: '#FFC0CB',
+                        transition: 'all 0.3s ease'
+                      }}
                     >
                       {cantidadTotal}
                       <span className="visually-hidden">productos en carrito</span>

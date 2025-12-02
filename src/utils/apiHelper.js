@@ -10,6 +10,19 @@ export const getProductos = async () => {
         console.error("Error:",ex)
     }
 }
+
+// Obtener producto por ID
+export const getProductoById = async (id) => {
+    try {
+        const resp = await fetch(`${API}/productoByID/${id}`)
+        if(!resp.ok) throw new Error("ERROR no se pudo cargar el producto")
+        const data = await resp.json()
+        return data
+    } catch (ex) {
+        console.error("Error al obtener producto por ID:", ex)
+        return null
+    }
+}
 /*
 export const updateProducto = async (data) => {
     try {

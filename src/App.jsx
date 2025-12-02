@@ -23,6 +23,7 @@ import DetalleBoleta from './pages/DetalleBoleta'
 import ComprasHistorial from './pages/ComprasHistorial'
 import ComprasDetalle from './pages/ComprasDetalle'
 import ReportesProductos from './pages/ReportesProductos';
+import DetalleProducto from './pages/DetalleProducto';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
@@ -38,6 +39,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/productos" element={<Productos />} />
+          <Route path="/producto/:id" element={<DetalleProducto />} />
           <Route path="/categoria/:categoria" element={<Categoria />} />
           <Route path="/nosotros" element={<Nosotros />} />
           <Route path="/blogs" element={<Blogs />} />
