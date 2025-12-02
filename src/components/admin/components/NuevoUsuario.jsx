@@ -15,16 +15,18 @@ function NuevoUsuario({
     borderRadius: '12px',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     padding: '2rem 1.5rem',
-    maxWidth: '900px',
+    maxWidth: '1000px',
     margin: '0 auto',
-    width: '100%'
+    width: '100%',
+    boxSizing: 'border-box'
   };
 
   const formResponsive = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '1.5rem',
-    width: '100%'
+    width: '100%',
+    boxSizing: 'border-box'
   };
 
   return (
@@ -44,11 +46,13 @@ function NuevoUsuario({
               onChange={handleInputChange}
               style={{ 
                 ...estilos.input,
+                width: '100%',
                 backgroundColor: '#FFF5E1',
                 background: '#FFF5E1',
                 WebkitAppearance: 'none',
                 MozAppearance: 'none',
-                appearance: 'none'
+                appearance: 'none',
+                boxSizing: 'border-box'
               }}
             >
               <option value="">Seleccionar rol</option>
@@ -68,7 +72,11 @@ function NuevoUsuario({
               placeholder="Ej: 12345678-9"
               value={nuevoUsuario.run}
               onChange={handleInputChange}
-              style={estilos.input}
+              style={{
+                ...estilos.input,
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 
@@ -82,7 +90,11 @@ function NuevoUsuario({
               required
               value={nuevoUsuario.nombre}
               onChange={handleInputChange}
-              style={estilos.input}
+              style={{
+                ...estilos.input,
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 
@@ -96,7 +108,11 @@ function NuevoUsuario({
               required
               value={nuevoUsuario.apellidos}
               onChange={handleInputChange}
-              style={estilos.input}
+              style={{
+                ...estilos.input,
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 
@@ -111,26 +127,42 @@ function NuevoUsuario({
               placeholder="ejemplo@duoc.cl"
               value={nuevoUsuario.correo}
               onChange={handleInputChange}
-              style={estilos.input}
+              style={{
+                ...estilos.input,
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 
-          <div style={estilos.inputGroup}>
+          <div style={{ 
+            ...estilos.inputGroup, 
+            gridColumn: '1 / -1',
+            marginBottom: '1rem'
+          }}>
             <label htmlFor="fecha_nacimiento" style={estilos.label}>Fecha de nacimiento</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ 
+              display: 'flex', 
+              gap: '10px',
+              flexWrap: 'wrap',
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
               <select
                 name="dia_nacimiento"
                 value={nuevoUsuario.dia_nacimiento || ''}
                 onChange={handleInputChange}
                 style={{ 
                   ...estilos.input, 
-                  flex: 1.2,
-                  minWidth: '80px',
+                  flex: '1 1 100px',
+                  minWidth: '90px',
+                  maxWidth: '120px',
                   backgroundColor: '#FFF5E1',
                   background: '#FFF5E1',
                   WebkitAppearance: 'none',
                   MozAppearance: 'none',
-                  appearance: 'none'
+                  appearance: 'none',
+                  boxSizing: 'border-box'
                 }}
               >
                 <option value="">Día</option>
@@ -144,13 +176,15 @@ function NuevoUsuario({
                 onChange={handleInputChange}
                 style={{ 
                   ...estilos.input, 
-                  flex: 1.5,
-                  minWidth: '120px',
+                  flex: '1.5 1 150px',
+                  minWidth: '130px',
+                  maxWidth: '200px',
                   backgroundColor: '#FFF5E1',
                   background: '#FFF5E1',
                   WebkitAppearance: 'none',
                   MozAppearance: 'none',
-                  appearance: 'none'
+                  appearance: 'none',
+                  boxSizing: 'border-box'
                 }}
               >
                 <option value="">Mes</option>
@@ -173,13 +207,15 @@ function NuevoUsuario({
                 onChange={handleInputChange}
                 style={{ 
                   ...estilos.input, 
-                  flex: 1.2,
-                  minWidth: '100px',
+                  flex: '1 1 110px',
+                  minWidth: '110px',
+                  maxWidth: '140px',
                   backgroundColor: '#FFF5E1',
                   background: '#FFF5E1',
                   WebkitAppearance: 'none',
                   MozAppearance: 'none',
-                  appearance: 'none'
+                  appearance: 'none',
+                  boxSizing: 'border-box'
                 }}
               >
                 <option value="">Año</option>
@@ -200,11 +236,13 @@ function NuevoUsuario({
               onChange={handleInputChange}
               style={{ 
                 ...estilos.input,
+                width: '100%',
                 backgroundColor: '#FFF5E1',
                 background: '#FFF5E1',
                 WebkitAppearance: 'none',
                 MozAppearance: 'none',
-                appearance: 'none'
+                appearance: 'none',
+                boxSizing: 'border-box'
               }}
             >
               <option value="">Seleccione región</option>
@@ -224,11 +262,13 @@ function NuevoUsuario({
               onChange={handleInputChange}
               style={{ 
                 ...estilos.input,
+                width: '100%',
                 backgroundColor: '#FFF5E1',
                 background: '#FFF5E1',
                 WebkitAppearance: 'none',
                 MozAppearance: 'none',
-                appearance: 'none'
+                appearance: 'none',
+                boxSizing: 'border-box'
               }}
               disabled={!nuevoUsuario.region}
             >
@@ -239,7 +279,10 @@ function NuevoUsuario({
             </select>
           </div>
 
-          <div style={estilos.inputGroup}>
+          <div style={{ 
+            ...estilos.inputGroup, 
+            gridColumn: '1 / -1'
+          }}>
             <label htmlFor="direccion" style={estilos.label}>Dirección*</label>
             <input 
               type="text" 
@@ -249,7 +292,11 @@ function NuevoUsuario({
               required
               value={nuevoUsuario.direccion}
               onChange={handleInputChange}
-              style={estilos.input}
+              style={{
+                ...estilos.input,
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 
@@ -263,7 +310,11 @@ function NuevoUsuario({
               required
               value={nuevoUsuario.password}
               onChange={handleInputChange}
-              style={estilos.input}
+              style={{
+                ...estilos.input,
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 
@@ -277,7 +328,11 @@ function NuevoUsuario({
               required
               value={nuevoUsuario.confirmPassword}
               onChange={handleInputChange}
-              style={estilos.input}
+              style={{
+                ...estilos.input,
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 
@@ -291,7 +346,11 @@ function NuevoUsuario({
               placeholder="Opcional"
               value={nuevoUsuario.codigo_descuento}
               onChange={handleInputChange}
-              style={estilos.input}
+              style={{
+                ...estilos.input,
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
 

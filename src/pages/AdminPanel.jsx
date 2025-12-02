@@ -22,15 +22,6 @@ import {
 } from '../utils/rutUtils';
 
 function AdminPanel() {
-  const [esMovil, setEsMovil] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setEsMovil(window.innerWidth < 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
   const navigate = useNavigate();
   const { productosStock } = useCarrito();
   const [vistaActiva, setVistaActiva] = useState('tablero');
@@ -972,7 +963,6 @@ function AdminPanel() {
                  vistaActiva === 'perfil' ? 'Mi Perfil' : 'Tablero'}
               </h1>
             </div>
-            {!esMovil && (
             <div style={estilos.derechaEncabezado}>
               <div style={estilos.informacionUsuario}>
                 <span style={estilos.textoBienvenida}>Bienvenido, Admin</span>
@@ -981,7 +971,6 @@ function AdminPanel() {
                 </div>
               </div>
             </div>
-            )}
           </header>
         )}
 

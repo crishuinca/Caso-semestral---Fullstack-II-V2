@@ -221,7 +221,9 @@ export const estilos = {
   inputGroup: {
     display: 'flex',
     flexDirection: 'column',
-    marginBottom: '0.5rem'
+    marginBottom: '0.5rem',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   label: {
     color: '#8B4513',
@@ -237,7 +239,9 @@ export const estilos = {
     color: '#5D4037',
     background: '#FFF5E1',
     outline: 'none',
-    transition: 'border 0.2s'
+    transition: 'border 0.2s',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   select: {
     border: '1.5px solid #FFC0CB',
@@ -248,7 +252,9 @@ export const estilos = {
     color: '#5D4037',
     background: '#FFF5E1',
     outline: 'none',
-    transition: 'border 0.2s'
+    transition: 'border 0.2s',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   submitButton: {
     gridColumn: '1 / -1',

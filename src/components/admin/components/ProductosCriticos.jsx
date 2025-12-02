@@ -84,7 +84,7 @@ function ProductosCriticos({
             Volver al catálogo
           </button>
         </div>
-      ) : (
+        ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
           {productosCriticos.map(producto => (
             <div 

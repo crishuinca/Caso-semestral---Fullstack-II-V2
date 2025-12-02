@@ -316,9 +316,10 @@ function Carrito() {
       fontFamily: 'sans-serif',
       color: '#5D4037',
       maxWidth: '780px',
+      width: '90%',
       maxHeight: '85vh',
       overflowY: 'auto',
-      width: '100%'
+      boxSizing: 'border-box'
     },
     overlay: {
       position: 'fixed',

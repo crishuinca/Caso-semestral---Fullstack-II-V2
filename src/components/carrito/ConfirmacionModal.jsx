@@ -145,8 +145,8 @@ function ConfirmacionModal({
         </div>
 
         {datosCompra.tipoEntrega === 'despacho' && (
-          <>
-            <p>Dirección de despacho</p>
+          <div style={{ marginBottom: '15px' }}>
+            <p style={{ marginBottom: '8px' }}>Dirección de despacho*</p>
             <input
               type="text"
               name="direccion"
@@ -154,66 +154,90 @@ function ConfirmacionModal({
               onChange={onInputChange}
               placeholder="Ej: Av. Principal 123, Comuna"
               style={{
-                ...estilos.inputCarrito
+                ...estilos.inputCarrito,
+                width: '100%',
+                boxSizing: 'border-box'
               }}
               className="form-control"
               required
             />
-          </>
+          </div>
         )}
 
-        <p>Fecha de entrega</p>
-        <small style={{ color: '#8B4513', fontStyle: 'italic', marginBottom: '10px', display: 'block' }}>
-          ⚠️ No se pueden seleccionar fechas pasadas
-        </small>
-        <div className="row g-0" style={{ columnGap: '15px', marginBottom: '15px' }}>
-          <div className="col-4">
-            <label style={{ marginBottom: '5px', display: 'block' }}>Día:</label>
-            <select
-              name="dia"
-              value={datosCompra.dia}
-              onChange={onInputChange}
-              style={estilos.inputCarrito}
-              className="form-control"
-              required
-            >
-              <option value="">Día</option>
-              {obtenerDiasValidos().map(dia => (
-                <option key={dia} value={dia}>{dia}</option>
-              ))}
-            </select>
-          </div>
-          <div className="col-4">
-            <label style={{ marginBottom: '5px', display: 'block' }}>Mes:</label>
-            <select
-              name="mes"
-              value={datosCompra.mes}
-              onChange={onInputChange}
-              style={estilos.inputCarrito}
-              className="form-control"
-              required
-            >
-              <option value="">Mes</option>
-              {obtenerMesesValidos().map(mes => (
-                <option key={mes} value={mes}>{nombresMeses[mes - 1]}</option>
-              ))}
-            </select>
-          </div>
-          <div className="col-4">
-            <label style={{ marginBottom: '5px', display: 'block' }}>Año:</label>
-            <select
-              name="ano"
-              value={datosCompra.ano}
-              onChange={onInputChange}
-              style={estilos.inputCarrito}
-              className="form-control"
-              required
-            >
-              <option value="">Año</option>
-              {obtenerAnosValidos().map(ano => (
-                <option key={ano} value={ano}>{ano}</option>
-              ))}
-            </select>
+        <div style={{ marginBottom: '15px' }}>
+          <p style={{ marginBottom: '8px' }}>Fecha de entrega</p>
+          <small style={{ color: '#8B4513', fontStyle: 'italic', marginBottom: '10px', display: 'block' }}>
+            ⚠️ No se pueden seleccionar fechas pasadas
+          </small>
+          <div style={{ 
+            display: 'flex', 
+            gap: '10px', 
+            flexWrap: 'wrap',
+            width: '100%'
+          }}>
+            <div style={{ flex: '1', minWidth: '80px', maxWidth: '120px' }}>
+              <label style={{ marginBottom: '5px', display: 'block', fontSize: '0.9rem' }}>Día:</label>
+              <select
+                name="dia"
+                value={datosCompra.dia}
+                onChange={onInputChange}
+                style={{
+                  ...estilos.inputCarrito,
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  minWidth: '80px'
+                }}
+                className="form-control"
+                required
+              >
+                <option value="">Día</option>
+                {obtenerDiasValidos().map(dia => (
+                  <option key={dia} value={dia}>{dia}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ flex: '1.5', minWidth: '120px', maxWidth: '180px' }}>
+              <label style={{ marginBottom: '5px', display: 'block', fontSize: '0.9rem' }}>Mes:</label>
+              <select
+                name="mes"
+                value={datosCompra.mes}
+                onChange={onInputChange}
+                style={{
+                  ...estilos.inputCarrito,
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  minWidth: '120px'
+                }}
+                className="form-control"
+                required
+              >
+                <option value="">Mes</option>
+                {obtenerMesesValidos().map(mes => (
+                  <option key={mes} value={mes}>{nombresMeses[mes - 1]}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ flex: '1', minWidth: '100px', maxWidth: '140px' }}>
+              <label style={{ marginBottom: '5px', display: 'block', fontSize: '0.9rem' }}>Año:</label>
+              <select
+                name="ano"
+                value={datosCompra.ano}
+                onChange={onInputChange}
+                style={{
+                  ...estilos.inputCarrito,
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  minWidth: '100px'
+                }}
+                className="form-control"
+                required
+              >
+                <option value="">Año</option>
+                {obtenerAnosValidos().map(ano => (
+                  <option key={ano} value={ano}>{ano}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
