@@ -4,7 +4,8 @@ function ProductosCriticos({
   productos, 
   setVistaActiva, 
   abrirModalEditar, 
-  estilos 
+  estilos,
+  onEliminar
 }) {
   const productosCriticos = productos.filter(producto => producto.stock <= 5);
   
@@ -133,13 +134,36 @@ function ProductosCriticos({
                   </div>
                   <div><strong>Stock Crítico:</strong> {producto.stock_critico}</div>
                 </div>
-                <div style={estilos.accionesProducto}>
+                <div style={{
+                  ...estilos.accionesProducto,
+                  gap: '0.5rem',
+                  flexWrap: 'wrap'
+                }}>
                   <button
                     onClick={() => abrirModalEditar(producto)}
                     style={estilos.botonEditar}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
                   >
-                    <i className="fas fa-edit"></i>
+                    <i className="fas fa-edit me-1"></i>
                     Editar 
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onEliminar) {
+                        onEliminar(producto.id);
+                      }
+                    }}
+                    style={{
+                      ...estilos.botonEditar,
+                      backgroundColor: '#dc3545'
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
+                  >
+                    <i className="fas fa-trash me-1"></i>
+                    Eliminar
                   </button>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Usuarios({ usuarios, abrirModalEditarUsuario, estilos }) {
+function Usuarios({ usuarios, abrirModalEditarUsuario, estilos, onEliminar }) {
   return (
     <div className="area-contenido" style={estilos.areaContenido}>
       <div style={estilos.encabezadoSeccion}>
@@ -41,7 +41,11 @@ function Usuarios({ usuarios, abrirModalEditarUsuario, estilos }) {
                   <div><strong>Dirección:</strong> {usuario.direccion}</div>
                 )}
               </div>
-              <div style={estilos.accionesUsuario}>
+              <div style={{
+                ...estilos.accionesUsuario,
+                gap: '0.5rem',
+                flexWrap: 'wrap'
+              }}>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -53,6 +57,23 @@ function Usuarios({ usuarios, abrirModalEditarUsuario, estilos }) {
                 >
                   <i className="fas fa-edit me-1"></i>
                   Editar
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onEliminar) {
+                      onEliminar(usuario.id);
+                    }
+                  }}
+                  style={{
+                    ...estilos.botonEditar,
+                    backgroundColor: '#dc3545'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
+                >
+                  <i className="fas fa-trash me-1"></i>
+                  Eliminar
                 </button>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV }) {
+function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV, onEliminar }) {
   const contenedorProductosResponsive = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
@@ -97,16 +97,38 @@ function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV }
               <div style={{
                 ...estilos.accionesProducto,
                 justifyContent: 'center',
-                marginTop: '1rem'
+                marginTop: '1rem',
+                gap: '0.5rem',
+                flexWrap: 'wrap'
               }}>
                 <button
-                  onClick={() => abrirModalEditar(producto)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    abrirModalEditar(producto);
+                  }}
                   style={estilos.botonEditar}
                   onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
                   onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
                 >
                   <i className="fas fa-edit me-1"></i>
                   Editar
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onEliminar) {
+                      onEliminar(producto.id);
+                    }
+                  }}
+                  style={{
+                    ...estilos.botonEditar,
+                    backgroundColor: '#dc3545'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
+                >
+                  <i className="fas fa-trash me-1"></i>
+                  Eliminar
                 </button>
               </div>
             </div>

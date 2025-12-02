@@ -24,7 +24,6 @@ export const CarritoProvider = ({ children }) => {
       try {
         const productosBDD = await getProductos();
         const productosFormateados = productosBDD.map(p => ({
-          p_id: p.p_id,
           prod_codigo: p.p_codigo,
           nombre: p.p_nombre,
           descripcion: p.p_descripcion || 'Sin descripción',
@@ -256,7 +255,6 @@ export const CarritoProvider = ({ children }) => {
       try {
         const productosBDD = await getProductos();
         const productosFormateados = productosBDD.map(p => ({
-          p_id: p.p_id,
           prod_codigo: p.p_codigo,
           nombre: p.p_nombre,
           descripcion: p.p_descripcion || 'Sin descripción',

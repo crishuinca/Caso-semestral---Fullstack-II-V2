@@ -1,9 +1,7 @@
 ﻿import { useCarrito } from '../../context/CarritoContext';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 function ProductCard({ producto }) {
-  const navigate = useNavigate();
   const { agregarProducto } = useCarrito();
   const [stockActual, setStockActual] = useState(producto.stock);
 
@@ -38,14 +36,8 @@ function ProductCard({ producto }) {
   const sinStock = stockActual === 0;
   const stockCritico = stockActual > 0 && stockActual <= 5;
 
-  const handleCardClick = () => {
-    if (producto.p_id) {
-      navigate(`/producto/${producto.p_id}`);
-    }
-  };
-
   return (
-    <div className="card h-100 shadow" style={{ cursor: 'pointer' }} onClick={handleCardClick}>
+    <div className="card h-100 shadow">
       <div className="position-relative">
         <img 
           src={producto.prod_imagen || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect width="300" height="200" fill="%23D2691E"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23FFF"%3EProducto%3C/text%3E%3C/svg%3E'} 
@@ -112,10 +104,7 @@ function ProductCard({ producto }) {
               </div>
             )}
             <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                handleAddToCart();
-              }}
+              onClick={handleAddToCart}
               className={`btn text-white ${sinStock ? 'btn-secondary' : ''}`}
               style={{ backgroundColor: sinStock ? '#6c757d' : '#D2691E' }}
               disabled={sinStock}

@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCarrito } from '../context/CarritoContext';
-import { getProductos, getUsuarios, updateProducto, registerUser, updateUsuario } from '../utils/apiHelper';
+import { getProductos, getUsuarios, updateProducto, registerUser, updateUsuario, createProducto, deleteProducto, deleteUsuario } from '../utils/apiHelper';
 import { regionesComunas } from '../components/admin/data/regionesComunas';
 import { estilos } from '../components/admin/styles/adminStyles';
 import Sidebar from '../components/admin/components/Sidebar';
@@ -11,6 +11,7 @@ import Usuarios from '../components/admin/components/Usuarios';
 import NuevoUsuario from '../components/admin/components/NuevoUsuario';
 import ModalEditarProducto from '../components/admin/components/ModalEditarProducto';
 import ModalEditarUsuario from '../components/admin/components/ModalEditarUsuario';
+import ModalCrearProducto from '../components/admin/components/ModalCrearProducto';
 import ProductosCriticos from '../components/admin/components/ProductosCriticos';
 import Reportes from '../components/admin/components/Reportes';
 import Perfil from './Perfil';
@@ -78,6 +79,19 @@ function AdminPanel() {
     comuna: '',
     direccion: ''
   });
+  const [modalCrearProducto, setModalCrearProducto] = useState(false);
+  const [nuevoProducto, setNuevoProducto] = useState({
+    codigo: '',
+    nombre: '',
+    descripcion: '',
+    precio: '',
+    stock: '',
+    stockCritico: '',
+    categoria: '',
+    imagen: '',
+    tieneDescuento: false,
+    precioConDescuento: ''
+  });
 
   useEffect(() => {
     const usuarioActual = JSON.parse(localStorage.getItem('usuarioActual') || '{}');
@@ -130,6 +144,17 @@ function AdminPanel() {
     cargarProductos();
     cargarUsuarios();
   }, [navigate]);
+
+
+  // Abrir modal de crear producto cuando se entra a la vista nuevoProducto
+  useEffect(() => {
+    if (vistaActiva === 'nuevoProducto' && !modalCrearProducto) {
+      const timer = setTimeout(() => {
+        abrirModalCrearProducto();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [vistaActiva]);
 
   const alternarMenu = () => {
     setMenuColapsado(!menuColapsado);
@@ -509,6 +534,216 @@ function AdminPanel() {
     }
   };
 
+  // Funciones para crear producto
+  const abrirModalCrearProducto = () => {
+    setNuevoProducto({
+      codigo: '',
+      nombre: '',
+      descripcion: '',
+      precio: '',
+      stock: '',
+      stockCritico: '3',
+      categoria: '',
+      imagen: '',
+      tieneDescuento: false,
+      precioConDescuento: ''
+    });
+    setModalCrearProducto(true);
+  };
+
+  const cerrarModalCrearProducto = () => {
+    setModalCrearProducto(false);
+    setNuevoProducto({
+      codigo: '',
+      nombre: '',
+      descripcion: '',
+      precio: '',
+      stock: '',
+      stockCritico: '3',
+      categoria: '',
+      imagen: '',
+      tieneDescuento: false,
+      precioConDescuento: ''
+    });
+  };
+
+  const handleInputChangeNuevoProducto = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNuevoProducto(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmitCrearProducto = async (e) => {
+    e.preventDefault();
+
+    if (!nuevoProducto.codigo || !nuevoProducto.nombre || !nuevoProducto.precio || 
+        !nuevoProducto.stock || !nuevoProducto.stockCritico || !nuevoProducto.categoria) {
+      alert('Por favor complete todos los campos obligatorios (código, nombre, precio, stock, stock crítico, categoría)');
+      return;
+    }
+
+    if (isNaN(nuevoProducto.precio) || nuevoProducto.precio <= 0) {
+      alert('El precio debe ser un número válido mayor a 0');
+      return;
+    }
+
+    if (isNaN(nuevoProducto.stock) || nuevoProducto.stock < 0) {
+      alert('El stock debe ser un número válido mayor o igual a 0');
+      return;
+    }
+
+    if (isNaN(nuevoProducto.stockCritico) || nuevoProducto.stockCritico < 0) {
+      alert('El stock crítico debe ser un número válido mayor o igual a 0');
+      return;
+    }
+
+    // Validar precio con descuento si tiene descuento activado
+    let precioEspecial = null;
+    if (nuevoProducto.tieneDescuento) {
+      if (!nuevoProducto.precioConDescuento) {
+        alert('Por favor ingrese el precio con descuento');
+        return;
+      }
+      const precioDesc = parseInt(nuevoProducto.precioConDescuento);
+      if (isNaN(precioDesc) || precioDesc <= 0) {
+        alert('El precio con descuento debe ser un número válido mayor a 0');
+        return;
+      }
+      if (precioDesc >= parseInt(nuevoProducto.precio)) {
+        alert('El precio con descuento debe ser menor al precio normal');
+        return;
+      }
+      precioEspecial = precioDesc;
+    }
+
+    // Preparar objeto para el backend
+    const productoParaBackend = {
+      p_codigo: nuevoProducto.codigo,
+      p_nombre: nuevoProducto.nombre,
+      p_descripcion: nuevoProducto.descripcion || '',
+      p_precio: parseInt(nuevoProducto.precio),
+      p_stock: parseInt(nuevoProducto.stock),
+      p_categoria: nuevoProducto.categoria,
+      p_imagen: nuevoProducto.imagen || '/img/default.png',
+      p_stock_critico: parseInt(nuevoProducto.stockCritico),
+      p_precio_oferta: precioEspecial
+    };
+
+    const response = await createProducto(productoParaBackend);
+
+    if (response.success) {
+      // Recargar productos desde el backend
+      const productosDB = await getProductos();
+      if (productosDB && productosDB.length > 0) {
+        const productosConStock = productosDB.map(producto => ({
+          id: producto.p_id,
+          codigo: producto.p_codigo,
+          nombre: producto.p_nombre,
+          precio: producto.p_precio,
+          descripcion: producto.p_descripcion,
+          categoria: producto.p_categoria,
+          stock: producto.p_stock,
+          imagen: producto.p_imagen,
+          stock_critico: producto.p_stock_critico,
+          precioEspecial: producto.p_precio_oferta || null
+        }));
+        setProductos(productosConStock);
+      }
+
+      alert('Producto creado exitosamente');
+      cerrarModalCrearProducto();
+      setVistaActiva('productos');
+      
+      // Disparar evento para actualizar productos en otras páginas
+      window.dispatchEvent(new Event('productosActualizados'));
+    } else {
+      alert(response.message || 'Error al crear producto');
+    }
+  };
+
+  // Funciones para eliminar producto
+  const handleEliminarProducto = async (id) => {
+    if (!window.confirm('¿Está seguro de que desea eliminar este producto? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    const response = await deleteProducto(id);
+
+    if (response.success) {
+      // Recargar productos desde el backend
+      const productosDB = await getProductos();
+      if (productosDB && productosDB.length > 0) {
+        const productosConStock = productosDB.map(producto => ({
+          id: producto.p_id,
+          codigo: producto.p_codigo,
+          nombre: producto.p_nombre,
+          precio: producto.p_precio,
+          descripcion: producto.p_descripcion,
+          categoria: producto.p_categoria,
+          stock: producto.p_stock,
+          imagen: producto.p_imagen,
+          stock_critico: producto.p_stock_critico,
+          precioEspecial: producto.p_precio_oferta || null
+        }));
+        setProductos(productosConStock);
+      }
+
+      alert('Producto eliminado exitosamente');
+      
+      // Disparar evento para actualizar productos en otras páginas
+      window.dispatchEvent(new Event('productosActualizados'));
+    } else {
+      alert(response.message || 'Error al eliminar producto');
+    }
+  };
+
+  // Funciones para eliminar usuario
+  const handleEliminarUsuario = async (id) => {
+    if (!window.confirm('¿Está seguro de que desea eliminar este usuario? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    const response = await deleteUsuario(id);
+
+    if (response.success) {
+      // Recargar usuarios desde el backend
+      const usuariosDB = await getUsuarios();
+      if (usuariosDB && usuariosDB.length > 0) {
+        const usuariosFormateados = usuariosDB.map(usuario => ({
+          id: usuario.u_id,
+          run: usuario.u_run || '',
+          nombre: usuario.u_nombre,
+          apellidos: usuario.u_apellido,
+          correo: usuario.u_correo,
+          fecha_nacimiento: usuario.u_f_nacimiento || '',
+          region: usuario.u_region,
+          comuna: usuario.u_comuna,
+          direccion: usuario.u_direccion,
+          isAdmin: usuario.u_rol === 'ADMIN',
+          fechaRegistro: usuario.u_f_registro
+        }));
+        setUsuarios(usuariosFormateados);
+      }
+
+      alert('Usuario eliminado exitosamente');
+    } else {
+      alert(response.message || 'Error al eliminar usuario');
+    }
+  };
+
+  // Exponer funciones de eliminar globalmente para que los componentes puedan usarlas
+  useEffect(() => {
+    window.onEliminarProducto = handleEliminarProducto;
+    window.onEliminarUsuario = handleEliminarUsuario;
+    
+    return () => {
+      delete window.onEliminarProducto;
+      delete window.onEliminarUsuario;
+    };
+  }, [productos, usuarios]);
+
   const descargarReporteCSV = (tipoReporte) => {
     let datos = [];
     let nombreArchivo = '';
@@ -607,6 +842,7 @@ function AdminPanel() {
           abrirModalEditar={abrirModalEditar} 
           estilos={estilos}
           descargarReporteCSV={() => descargarReporteCSV('productos')}
+          onEliminar={handleEliminarProducto}
         />;
       case 'productosCriticos':
         return <ProductosCriticos 
@@ -614,6 +850,7 @@ function AdminPanel() {
           setVistaActiva={setVistaActiva}
           abrirModalEditar={abrirModalEditar}
           estilos={estilos}
+          onEliminar={handleEliminarProducto}
         />;
       case 'reportes':
         return <Reportes 
@@ -624,7 +861,12 @@ function AdminPanel() {
           estilos={estilos}
         />;
       case 'usuarios':
-        return <Usuarios usuarios={usuarios} abrirModalEditarUsuario={abrirModalEditarUsuario} estilos={estilos} />;
+        return <Usuarios 
+          usuarios={usuarios} 
+          abrirModalEditarUsuario={abrirModalEditarUsuario} 
+          estilos={estilos}
+          onEliminar={handleEliminarUsuario}
+        />;
       case 'nuevoUsuario':
         return (
           <NuevoUsuario 
@@ -636,6 +878,32 @@ function AdminPanel() {
             regionesComunas={regionesComunas}
             estilos={estilos}
           />
+        );
+      case 'nuevoProducto':
+        return (
+          <div style={estilos.areaContenido}>
+            <div style={estilos.encabezadoSeccion}>
+              <h2>Crear Nuevo Producto</h2>
+            </div>
+            <div style={{ padding: '2rem', textAlign: 'center' }}>
+              <p style={{ color: '#5D4037', marginBottom: '1rem' }}>
+                Haz clic en el botón para crear un nuevo producto
+              </p>
+              <button
+                onClick={abrirModalCrearProducto}
+                style={{
+                  ...estilos.botonEditar,
+                  padding: '1rem 2rem',
+                  fontSize: '1.1rem'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
+              >
+                <i className="fas fa-plus-circle me-2"></i>
+                Crear Nuevo Producto
+              </button>
+            </div>
+          </div>
         );
       case 'perfil':
         return (
@@ -700,6 +968,7 @@ function AdminPanel() {
                  vistaActiva === 'reportes' ? 'Reportes' :
                  vistaActiva === 'usuarios' ? 'Usuarios' : 
                  vistaActiva === 'nuevoUsuario' ? 'Nuevo Usuario' :
+                 vistaActiva === 'nuevoProducto' ? 'Nuevo Producto' :
                  vistaActiva === 'perfil' ? 'Mi Perfil' : 'Tablero'}
               </h1>
             </div>
@@ -735,6 +1004,15 @@ function AdminPanel() {
         handleInputChangeUsuario={handleInputChangeUsuario}
         handleSubmitEditarUsuario={handleSubmitEditarUsuario}
         cerrarModalEditarUsuario={cerrarModalEditarUsuario}
+        estilos={estilos}
+      />
+
+      <ModalCrearProducto
+        modalCrearProducto={modalCrearProducto}
+        nuevoProducto={nuevoProducto}
+        handleInputChangeProducto={handleInputChangeNuevoProducto}
+        handleSubmitCrearProducto={handleSubmitCrearProducto}
+        cerrarModalCrear={cerrarModalCrearProducto}
         estilos={estilos}
       />
     </div>

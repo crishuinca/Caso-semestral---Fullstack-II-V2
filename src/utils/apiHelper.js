@@ -1,4 +1,5 @@
-const API = 'http://localhost:8094/api/v1'
+// Usa la variable de entorno si está disponible, sino usa el valor por defecto
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8094/api/v1'
 
 export const getProductos = async () => {
     try {
@@ -8,19 +9,6 @@ export const getProductos = async () => {
         return data
     } catch (ex) {
         console.error("Error:",ex)
-    }
-}
-
-// Obtener producto por ID
-export const getProductoById = async (id) => {
-    try {
-        const resp = await fetch(`${API}/productoByID/${id}`)
-        if(!resp.ok) throw new Error("ERROR no se pudo cargar el producto")
-        const data = await resp.json()
-        return data
-    } catch (ex) {
-        console.error("Error al obtener producto por ID:", ex)
-        return null
     }
 }
 /*
@@ -88,6 +76,25 @@ export const getUsuarios = async () => {
     }
 }
 
+// Crear producto
+export const createProducto = async (producto) => {
+    try {
+        const resp = await fetch(`${API}/addProducto`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(producto)
+        })
+        if(!resp.ok) throw new Error("ERROR al crear producto")
+        const data = await resp.json()
+        return { success: true, data }
+    } catch (ex) {
+        console.error("Error al crear producto:", ex)
+        return { success: false, message: "Error al crear producto" }
+    }
+}
+
 // Actualizar producto
 export const updateProducto = async (producto) => {
     try {
@@ -104,6 +111,21 @@ export const updateProducto = async (producto) => {
     } catch (ex) {
         console.error("Error al actualizar producto:", ex)
         return { success: false, message: "Error al actualizar producto" }
+    }
+}
+
+// Eliminar producto
+export const deleteProducto = async (id) => {
+    try {
+        const resp = await fetch(`${API}/eliminarProducto/${id}`, {
+            method: "DELETE"
+        })
+        if(!resp.ok) throw new Error("ERROR al eliminar producto")
+        const data = await resp.text()
+        return { success: true, message: data }
+    } catch (ex) {
+        console.error("Error al eliminar producto:", ex)
+        return { success: false, message: "Error al eliminar producto" }
     }
 }
 

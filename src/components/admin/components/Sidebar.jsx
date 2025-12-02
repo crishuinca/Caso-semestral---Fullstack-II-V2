@@ -78,6 +78,24 @@ function Sidebar({ menuColapsado, vistaActiva, setVistaActiva, estilos }) {
           </li>
           <li style={estilos.elementoNavegacion}>
             <a
+              onClick={() => setVistaActiva('nuevoProducto')}
+              style={{
+                ...estilos.enlaceNavegacion,
+                ...(vistaActiva === 'nuevoProducto' ? estilos.enlaceNavegacionActivo : {})
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+              onMouseLeave={(e) => {
+                if (vistaActiva !== 'nuevoProducto') {
+                  e.target.style.backgroundColor = 'transparent';
+                }
+              }}
+            >
+              <i className="fas fa-plus-circle" style={{...estilos.iconoNavegacion, marginRight: menuColapsado ? 0 : '1rem'}}></i>
+              {!menuColapsado && <span>Nuevo Producto</span>}
+            </a>
+          </li>
+          <li style={estilos.elementoNavegacion}>
+            <a
               onClick={() => setVistaActiva('reportes')}
               style={{
                 ...estilos.enlaceNavegacion,

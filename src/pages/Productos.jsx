@@ -1,5 +1,4 @@
 ﻿import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/productCard/ProductCard';
 import { useCarrito } from '../context/CarritoContext';
 import { useFiltro } from '../context/FiltroContext';
@@ -8,7 +7,6 @@ import Footer from '../components/footer/Footer';
 import { getProductos } from '../utils/apiHelper';
 
 function Productos() {
-  const navigate = useNavigate();
   const { productosStock, agregarProducto, cargandoProductos } = useCarrito();
   const { categoriaSeleccionada, setCategoriaSeleccionada, terminoBusqueda, setTerminoBusqueda } = useFiltro();
   const [productos, setProductos] = useState([]);
@@ -19,7 +17,6 @@ function Productos() {
   useEffect(() => {
     if (!cargandoProductos && productosStock.length > 0) {
       const productosFormateados = productosStock.map(producto => ({
-        p_id: producto.p_id,
         prod_codigo: producto.prod_codigo,
         prod_nombre: producto.nombre,
         prod_desc: producto.descripcion || 'Sin descripción',
@@ -44,7 +41,6 @@ function Productos() {
         const productosAdmin = await getProductos()
         if (productosAdmin) {
           const productosActualizados = productosAdmin.map(producto => ({
-            p_id: producto.p_id,
             prod_codigo: producto.p_codigo,
             prod_nombre: producto.p_nombre,
             prod_desc: producto.p_descripcion || 'Sin descripción',
@@ -180,11 +176,7 @@ function Productos() {
             <div className="row g-4 mb-5">
               {ofertas.map(producto => (
                 <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
-                  <div 
-                    className="oferta-card" 
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => producto.p_id && navigate(`/producto/${producto.p_id}`)}
-                  >
+                  <div className="oferta-card">
                     <div className="oferta-badge">
                       -{producto.descuento}%
                     </div>
@@ -214,10 +206,7 @@ function Productos() {
                       </div>
                       <button 
                         className="oferta-button w-100"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddOfertaToCart(producto);
-                        }}
+                        onClick={() => handleAddOfertaToCart(producto)}
                       >
                         Agregar al Carrito 🛒
                       </button>
