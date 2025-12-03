@@ -23,6 +23,7 @@ import DetalleBoleta from './pages/DetalleBoleta'
 import ComprasHistorial from './pages/ComprasHistorial'
 import ComprasDetalle from './pages/ComprasDetalle'
 import ReportesProductos from './pages/ReportesProductos';
+import { useCarrito } from './context/CarritoContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css';
