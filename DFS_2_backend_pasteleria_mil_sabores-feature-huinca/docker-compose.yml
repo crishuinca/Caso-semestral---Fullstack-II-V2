@@ -1,0 +1,28 @@
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim
+    platform: linux/amd64
+    container_name: oracle-xe
+    environment:
+      - ORACLE_PASSWORD=MiClaveBD123
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./init-db.sql:/container-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "sqlplus -s sys/MiClaveBD123@localhost:1521/XE as sysdba <<< 'SELECT 1 FROM DUAL;' | grep -q 1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    networks:
+      - pasteleria-network
+
+volumes:
+  oracle-data:
+
+networks:
+  pasteleria-network:
+    driver: bridge

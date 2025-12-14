@@ -1,0 +1,140 @@
+/* Login.css */
+
+.login-container {
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Lato', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('/img/fonLogImg5.jpg') no-repeat right bottom fixed;
+  background-size: cover;
+  background-color: #fff8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px 20px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.login-container > main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.10);
+  padding: 3rem 2.2rem 2rem 2.2rem;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  border: 2px solid #FFC0CB;
+  margin: 0 auto;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-title {
+  color: #8B4513;
+  font-family: 'Pacifico', cursive;
+  font-size: 2.2rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.login-subtitle {
+  color: #5D4037;
+  margin-bottom: 2rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.form-label {
+  color: #8B4513;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  flex: 1;
+}
+
+.form-input {
+  border: 1.5px solid #FFC0CB;
+  border-radius: 8px;
+  padding: 0.6rem 0rem;
+  text-indent: 12px;
+  font-size: 1rem;
+  width: 100%;
+  font-family: 'Lato', sans-serif;
+  color: #5D4037;
+  background: #FFF5E1;
+  outline: none;
+  transition: border 0.2s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #8B4513;
+}
+
+.login-button {
+  background: #FFC0CB;
+  color: #fff;
+  border: none;
+  padding: 0.9rem 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.08);
+  transition: background 0.2s, transform 0.2s;
+  font-family: 'Lato', sans-serif;
+}
+
+.login-button:hover {
+  background: #8B4513;
+  transform: translateY(-2px) scale(1.03);
+}
+
+.register-link {
+  margin-top: 1.2rem;
+  font-size: 0.97rem;
+}
+
+.register-link a {
+  color: #8B4513;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-family: 'Lato', sans-serif;
+}
+
+.register-link a:hover {
+  color: #FFC0CB;
+}
+
+.error-message {
+  margin-top: 1.2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #8B4513;
+}

@@ -1,0 +1,90 @@
+import React from 'react';
+
+function Usuarios({ usuarios, abrirModalEditarUsuario, estilos, onEliminar }) {
+  return (
+    <div className="area-contenido" style={estilos.areaContenido}>
+      <div style={estilos.encabezadoSeccion}>
+        <h2>Lista de Usuarios</h2>
+      </div>
+      <div style={estilos.contenedorUsuarios}>
+        {usuarios.map(usuario => (
+          <div 
+            key={usuario.id} 
+            style={{
+              ...estilos.tarjetaUsuario,
+              cursor: 'pointer'
+            }}
+            onClick={() => abrirModalEditarUsuario(usuario)}
+          >
+            <div style={estilos.avatarUsuarioTarjeta}>
+              <i className="fas fa-user-circle" style={estilos.iconoUsuario}></i>
+            </div>
+            <div style={estilos.informacionUsuarioTarjeta}>
+              <div style={estilos.nombreUsuario}>{usuario.nombre} {usuario.apellidos}</div>
+              <div style={estilos.correoUsuario}>{usuario.correo}</div>
+              <div style={estilos.detallesUsuario}>
+                <div><strong>Región:</strong> {usuario.region}</div>
+                <div><strong>Comuna:</strong> {usuario.comuna}</div>
+                {usuario.run && (
+                  <div><strong>RUT:</strong> {usuario.run}</div>
+                )}
+                <div style={estilos.tipoUsuarioInfo}>
+                  <strong>Tipo:</strong> 
+                  <span style={{
+                    ...estilos.badgeUsuario,
+                    backgroundColor: usuario.isAdmin ? '#8B4513' : usuario.isVendedor || usuario.rol === 'VENDEDOR' ? '#28a745' : '#6c757d'
+                  }}>
+                    {usuario.isAdmin ? 'Admin' : usuario.isVendedor || usuario.rol === 'VENDEDOR' ? 'Vendedor' : 'Usuario'}
+                  </span>
+                </div>
+                {usuario.direccion && (
+                  <div><strong>Dirección:</strong> {usuario.direccion}</div>
+                )}
+              </div>
+              <div style={{
+                ...estilos.accionesUsuario,
+                gap: '0.5rem',
+                flexWrap: 'wrap'
+              }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    abrirModalEditarUsuario(usuario);
+                  }}
+                  style={estilos.botonEditar}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
+                >
+                  <i className="fas fa-edit me-1"></i>
+                  Editar
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onEliminar) {
+                      onEliminar(usuario.id);
+                    }
+                  }}
+                  style={{
+                    ...estilos.botonEditar,
+                    backgroundColor: '#dc3545'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
+                >
+                  <i className="fas fa-trash me-1"></i>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default Usuarios;
+
+
+
