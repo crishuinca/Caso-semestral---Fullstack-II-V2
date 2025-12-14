@@ -6,19 +6,51 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+backend.log
+frontend.log
 
+# Dependencies
 node_modules
+node_modules/
+package-lock.json
+
+# Build outputs
 dist
 dist-ssr
+dist/
+build/
+target/
 *.local
 
-# Editor directories and files
+# IDE
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# Docker
+docker-compose.override.yml
+
+# Temporary files
+*.tmp
+*.temp
+*.pid

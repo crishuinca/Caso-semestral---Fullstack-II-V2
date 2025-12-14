@@ -1,0 +1,58 @@
+/* =============================================
+   PALETA DE COLORES - MIL SABORES
+   Archivo de referencia para la paleta de colores
+============================================= */
+
+/* COLORES PRINCIPALES */
+:root {
+  /* Marrones - Colores base de la pastelería */
+  --primary-brown: #8B4513;        /* Marrón principal - navbar, títulos principales */
+  --secondary-brown: #5D4037;      /* Marrón más oscuro - texto, subtítulos */
+  --hover-brown: #A0522D;          /* Marrón para hover/interacciones */
+  
+  /* Cremas - Fondos y espacios neutros */
+  --cream-bg: #FFF5E1;             /* Crema principal - fondo de páginas */
+  --card-cream: #fff5e1;           /* Crema para cards y contenedores */
+  --light-cream: #fff7f1;          /* Crema muy claro - textos sobre fondos oscuros */
+  
+  /* Rosa pastel - Acentos y elementos destacados */
+  --accent-pink: #FFC0CB;          /* Rosa pastel - botones secundarios, destacados */
+  
+  /* Colores de borde y efectos */
+  --border-orange: #ff2600a9;      /* Naranja transparente - bordes de cards */
+  --overlay-cream: rgba(255, 245, 225, 0.6); /* Overlay crema */
+  --shadow-color: rgba(0, 0, 0, 0.1);         /* Sombras suaves */
+  
+  /* Colores de estado y utilidad */
+  --success-green: #28a745;        /* Verde para éxito */
+  --danger-red: #dc3545;           /* Rojo para errores */
+  --white: #ffffff;                /* Blanco puro */
+}
+
+/* GUÍA DE USO:
+   
+   Navegación:
+   - Fondo: var(--primary-brown)
+   - Texto: var(--light-cream)
+   - Hover: var(--accent-pink)
+   
+   Páginas:
+   - Fondo principal: var(--cream-bg)
+   - Cards: var(--card-cream)
+   - Bordes: var(--border-orange)
+   
+   Tipografía:
+   - Títulos principales: var(--primary-brown)
+   - Texto general: var(--secondary-brown)
+   - Títulos de cards: var(--secondary-brown)
+   
+   Botones:
+   - Primarios: var(--primary-brown)
+   - Secundarios: var(--accent-pink)
+   - Hover: var(--hover-brown)
+   
+   Estados:
+   - Éxito: var(--success-green)
+   - Error: var(--danger-red)
+   - Sombras: var(--shadow-color)
+*/
