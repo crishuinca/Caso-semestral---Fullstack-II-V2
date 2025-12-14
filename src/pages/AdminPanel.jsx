@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCarrito } from '../context/CarritoContext';
 import { getProductos, getUsuarios, updateProducto, registerUser, updateUsuario, createProducto, deleteProducto, deleteUsuario } from '../utils/apiHelper';
@@ -68,7 +68,8 @@ function AdminPanel() {
     fecha_nacimiento: '',
     region: '',
     comuna: '',
-    direccion: ''
+    direccion: '',
+    rol: ''
   });
   const [modalCrearProducto, setModalCrearProducto] = useState(false);
   const [nuevoProducto, setNuevoProducto] = useState({
@@ -126,6 +127,8 @@ function AdminPanel() {
           comuna: usuario.u_comuna,
           direccion: usuario.u_direccion,
           isAdmin: usuario.u_rol === 'ADMIN',
+          isVendedor: usuario.u_rol === 'VENDEDOR',
+          rol: usuario.u_rol,
           fechaRegistro: usuario.u_f_registro
         }));
         setUsuarios(usuariosFormateados);
@@ -214,7 +217,7 @@ function AdminPanel() {
       u_direccion: nuevoUsuario.direccion,
       u_f_nacimiento: fechaNacimientoFormateada,
       u_f_registro: new Date().toISOString(),
-      u_rol: nuevoUsuario.rol === 'admin' ? 'ADMIN' : 'USER',
+      u_rol: nuevoUsuario.rol === 'admin' ? 'ADMIN' : nuevoUsuario.rol === 'vendedor' ? 'VENDEDOR' : 'USER',
       u_comuna: nuevoUsuario.comuna,
       u_region: nuevoUsuario.region,
       u_descuento_10: false,
@@ -241,6 +244,8 @@ function AdminPanel() {
           comuna: usuario.u_comuna,
           direccion: usuario.u_direccion,
           isAdmin: usuario.u_rol === 'ADMIN',
+          isVendedor: usuario.u_rol === 'VENDEDOR',
+          rol: usuario.u_rol,
           fechaRegistro: usuario.u_f_registro
         }));
         setUsuarios(usuariosFormateados);
@@ -392,6 +397,14 @@ function AdminPanel() {
 
   const abrirModalEditarUsuario = (usuario) => {
     setUsuarioEditando(usuario);
+    // Determinar el rol basado en isAdmin y si es vendedor
+    let rolUsuario = 'cliente';
+    if (usuario.isAdmin) {
+      rolUsuario = 'admin';
+    } else if (usuario.rol === 'VENDEDOR' || usuario.isVendedor) {
+      rolUsuario = 'vendedor';
+    }
+    
     setUsuarioEditado({
       nombre: usuario.nombre,
       apellidos: usuario.apellidos,
@@ -400,7 +413,8 @@ function AdminPanel() {
       fecha_nacimiento: usuario.fecha_nacimiento,
       region: usuario.region,
       comuna: usuario.comuna,
-      direccion: usuario.direccion
+      direccion: usuario.direccion,
+      rol: rolUsuario
     });
 
     if (usuario.region && regionesComunas[usuario.region]) {
@@ -420,7 +434,8 @@ function AdminPanel() {
       fecha_nacimiento: '',
       region: '',
       comuna: '',
-      direccion: ''
+      direccion: '',
+      rol: ''
     });
     setComunas([]);
   };
@@ -488,7 +503,7 @@ function AdminPanel() {
       u_direccion: usuarioEditado.direccion,
       u_f_nacimiento: usuarioEditado.fecha_nacimiento,
       u_f_registro: usuarioOriginal.fechaRegistro,
-      u_rol: usuarioOriginal.isAdmin ? 'ADMIN' : 'USER',
+      u_rol: usuarioEditado.rol === 'admin' ? 'ADMIN' : usuarioEditado.rol === 'vendedor' ? 'VENDEDOR' : 'USER',
       u_comuna: usuarioEditado.comuna,
       u_region: usuarioEditado.region,
       u_descuento_10: false,
@@ -511,7 +526,10 @@ function AdminPanel() {
               fecha_nacimiento: usuarioEditado.fecha_nacimiento,
               region: usuarioEditado.region,
               comuna: usuarioEditado.comuna,
-              direccion: usuarioEditado.direccion
+              direccion: usuarioEditado.direccion,
+              isAdmin: usuarioEditado.rol === 'admin',
+              isVendedor: usuarioEditado.rol === 'vendedor',
+              rol: usuarioEditado.rol === 'admin' ? 'ADMIN' : usuarioEditado.rol === 'vendedor' ? 'VENDEDOR' : 'USER'
             }
           : usuario
       );
@@ -713,6 +731,8 @@ function AdminPanel() {
           comuna: usuario.u_comuna,
           direccion: usuario.u_direccion,
           isAdmin: usuario.u_rol === 'ADMIN',
+          isVendedor: usuario.u_rol === 'VENDEDOR',
+          rol: usuario.u_rol,
           fechaRegistro: usuario.u_f_registro
         }));
         setUsuarios(usuariosFormateados);

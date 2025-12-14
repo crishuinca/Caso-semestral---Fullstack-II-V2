@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV, onEliminar }) {
+function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV, onEliminar, soloLectura = false }) {
   const contenedorProductosResponsive = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
@@ -18,14 +18,14 @@ function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV, 
         {productos.map(producto => (
           <div 
             key={producto.codigo} 
+            onClick={() => !soloLectura && abrirModalEditar(producto)}
             style={{
               ...estilos.tarjetaProducto,
               maxWidth: '100%',
               padding: '1rem',
               flexDirection: 'column',
-              cursor: 'pointer'
+              cursor: soloLectura ? 'default' : 'pointer'
             }}
-            onClick={() => abrirModalEditar(producto)}
           >
             <div style={{
               ...estilos.avatarProductoTarjeta,
@@ -94,87 +94,91 @@ function Productos({ productos, abrirModalEditar, estilos, descargarReporteCSV, 
                   }}
                 />
               </div>
-              <div style={{
-                ...estilos.accionesProducto,
-                justifyContent: 'center',
-                marginTop: '1rem',
-                gap: '0.5rem',
-                flexWrap: 'wrap'
-              }}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    abrirModalEditar(producto);
-                  }}
-                  style={estilos.botonEditar}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
-                >
-                  <i className="fas fa-edit me-1"></i>
-                  Editar
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (onEliminar) {
-                      onEliminar(producto.id);
-                    }
-                  }}
-                  style={{
-                    ...estilos.botonEditar,
-                    backgroundColor: '#dc3545'
-                  }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
-                >
-                  <i className="fas fa-trash me-1"></i>
-                  Eliminar
-                </button>
-              </div>
+              {!soloLectura && (
+                <div style={{
+                  ...estilos.accionesProducto,
+                  justifyContent: 'center',
+                  marginTop: '1rem',
+                  gap: '0.5rem',
+                  flexWrap: 'wrap'
+                }}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      abrirModalEditar(producto);
+                    }}
+                    style={estilos.botonEditar}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#A0522D'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#8B4513'}
+                  >
+                    <i className="fas fa-edit me-1"></i>
+                    Editar
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onEliminar) {
+                        onEliminar(producto.id);
+                      }
+                    }}
+                    style={{
+                      ...estilos.botonEditar,
+                      backgroundColor: '#dc3545'
+                    }}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
+                  >
+                    <i className="fas fa-trash me-1"></i>
+                    Eliminar
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
       
       {/* Botón de descarga de reporte */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        padding: '2rem 1rem',
-        marginTop: '1rem'
-      }}>
-        <button 
-          style={{
-            background: 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '0.75rem 1.5rem',
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            boxShadow: '0 2px 8px rgba(139, 69, 19, 0.2)',
-            transition: 'all 0.3s ease'
-          }}
-          onClick={() => descargarReporteCSV && descargarReporteCSV()}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'linear-gradient(135deg, #A0522D 0%, #8B4513 100%)';
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 4px 12px rgba(139, 69, 19, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)';
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 2px 8px rgba(139, 69, 19, 0.2)';
-          }}
-        >
-          <i className="fas fa-download"></i>
-          Descargar reporte en CSV
-        </button>
-      </div>
+      {!soloLectura && (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '2rem 1rem',
+          marginTop: '1rem'
+        }}>
+          <button 
+            style={{
+              background: 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.75rem 1.5rem',
+              fontSize: '0.9rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              boxShadow: '0 2px 8px rgba(139, 69, 19, 0.2)',
+              transition: 'all 0.3s ease'
+            }}
+            onClick={() => descargarReporteCSV && descargarReporteCSV()}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'linear-gradient(135deg, #A0522D 0%, #8B4513 100%)';
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 4px 12px rgba(139, 69, 19, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)';
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 2px 8px rgba(139, 69, 19, 0.2)';
+            }}
+          >
+            <i className="fas fa-download"></i>
+            Descargar reporte en CSV
+          </button>
+        </div>
+      )}
     </div>
   );
 }

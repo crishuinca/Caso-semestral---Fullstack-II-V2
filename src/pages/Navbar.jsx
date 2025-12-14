@@ -1,4 +1,4 @@
-﻿import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCarrito } from '../context/CarritoContext';
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -276,7 +276,85 @@ function Navbar() {
               </li>
               {usuarioActual ? (
                 <>
-                  {!usuarioActual.isAdmin && (
+                  {usuarioActual.isAdmin && (
+                    <li className="nav-item dropdown" role="none">
+                      <button
+                        className="nav-link px-4 py-2 rounded dropdown-toggle btn btn-link"
+                        style={{ color: '#8B4513', textDecoration: 'none', border: 'none' }}
+                        onClick={() => setShowProfile(!showProfile)}
+                        aria-expanded={showProfile}
+                        aria-label="Mi perfil"
+                      >
+                        Mi Perfil
+                      </button>
+                      {showProfile && (
+                        <div className="dropdown-menu show" style={{ backgroundColor: '#FFF5E1', border: '1px solid #D2691E' }}>
+                          <button
+                            className="dropdown-item"
+                            style={{ color: '#8B4513' }}
+                            onClick={() => {
+                              setShowProfile(false);
+                              cerrarNavbar();
+                              navigate('/admin');
+                            }}
+                          >
+                            Panel de Admin
+                          </button>
+                          <button
+                            className="dropdown-item"
+                            style={{ color: '#8B4513' }}
+                            onClick={() => {
+                              setShowProfile(false);
+                              cerrarNavbar();
+                              cerrarSesion();
+                            }}
+                          >
+                            Cerrar Sesión
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  )}
+                  {usuarioActual.isVendedor && !usuarioActual.isAdmin && (
+                    <li className="nav-item dropdown" role="none">
+                      <button
+                        className="nav-link px-4 py-2 rounded dropdown-toggle btn btn-link"
+                        style={{ color: '#8B4513', textDecoration: 'none', border: 'none' }}
+                        onClick={() => setShowProfile(!showProfile)}
+                        aria-expanded={showProfile}
+                        aria-label="Mi perfil"
+                      >
+                        Mi Perfil
+                      </button>
+                      {showProfile && (
+                        <div className="dropdown-menu show" style={{ backgroundColor: '#FFF5E1', border: '1px solid #D2691E' }}>
+                          <button
+                            className="dropdown-item"
+                            style={{ color: '#8B4513' }}
+                            onClick={() => {
+                              setShowProfile(false);
+                              cerrarNavbar();
+                              navigate('/vendedor');
+                            }}
+                          >
+                            Panel Vendedor
+                          </button>
+                          <button
+                            className="dropdown-item"
+                            style={{ color: '#8B4513' }}
+                            onClick={() => {
+                              setShowProfile(false);
+                              cerrarNavbar();
+                              cerrarSesion();
+                            }}
+                          >
+                            Cerrar Sesión
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  )}
+                  {!usuarioActual.isAdmin && !usuarioActual.isVendedor && (
                     <li className="nav-item dropdown" role="none">
                       <button
                         className="nav-link px-4 py-2 rounded dropdown-toggle btn btn-link"
@@ -314,47 +392,6 @@ function Navbar() {
                         </div>
                       )}
                     </li>
-                  )}
-                  {usuarioActual.isAdmin && (
-                    <>
-                      <li className="nav-item dropdown" role="none">
-                        <button
-                          className="nav-link px-4 py-2 rounded dropdown-toggle btn btn-link"
-                          style={{ color: '#8B4513', textDecoration: 'none', border: 'none' }}
-                          onClick={() => setShowProfile(!showProfile)}
-                          aria-expanded={showProfile}
-                          aria-label="Mi perfil"
-                        >
-                          Mi Perfil
-                        </button>
-                        {showProfile && (
-                          <div className="dropdown-menu show" style={{ backgroundColor: '#FFF5E1', border: '1px solid #D2691E' }}>
-                            <button
-                              className="dropdown-item"
-                              style={{ color: '#8B4513' }}
-                              onClick={() => {
-                                setShowProfile(false);
-                                cerrarNavbar();
-                                navigate('/admin');
-                              }}
-                            >
-                              Panel de Admin
-                            </button>
-                            <button
-                              className="dropdown-item"
-                              style={{ color: '#8B4513' }}
-                              onClick={() => {
-                                setShowProfile(false);
-                                cerrarNavbar();
-                                cerrarSesion();
-                              }}
-                            >
-                              Cerrar Sesión
-                            </button>
-                          </div>
-                        )}
-                      </li>
-                    </>
                   )}
                 </>
               ) : (

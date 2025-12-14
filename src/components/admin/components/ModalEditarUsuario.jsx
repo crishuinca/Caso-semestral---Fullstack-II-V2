@@ -145,6 +145,29 @@ function ModalEditarUsuario({
             />
           </div>
 
+          <div style={estilos.inputGroup}>
+            <label style={estilos.label}>Rol*</label>
+            <select
+              name="rol"
+              value={usuarioEditado.rol || ''}
+              onChange={handleInputChangeUsuario}
+              style={{ 
+                ...estilos.input,
+                backgroundColor: '#FFF5E1',
+                background: '#FFF5E1',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none'
+              }}
+              required
+            >
+              <option value="">Seleccionar rol</option>
+              <option value="cliente">Cliente</option>
+              <option value="admin">Administrador</option>
+              <option value="vendedor">Vendedor</option>
+            </select>
+          </div>
+
           <div style={estilos.modalActions}>
             <button 
               type="button" 

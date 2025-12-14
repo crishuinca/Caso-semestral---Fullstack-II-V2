@@ -32,9 +32,9 @@ function Usuarios({ usuarios, abrirModalEditarUsuario, estilos, onEliminar }) {
                   <strong>Tipo:</strong> 
                   <span style={{
                     ...estilos.badgeUsuario,
-                    backgroundColor: usuario.isAdmin ? '#8B4513' : '#6c757d'
+                    backgroundColor: usuario.isAdmin ? '#8B4513' : usuario.isVendedor || usuario.rol === 'VENDEDOR' ? '#28a745' : '#6c757d'
                   }}>
-                    {usuario.isAdmin ? 'Admin' : 'Usuario'}
+                    {usuario.isAdmin ? 'Admin' : usuario.isVendedor || usuario.rol === 'VENDEDOR' ? 'Vendedor' : 'Usuario'}
                   </span>
                 </div>
                 {usuario.direccion && (

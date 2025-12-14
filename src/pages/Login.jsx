@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../utils/apiHelper';
 import '../styles/Login.css';
@@ -35,6 +35,8 @@ function Login() {
       
       if (response.usuario.isAdmin) {
         navigate('/admin');
+      } else if (response.usuario.isVendedor) {
+        navigate('/vendedor');
       } else {
         navigate('/');
       }

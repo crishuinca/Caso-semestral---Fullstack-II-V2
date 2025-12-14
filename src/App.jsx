@@ -1,4 +1,4 @@
-﻿import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CarritoProvider } from './context/CarritoContext';
 import { FiltroProvider } from './context/FiltroContext';
 import RutaProtegida from './components/RutaProtegida';
@@ -16,6 +16,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Perfil from './pages/Perfil';
 import AdminPanel from './pages/AdminPanel';
+import VendedorDashboard from './pages/VendedorDashboard';
 import CompraExitosa from './pages/CompraExitosa'
 import CompraErronea from './pages/CompraErronea'
 import Boletas from './pages/Boletas'
@@ -31,10 +32,11 @@ import './App.css';
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isVendedorRoute = location.pathname.startsWith('/vendedor');
 
   return (
     <div className="App">
-      {!isAdminRoute && <Navbar />}
+      {!isAdminRoute && !isVendedorRoute && <Navbar />}
       <main role="main" aria-label="Contenido principal">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -57,6 +59,8 @@ function AppContent() {
           <Route path="/admin/boletas/detalle-boleta" element={<RutaProtegida requiereAdmin={true}><DetalleBoleta/></RutaProtegida>}/>
           <Route path="/admin/historial-compras" element={<RutaProtegida requiereAdmin={true}><ComprasHistorial/></RutaProtegida>}/>
           <Route path="/admin/historial-compras/detalle-compra" element={<RutaProtegida requiereAdmin={true}><ComprasDetalle/></RutaProtegida>}/>
+          <Route path="/vendedor" element={<RutaProtegida requiereVendedor={true}><VendedorDashboard /></RutaProtegida>} />
+          <Route path="/vendedor/boletas/detalle-boleta" element={<RutaProtegida requiereVendedor={true}><DetalleBoleta/></RutaProtegida>}/>
           <Route path="*" element={<Home />} />
         </Routes>
       </main>

@@ -58,6 +58,7 @@ function NuevoUsuario({
               <option value="">Seleccionar rol</option>
               <option value="cliente">Cliente</option>
               <option value="admin">Administrador</option>
+              <option value="vendedor">Vendedor</option>
             </select>
           </div>
 
