@@ -1,6 +1,7 @@
 import { useCarrito } from '../../context/CarritoContext';
 import { useEffect, useState } from 'react';
 import ModalDetalleProducto from './ModalDetalleProducto';
+import './ProductCard.css';
 
 function ProductCard({ producto }) {
   const { agregarProducto } = useCarrito();
@@ -51,6 +52,7 @@ function ProductCard({ producto }) {
 
   return (
     <>
+      <div className="product-card-wrapper" style={{ position: 'relative' }}>
       <div className="card h-100 shadow" style={{ cursor: 'pointer' }} onClick={handleCardClick}>
       <div className="position-relative">
         <img 
@@ -127,6 +129,8 @@ function ProductCard({ producto }) {
             </button>
           </div>
         </div>
+      </div>
+      </div>
       </div>
 
       <ModalDetalleProducto 
