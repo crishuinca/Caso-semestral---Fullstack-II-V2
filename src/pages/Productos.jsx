@@ -1,5 +1,6 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ProductCard from '../components/productCard/ProductCard';
+import ModalDetalleProducto from '../components/productCard/ModalDetalleProducto';
 import { useCarrito } from '../context/CarritoContext';
 import { useFiltro } from '../context/FiltroContext';
 import '../styles/Productos.css';
@@ -13,6 +14,8 @@ function Productos() {
   const [filteredProductos, setFilteredProductos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [ofertas, setOfertas] = useState([]);
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (!cargandoProductos && productosStock.length > 0) {
@@ -107,8 +110,14 @@ function Productos() {
     }).format(price);
   };
 
-  const handleAddOfertaToCart = (producto) => {
+  const handleAddOfertaToCart = (e, producto) => {
+    e.stopPropagation();
     agregarProducto(producto.prod_codigo, 1, '', producto.prod_precio_oferta);
+  };
+
+  const handleOfertaClick = (producto) => {
+    setProductoSeleccionado(producto);
+    setShowModal(true);
   };
 
   return (
@@ -176,7 +185,7 @@ function Productos() {
             <div className="row g-4 mb-5">
               {ofertas.map(producto => (
                 <div key={producto.prod_codigo} className="col-lg-4 col-md-6">
-                  <div className="oferta-card">
+                  <div className="oferta-card" style={{ cursor: 'pointer' }} onClick={() => handleOfertaClick(producto)}>
                     <div className="oferta-badge">
                       -{producto.descuento}%
                     </div>
@@ -206,7 +215,7 @@ function Productos() {
                       </div>
                       <button 
                         className="oferta-button w-100"
-                        onClick={() => handleAddOfertaToCart(producto)}
+                        onClick={(e) => handleAddOfertaToCart(e, producto)}
                       >
                         Agregar al Carrito 🛒
                       </button>
@@ -246,6 +255,15 @@ function Productos() {
         )}
       </div>
       <Footer />
+
+      <ModalDetalleProducto 
+        producto={productoSeleccionado}
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setProductoSeleccionado(null);
+        }}
+      />
     </div>
   );
 }

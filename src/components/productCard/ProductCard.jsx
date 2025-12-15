@@ -1,16 +1,24 @@
-﻿import { useCarrito } from '../../context/CarritoContext';
+import { useCarrito } from '../../context/CarritoContext';
 import { useEffect, useState } from 'react';
+import ModalDetalleProducto from './ModalDetalleProducto';
 
 function ProductCard({ producto }) {
   const { agregarProducto } = useCarrito();
-  const [stockActual, setStockActual] = useState(producto.stock);
+  const [stockActual, setStockActual] = useState(producto.prod_stock || producto.stock || 0);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const actualizarStock = () => {
       const productosStock = JSON.parse(localStorage.getItem('productosStock')) || [];
-      const productoActualizado = productosStock.find(p => p.prod_codigo === producto.prod_codigo);
+      const codigo = producto.prod_codigo || producto.codigo;
+      const productoActualizado = productosStock.find(p => 
+        p.prod_codigo === codigo || p.codigo === codigo
+      );
       if (productoActualizado) {
         setStockActual(productoActualizado.stock);
+      } else {
+        // Si no está en localStorage, usar el stock del producto
+        setStockActual(producto.prod_stock || producto.stock || 0);
       }
     };
 
@@ -20,7 +28,7 @@ function ProductCard({ producto }) {
     return () => {
       window.removeEventListener('productosActualizados', actualizarStock);
     };
-  }, [producto.prod_codigo]);
+  }, [producto.prod_codigo, producto.codigo]);
   
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-CL', {
@@ -29,15 +37,21 @@ function ProductCard({ producto }) {
     }).format(price);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
     agregarProducto(producto.prod_codigo, 1, '', producto.prod_precio_oferta || null);
+  };
+
+  const handleCardClick = () => {
+    setShowModal(true);
   };
 
   const sinStock = stockActual === 0;
   const stockCritico = stockActual > 0 && stockActual <= 5;
 
   return (
-    <div className="card h-100 shadow">
+    <>
+      <div className="card h-100 shadow" style={{ cursor: 'pointer' }} onClick={handleCardClick}>
       <div className="position-relative">
         <img 
           src={producto.prod_imagen || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="200"%3E%3Crect width="300" height="200" fill="%23D2691E"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23FFF"%3EProducto%3C/text%3E%3C/svg%3E'} 
@@ -114,7 +128,13 @@ function ProductCard({ producto }) {
           </div>
         </div>
       </div>
-    </div>
+
+      <ModalDetalleProducto 
+        producto={producto}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+      />
+    </>
   );
 }
 
