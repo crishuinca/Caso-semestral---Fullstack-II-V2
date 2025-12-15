@@ -92,6 +92,7 @@ function Navbar() {
   }, [showCategories, showProfile]);
 
   const cerrarSesion = () => {
+    localStorage.removeItem("token")
     localStorage.removeItem('usuarioActual');
     setUsuarioActual(null);
     

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser } from '../utils/apiHelper';
+import { iniciarSesion, loginUser } from '../utils/apiHelper';
 import '../styles/Login.css';
 
 function Login() {
@@ -34,6 +34,7 @@ function Login() {
       window.dispatchEvent(new Event('usuarioActualizado'));
       
       if (response.usuario.isAdmin) {
+        iniciarSesion(response.usuario.correo, response.usuario.password)
         navigate('/admin');
       } else if (response.usuario.isVendedor) {
         navigate('/vendedor');

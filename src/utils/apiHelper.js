@@ -1,5 +1,40 @@
 // Usa la variable de entorno si está disponible, sino usa el valor por defecto
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8094/api/v1'
+const API_KEY = import.meta.env.VITE_API_KEY
+
+export const iniciarSesion = async (correo, password) => {
+  try {
+    const resp = await fetch("http://localhost:8094/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        correo: correo,
+        password: password
+      })
+    })
+
+    if (!resp.ok) {
+      const msg = await resp.text()
+      throw new Error(msg || "Error al iniciar sesión")
+    }
+    const data = await resp.json() 
+    console.log(API_KEY +" - "+ API)
+    localStorage.setItem("token", data.token)
+
+    const token = localStorage.getItem("token");
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    console.log(payload);
+    console.log(API_KEY);
+    console.log(token);
+
+    return true
+  } catch (error) {
+    console.error("Login error:", error.message)
+    return false
+  }
+};
 
 export const getProductos = async () => {
     try {
@@ -82,9 +117,12 @@ export const createProducto = async (producto) => {
         const resp = await fetch(`${API}/addProducto`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
-            body: JSON.stringify(producto)
+            body: JSON.stringify(producto),
+            credentials: "include"
         })
         if(!resp.ok) throw new Error("ERROR al crear producto")
         const data = await resp.json()
@@ -118,7 +156,12 @@ export const updateProducto = async (producto) => {
 export const deleteProducto = async (id) => {
     try {
         const resp = await fetch(`${API}/eliminarProducto/${id}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: {
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            credentials: "include"
         })
         if(!resp.ok) throw new Error("ERROR al eliminar producto")
         const data = await resp.text()
@@ -135,9 +178,12 @@ export const updateUsuario = async (usuario) => {
         const resp = await fetch(`${API}/modificarUsuario`, {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
-            body: JSON.stringify(usuario)
+            body: JSON.stringify(usuario),
+            credentials: "include"
         })
         if(!resp.ok) throw new Error("ERROR al actualizar usuario")
         const data = await resp.json()
@@ -152,7 +198,12 @@ export const updateUsuario = async (usuario) => {
 export const deleteUsuario = async (id) => {
     try {
         const resp = await fetch(`${API}/eliminarUsuario/${id}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: {
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            credentials: "include"
         })
         if(!resp.ok) throw new Error("ERROR al eliminar usuario")
         return { success: true }
@@ -167,7 +218,13 @@ export const deleteUsuario = async (id) => {
 // Obtener todas las boletas
 export const getBoletas = async () => {
     try {
-        const resp = await fetch(`${API}/boletas`)
+        const resp = await fetch(`${API}/boletas`, {
+            headers: {
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            credentials: "include"
+        })
         if(!resp.ok) throw new Error("ERROR al cargar boletas")
         const data = await resp.json()
         return data
@@ -199,7 +256,13 @@ export const createBoleta = async (boleta) => {
 // Obtener boleta por ID
 export const getBoletaById = async (id) => {
     try {
-        const resp = await fetch(`${API}/boletasByID/${id}`)
+        const resp = await fetch(`${API}/boletasByID/${id}`, {
+            headers: {
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            credentials: "include"
+        })
         if(!resp.ok) throw new Error("ERROR al cargar boleta")
         const data = await resp.json()
         return data
@@ -214,7 +277,13 @@ export const getBoletaById = async (id) => {
 // Obtener todos los detalles de boletas
 export const getDetalleBoletas = async () => {
     try {
-        const resp = await fetch(`${API}/detalle_boletas`)
+        const resp = await fetch(`${API}/detalle_boletas`, {
+            headers: {
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            credentials: "include"
+        })
         if(!resp.ok) throw new Error("ERROR al cargar detalles")
         const data = await resp.json()
         return data
@@ -249,9 +318,12 @@ export const updateDetalleBoleta = async (detalle) => {
         const resp = await fetch(`${API}/modificarDetalle_boleta`, {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
-            body: JSON.stringify(detalle)
+            body: JSON.stringify(detalle),
+            credentials: "include"
         })
         if(!resp.ok) throw new Error("ERROR al actualizar detalle")
         const data = await resp.json()
@@ -265,7 +337,13 @@ export const updateDetalleBoleta = async (detalle) => {
 // Obtener detalle de boleta por ID
 export const getDetalleBoletaById = async (id) => {
     try {
-        const resp = await fetch(`${API}/detalle_boletaByID/${id}`)
+        const resp = await fetch(`${API}/detalle_boletaByID/${id}`, {
+            headers: {
+                "X-API-KEY": API_KEY,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            credentials: "include"
+        })
         if(!resp.ok) throw new Error("ERROR al cargar detalle")
         const data = await resp.json()
         return data
