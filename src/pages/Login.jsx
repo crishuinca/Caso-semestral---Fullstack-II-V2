@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { iniciarSesion, loginUser } from '../utils/apiHelper';
 import '../styles/Login.css';
@@ -37,6 +37,7 @@ function Login() {
         iniciarSesion(response.usuario.correo, response.usuario.password)
         navigate('/admin');
       } else if (response.usuario.isVendedor) {
+        iniciarSesion(response.usuario.correo, response.usuario.password)
         navigate('/vendedor');
       } else {
         navigate('/');
